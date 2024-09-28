@@ -1,15 +1,19 @@
-import { useState } from "react";
 import "./App.css";
 import "./translation/i18n";
-import { useTranslation } from "react-i18next";
+
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { lightTheme, darkTheme } from "./theme";
+import { useState } from "react";
+import { SignIn } from "./pages/SignIn";
 
 function App() {
-  const { t } = useTranslation();
+  const [isDarkMode] = useState(false);
 
   return (
-    <>
-      <h1>Vite + {t("welcome")}</h1>
-    </>
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+      <CssBaseline />
+      <SignIn />
+    </ThemeProvider>
   );
 }
 

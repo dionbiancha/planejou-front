@@ -9,9 +9,9 @@ import {
   TextField,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useCustomNavigate } from "../../context/navigationContext";
 import CustomButton from "../../components/Button/CustomButton";
 import LoginButton from "../../features/LoginButton";
+import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 
 export function SignIn() {
   const { t } = useTranslation();

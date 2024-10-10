@@ -8,7 +8,8 @@ import { SignIn } from "./pages/SignIn";
 import Layout from "./components/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
-import { Start } from "./pages/Start";
+import Start from "./pages/Start";
+import { GoalProvider } from "./context";
 
 function App() {
   const [isDarkMode] = useState(false);
@@ -16,14 +17,16 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <Layout>
-          <CssBaseline />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<SignIn />} />
-            <Route path="/start" element={<Start />} />
-          </Routes>
-        </Layout>
+        <GoalProvider>
+          <Layout>
+            <CssBaseline />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<SignIn />} />
+              <Route path="/start" element={<Start />} />
+            </Routes>
+          </Layout>
+        </GoalProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

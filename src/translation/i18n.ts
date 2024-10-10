@@ -17,7 +17,7 @@ i18n
         translation: ptTranslation,
       },
     },
-    fallbackLng: "en", // Idioma padrão se o detectado não estiver disponível
+    fallbackLng: "pt", // Idioma padrão se o detectado não estiver disponível
     interpolation: {
       escapeValue: false, // React já escapa por padrão
     },

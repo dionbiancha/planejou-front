@@ -1,7 +1,6 @@
 export enum Step {
   Goal,
   Date,
-  Objective,
 }
 
 export interface StartProps {

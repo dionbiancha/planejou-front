@@ -5,6 +5,7 @@ import {
   Typography,
   useTheme,
   IconButton,
+  Button,
 } from "@mui/material";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import CustomButton from "../../components/Button/CustomButton";
@@ -19,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete"; // Novo ícone de exclusão
 import { StartProps, Step } from "../../types";
 import { useGoals } from "../../context";
+import { ArrowBack } from "@mui/icons-material";
 
 export default function Goal({ handleStep }: StartProps) {
   const { t } = useTranslation();
@@ -38,7 +40,10 @@ export default function Goal({ handleStep }: StartProps) {
         setErrorGoal("Você atingiu o limite de 25 metas.");
         return;
       }
-      setGoals([...goals, { id: `goal-${goals.length}`, content: goal }]);
+      setGoals([
+        ...goals,
+        { id: `goal-${goals.length}`, content: goal, months: 24 },
+      ]);
       setGoal("");
     }
   };
@@ -71,22 +76,40 @@ export default function Goal({ handleStep }: StartProps) {
 
   return (
     <Stack direction={"column"} alignItems={"center"} height={"100%"}>
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        sx={{
+          maxWidth: "600px",
+          width: "100%",
+          padding: "10px",
+        }}
+      >
+        <Button
+          variant="text"
+          color="inherit"
+          startIcon={<ArrowBack sx={{ height: "20px" }} />}
+          onClick={() => handleStep(Step.Goal)}
+        >
+          Voltar
+        </Button>
+      </Stack>
       <Card
         sx={{
           maxWidth: "600px",
           width: "100%",
-          padding: "30px",
+          padding: "20px",
           borderRadius: "15px",
           boxShadow: "none",
-          maxHeight: "600px",
-          height: "100%",
+          minHeight: "600px",
         }}
       >
         <Stack
           spacing={3}
           flexDirection={"column"}
           justifyContent={"space-between"}
-          height={"100%"}
+          sx={{ minHeight: "600px" }}
         >
           <Box>
             <RoundedTextField
@@ -112,7 +135,11 @@ export default function Goal({ handleStep }: StartProps) {
                   onClick={() => {
                     setGoals([
                       ...goals,
-                      { id: `goal-${goals.length}`, content: exempleGoal },
+                      {
+                        id: `goal-${goals.length}`,
+                        content: exempleGoal,
+                        months: 24,
+                      },
                     ]);
                   }}
                   sx={{
@@ -121,10 +148,10 @@ export default function Goal({ handleStep }: StartProps) {
                     padding: "5px 10px",
                     borderRadius: "20px",
                     margin: "5px",
-                    backgroundColor: `${isDarkMode() ? "#333" : "#f9f9f9"}`,
+                    backgroundColor: `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
                     "&:hover": {
                       backgroundColor: `${
-                        isDarkMode() ? "#33333384" : "#f5f5f5"
+                        isDarkMode() ? "#24293345" : "#f5f5f5"
                       }`,
                     },
                   }}
@@ -174,11 +201,11 @@ export default function Goal({ handleStep }: StartProps) {
                                 borderRadius: "10px",
                                 boxShadow: "none",
                                 backgroundColor: snapshot.isDragging
-                                  ? `${isDarkMode() ? "#121212" : "#e0e0e0"}`
-                                  : `${isDarkMode() ? "#333" : "#f9f9f9"}`,
+                                  ? `${isDarkMode() ? "#242933" : "#e0e0e0"}`
+                                  : `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
                                 "&:hover": {
                                   backgroundColor: `${
-                                    isDarkMode() ? "#33333384" : "#f5f5f5"
+                                    isDarkMode() ? "#24293345" : "#f5f5f5"
                                   }`,
                                 },
                               }}

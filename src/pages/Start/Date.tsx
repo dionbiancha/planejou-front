@@ -11,17 +11,17 @@ import { StartProps, Step } from "../../types";
 import CustomButton from "../../components/Button/CustomButton";
 import { useGoals } from "../../context";
 import { ArrowBack, Add, Remove } from "@mui/icons-material";
-import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 
 export default function Date({ handleStep }: StartProps) {
-  const { goals } = useGoals();
+  const { goals, setGoals } = useGoals();
   const theme = useTheme();
-
-  // Estado para controlar a quantidade de meses
-  const [months, setMonths] = useState<number>(3);
+  const { t } = useTranslation();
+  const { goToHome } = useCustomNavigate();
 
   // Função para incrementar os meses
-  const incrementMonths = () => {
+  const incrementMonths = (months: number, id: number) => {
     const nextMonths =
       months === 3
         ? 6
@@ -32,11 +32,16 @@ export default function Date({ handleStep }: StartProps) {
         : months === 24
         ? 48
         : 3;
-    setMonths(nextMonths);
+
+    setGoals((prevGoals) =>
+      prevGoals.map((goal, index) =>
+        index === id ? { ...goal, months: nextMonths } : goal
+      )
+    );
   };
 
   // Função para decrementar os meses
-  const decrementMonths = () => {
+  const decrementMonths = (months: number, id: number) => {
     const previousMonths =
       months === 48
         ? 24
@@ -47,16 +52,29 @@ export default function Date({ handleStep }: StartProps) {
         : months === 6
         ? 3
         : 3;
-    setMonths(previousMonths);
+    setGoals((prevGoals) =>
+      prevGoals.map((goal, index) =>
+        index === id ? { ...goal, months: previousMonths } : goal
+      )
+    );
   };
 
   function isDarkMode() {
     return theme.palette.mode === "dark";
   }
 
+  function shortTerm(month: number) {
+    if (month === 3) return "#c2052e11";
+    if (month === 6) return "#f28d0018";
+    return "#05c26a13";
+  }
+
   return (
     <Stack direction={"column"} alignItems={"center"} height={"100%"}>
-      <Box
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
         sx={{
           maxWidth: "600px",
           width: "100%",
@@ -69,25 +87,24 @@ export default function Date({ handleStep }: StartProps) {
           startIcon={<ArrowBack sx={{ height: "20px" }} />}
           onClick={() => handleStep(Step.Goal)}
         >
-          Voltar
+          {t("Voltar")}
         </Button>
-      </Box>
+      </Stack>
       <Card
         sx={{
           maxWidth: "600px",
           width: "100%",
-          padding: "30px",
+          padding: "20px",
           borderRadius: "15px",
           boxShadow: "none",
-          maxHeight: "600px",
-          height: "100%",
+          minHeight: "600px",
         }}
       >
         <Stack
           spacing={3}
           flexDirection={"column"}
           justifyContent={"space-between"}
-          height={"100%"}
+          sx={{ minHeight: "600px" }}
         >
           <Box>
             {goals.slice(0, 5).map((goal, index) => (
@@ -95,16 +112,17 @@ export default function Date({ handleStep }: StartProps) {
                 key={index}
                 sx={{
                   display: "flex",
-                  alignItems: "center",
+
                   justifyContent: "space-between",
+                  flexDirection: { xs: "column", md: "row" },
                   padding: "10px",
                   marginBottom: "10px",
                   borderRadius: "10px",
                   boxShadow: "none",
-                  backgroundColor: `${isDarkMode() ? "#333" : "#f9f9f9"}`,
+                  backgroundColor: `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
                   "&:hover": {
                     backgroundColor: `${
-                      isDarkMode() ? "#33333384" : "#f5f5f5"
+                      isDarkMode() ? "#24293345" : "#f5f5f5"
                     }`,
                   },
                 }}
@@ -125,10 +143,11 @@ export default function Date({ handleStep }: StartProps) {
                 </Typography>
                 <Box
                   sx={{
-                    backgroundColor: "#05c26a13",
+                    backgroundColor: shortTerm(goal.months),
                     borderRadius: "10px",
                     padding: "3px",
-                    width: "130px",
+                    width: { xs: "100%", md: "130px" },
+                    marginTop: { xs: "10px", md: 0 },
                   }}
                   display="flex"
                   alignItems="center"
@@ -137,7 +156,7 @@ export default function Date({ handleStep }: StartProps) {
                   <IconButton
                     size="small"
                     aria-label="decrement months"
-                    onClick={decrementMonths}
+                    onClick={() => decrementMonths(goal.months, index)}
                   >
                     <Remove sx={{ width: "15px", height: "15px" }} />
                   </IconButton>
@@ -146,14 +165,16 @@ export default function Date({ handleStep }: StartProps) {
                     color="textPrimary"
                     sx={{ marginX: 1, fontWeight: "bold" }}
                   >
-                    {months >= 12
-                      ? `${months / 12} ano${months / 12 > 1 ? "s" : ""}`
-                      : `${months} meses`}
+                    {goal.months >= 12
+                      ? `${goal.months / 12} ${t("ano")}${
+                          goal.months / 12 > 1 ? "s" : ""
+                        }`
+                      : `${goal.months} ${t("meses")}`}
                   </Typography>
                   <IconButton
                     size="small"
                     aria-label="increment months"
-                    onClick={incrementMonths}
+                    onClick={() => incrementMonths(goal.months, index)}
                   >
                     <Add sx={{ width: "15px", height: "15px" }} />
                   </IconButton>
@@ -162,10 +183,10 @@ export default function Date({ handleStep }: StartProps) {
             ))}
           </Box>
           <CustomButton
-            onClick={() => handleStep(Step.Objective)}
+            onClick={() => goToHome()}
             variant="contained"
             size="large"
-            label={"Próximo"}
+            label={t("Pronto")}
             // disabled={disabledButton()}
           />
         </Stack>

@@ -1,8 +1,19 @@
 import React, { createContext, useState, ReactNode } from "react";
 
-interface Goal {
+export interface Goal {
   id: string;
   content: string;
+  months: number;
+  objectives?: Objective[];
+}
+
+export interface Objective {
+  name: string;
+  repeat: "Diariamente" | "Semanalmente" | "Uma vez";
+  perWeek?: number;
+  selectDaily?: string[];
+  remindMe?: string;
+  goalId: string;
 }
 
 interface GoalContextProps {

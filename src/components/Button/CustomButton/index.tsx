@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, useTheme } from "@mui/material";
+import { Button } from "@mui/material";
 import { useTranslation } from "react-i18next"; // Supondo que você esteja usando i18next
 
 interface CustomButtonProps {
@@ -8,6 +8,7 @@ interface CustomButtonProps {
   size?: "small" | "medium" | "large"; // Tamanhos do botão
   variant?: "text" | "outlined" | "contained"; // Tipos de variante do botão
   disabled?: boolean; // Botão desabilitado
+  borderRadius?: number; // Raio do botão
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -16,8 +17,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   size = "medium",
   variant = "contained",
   disabled,
+  borderRadius = "20px",
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation();
 
   return (
@@ -25,10 +26,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       disabled={disabled}
       onClick={onClick}
       sx={{
-        borderRadius: "20px",
+        borderRadius: borderRadius,
         fontWeight: "bold",
         boxShadow: "none",
-        color: theme.palette.mode === "dark" ? "inherit" : "#FFF", // Cor do texto baseado no modo
+        color: "#FFF", // Cor do texto baseado no modo
       }}
       variant={variant}
       size={size}

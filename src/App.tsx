@@ -5,11 +5,14 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import { lightTheme, darkTheme } from "./theme";
 import { useState } from "react";
 import { SignIn } from "./pages/SignIn";
-import Layout from "./components/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home } from "./pages/Home";
 import Start from "./pages/Start";
 import { GoalProvider } from "./context";
+import { Objectives } from "./pages/Objectives";
+import { List } from "./pages/List";
+import NewObjetive from "./pages/NewObjetive";
+import { SnackProvider } from "./context/SnackContext";
+import Snack from "./components/Snack";
 
 function App() {
   const [isDarkMode] = useState(false);
@@ -17,16 +20,19 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <GoalProvider>
-          <Layout>
+        <SnackProvider>
+          <GoalProvider>
+            <Snack />
             <CssBaseline />
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Objectives />} />
               <Route path="/login" element={<SignIn />} />
               <Route path="/start" element={<Start />} />
+              <Route path="/list" element={<List />} />
+              <Route path="/new" element={<NewObjetive />} />
             </Routes>
-          </Layout>
-        </GoalProvider>
+          </GoalProvider>
+        </SnackProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

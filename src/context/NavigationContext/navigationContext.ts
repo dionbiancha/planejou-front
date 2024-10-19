@@ -15,9 +15,24 @@ export function useCustomNavigate() {
     navigate("/");
   }
 
+  function goToStart() {
+    navigate("/start");
+  }
+
+  function goToList() {
+    navigate("/list");
+  }
+
+  function goToNewObjetive() {
+    navigate("/new");
+  }
+
   return {
     goBack,
     goToLogin,
     goToHome,
+    goToList,
+    goToStart,
+    goToNewObjetive,
   };
 }

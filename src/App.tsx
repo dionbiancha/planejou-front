@@ -2,8 +2,7 @@ import "./App.css";
 import "./translation/i18n";
 
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { lightTheme, darkTheme } from "./theme";
-import { useState } from "react";
+import { lightTheme } from "./theme";
 import { SignIn } from "./pages/SignIn";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Start from "./pages/Start";
@@ -15,11 +14,11 @@ import { SnackProvider } from "./context/SnackContext";
 import Snack from "./components/Snack";
 
 function App() {
-  const [isDarkMode] = useState(false);
+  // const [isDarkMode] = useState(false);
 
   return (
     <BrowserRouter>
-      <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+      <ThemeProvider theme={lightTheme}>
         <SnackProvider>
           <GoalProvider>
             <Snack />

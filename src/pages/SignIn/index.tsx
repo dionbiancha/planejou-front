@@ -61,71 +61,35 @@ export function SignIn() {
             handleSignInGoogle={handleSignInGoogle}
           />
           <Divider sx={{ color: "#E8E9EA" }}>{t("OU")}</Divider>
-          {loading.state ? (
-            <>
-              <Skeleton
-                variant="rectangular"
-                width={"100%"}
-                height={"50px"}
-                sx={{ borderRadius: "10px" }}
-              />
-              <Skeleton
-                variant="rectangular"
-                width={"100%"}
-                height={"50px"}
-                sx={{ borderRadius: "10px" }}
-              />
-              <Skeleton
-                variant="rectangular"
-                width={"100%"}
-                height={"30px"}
-                sx={{ borderRadius: "10px" }}
-              />
-              <Skeleton
-                variant="rectangular"
-                width={"100%"}
-                height={"50px"}
-                sx={{ borderRadius: "10px" }}
-              />
-              <Skeleton
-                variant="rectangular"
-                width={"100%"}
-                height={"20px"}
-                sx={{ borderRadius: "10px" }}
-              />
-            </>
-          ) : (
-            <>
-              <TextField
-                disabled={loading.state}
-                label="Email"
-                variant="outlined"
-                placeholder="your@email.com"
-              />
-              <TextField
-                disabled={loading.state}
-                label={t("Senha")}
-                variant="outlined"
-                type="password"
-                placeholder="••••••••••"
-              />
-              <FormControlLabel
-                control={<Checkbox disabled={loading.state} />}
-                label={t("Me lembre")}
-              />
+          <TextField
+            disabled={loading.state}
+            label="Email"
+            variant="outlined"
+            placeholder="your@email.com"
+          />
+          <TextField
+            disabled={loading.state}
+            label={t("Senha")}
+            variant="outlined"
+            type="password"
+            placeholder="••••••••••"
+          />
+          <FormControlLabel
+            control={<Checkbox disabled={loading.state} />}
+            label={t("Me lembre")}
+          />
 
-              <CustomButton
-                variant="contained"
-                size="large"
-                onClick={handleSignIn}
-                label="Entrar"
-                disabled={loading.state}
-              />
-
-              <Box sx={{ textAlign: "center" }}>
-                {t("Não possui conta?")} <Link>{t("Criar conta")}</Link>
-              </Box>
-            </>
+          <CustomButton
+            variant="contained"
+            size="large"
+            onClick={handleSignIn}
+            label="Entrar"
+            disabled={loading.state}
+          />
+          {!loading.state && (
+            <Box sx={{ textAlign: "center" }}>
+              {t("Não possui conta?")} <Link>{t("Criar conta")}</Link>
+            </Box>
           )}
         </Stack>
       </Card>

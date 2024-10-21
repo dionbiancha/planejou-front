@@ -17,7 +17,7 @@ interface LoadingProviderProps {
 export const LoadingProvider: React.FC<LoadingProviderProps> = ({
   children,
 }) => {
-  const [state, setState] = useState<boolean>(true);
+  const [state, setState] = useState<boolean>(false);
 
   function show() {
     setState(true);

@@ -3,8 +3,11 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { v4 as uuidv4 } from "uuid";
@@ -30,6 +33,29 @@ export async function addGoalList(goals: Goal[]) {
   }
 }
 
+export async function listGoalsByUserId() {
+  try {
+    const auth = validateAuth();
+
+    const goalsQuery = query(
+      collection(db, "goals"),
+      where("userId", "==", auth.userId)
+    );
+    const querySnapshot = await getDocs(goalsQuery);
+
+    if (!querySnapshot.empty) {
+      const userGoals = querySnapshot.docs[0].data();
+      return userGoals.goals;
+    } else {
+      console.log("Nenhum documento encontrado para este userId.");
+      return null;
+    }
+  } catch (e) {
+    console.error("Erro ao buscar metas:", e);
+    return null;
+  }
+}
+
 export async function addObjective({
   goalId,
   objectives,
@@ -43,17 +69,14 @@ export async function addObjective({
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      // Se o documento já existir, adiciona o campo objectives
       await updateDoc(docRef, {
-        // Aqui você pode escolher como deseja adicionar o campo
         objectives: {
-          ...docSnap.data()?.objectives, // Mantém os objectives existentes
-          ...objectives, // Adiciona os novos objectives
+          ...docSnap.data()?.objectives,
+          ...objectives,
         },
       });
       console.log("Objectives adicionados com sucesso!");
     } else {
-      // Caso não exista, cria um novo documento com goalId, userId e objectives
       await setDoc(docRef, {
         goalId,
         userId: auth.userId,

@@ -8,15 +8,15 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+
 import { useTranslation } from "react-i18next";
 import { Add, MoreVertOutlined } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { useEffect } from "react";
 import { useGoals } from "../../context";
 
 export function Objectives() {
   const { t } = useTranslation();
-  const { goToNewObjetive, goToStart } = useCustomNavigate();
+  const { goToNewObjetive } = useCustomNavigate();
   const theme = useTheme();
   const { goals } = useGoals();
 
@@ -25,11 +25,11 @@ export function Objectives() {
     0
   );
 
-  useEffect(() => {
-    if (goals.length === 0) {
-      goToStart();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (goals.length === 0) {
+  //     goToStart();
+  //   }
+  // }, []);
 
   return (
     <>

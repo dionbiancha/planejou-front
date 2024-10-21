@@ -6,6 +6,7 @@ import {
   Button,
   Checkbox,
   useTheme,
+  Skeleton,
 } from "@mui/material";
 import CustomButton from "../../components/Button/CustomButton";
 import { useEffect, useState } from "react";
@@ -18,7 +19,8 @@ import RoundedSelectGoalField from "../../features/RoundedSelectGoalField";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
-// import { addObjectivesToGoal } from "../../services/goal";
+import { addObjective, listGoalsByUserId } from "../../services/goal";
+import { useLoading } from "../../context/LoadingContext/useLoading";
 
 export default function NewObjetive() {
   const { t } = useTranslation();
@@ -35,6 +37,7 @@ export default function NewObjetive() {
   const [selectedHour, setSelectedHour] = useState<string>("6 am");
   const { goals, setGoals } = useGoals();
   const snack = useSnack();
+  const loading = useLoading();
 
   const toggleDaySelection = (day: string) => {
     setSelectedDailyDays((prevSelectedDays) =>
@@ -90,48 +93,55 @@ export default function NewObjetive() {
   }
 
   async function handleAddObjective() {
-    setGoals((prevGoals) => {
-      const goalToUpdate = prevGoals.find((g) => g.position === goal?.position);
-      if (goalToUpdate) {
-        const newObjective: Objective = {
-          name: objective,
-          repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
-          perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
-          selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
-          remindMe: remindMe ? selectedHour : undefined,
-          goalId: goalToUpdate.position,
-        };
+    // setGoals((prevGoals) => {
+    //   const goalToUpdate = prevGoals.find((g) => g.position === goal?.position);
+    //   if (goalToUpdate) {
+    //     const newObjective: Objective = {
+    //       name: objective,
+    //       repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
+    //       perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
+    //       selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
+    //       remindMe: remindMe ? selectedHour : undefined,
+    //       goalId: goalToUpdate.position,
+    //     };
 
-        if (!goalToUpdate.objectives) {
-          goalToUpdate.objectives = [];
-        }
-        goalToUpdate.objectives.push(newObjective);
-        snack.success("Objetivo criado com sucesso!");
-        goToHome();
-      }
-      return [...prevGoals];
-    });
-    // try {
+    //     if (!goalToUpdate.objectives) {
+    //       goalToUpdate.objectives = [];
+    //     }
+    //     goalToUpdate.objectives.push(newObjective);
+    //     snack.success("Objetivo criado com sucesso!");
+    //     goToHome();
+    //   }
+    //   return [...prevGoals];
+    // });
+    try {
+      if (!goal?.id || !goal) return;
+      const newObjective: Objective = {
+        name: objective,
+        repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
+        perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : null,
+        selectDaily: repeat === "Diariamente" ? selectedDailyDays : null,
+        remindMe: remindMe ? selectedHour : null,
+      };
+      const data = {
+        goalId: goal.id,
+        objectives: newObjective,
+      };
+      await addObjective(data);
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
-    //   const newObjective: Objective = {
-    //     name: objective,
-    //     repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
-    //     perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
-    //     selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
-    //     remindMe: remindMe ? selectedHour : undefined,
-    //     goalId: goal?.position ?? "0",
-    //   };
-
-    //   const data = {
-    //     userId: userData.uid,
-    //     position: goal?.position ?? "0",
-    //     objectives: newObjective,
-    //   };
-    //   const res = await addObjectivesToGoal(data);
-    //   console.log(res);
-    // } catch (e) {
-    //   console.error("Erro ao adicionar documento: ", e);
-    // }
+  async function listGoals() {
+    loading.show();
+    try {
+      const res = await listGoalsByUserId();
+      setGoals(res);
+    } catch (e) {
+      console.error("Erro ao listar as metas:", e);
+    }
+    loading.hide();
   }
 
   useEffect(() => {
@@ -143,8 +153,8 @@ export default function NewObjetive() {
   }, []);
 
   useEffect(() => {
-    console.log("aqui", goals);
-  }, [goals]);
+    listGoals();
+  }, []);
 
   return (
     <Stack direction={"column"} alignItems={"center"} height={"100%"}>
@@ -184,17 +194,26 @@ export default function NewObjetive() {
           sx={{ minHeight: "600px" }}
         >
           <Stack spacing={3}>
-            <RoundedSelectGoalField
-              items={goals}
-              label={t("Minha meta é...")}
-              onChange={(goal) => {
-                console.log("AQUI", goal);
-                setGoal(goal);
-              }}
-              value={goal}
-              fullWidth
-              placeholder={t("Selecione uma meta")}
-            />
+            {loading.state ? (
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"50px"}
+                sx={{ borderRadius: "15px" }}
+              />
+            ) : (
+              <RoundedSelectGoalField
+                items={goals}
+                label={t("Minha meta é...")}
+                onChange={(goal) => {
+                  setGoal(goal);
+                }}
+                value={goal}
+                fullWidth
+                placeholder={t("Selecione uma meta")}
+              />
+            )}
+
             <RoundedTextField
               fullWidth
               label={t("Objetivo")}

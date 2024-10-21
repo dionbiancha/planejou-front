@@ -11,10 +11,10 @@ export interface Goal {
 export interface Objective {
   name: string;
   repeat: "Diariamente" | "Semanalmente" | "Uma vez";
-  perWeek?: number;
-  selectDaily?: string[];
-  remindMe?: string;
-  goalId: string;
+  perWeek?: number | null;
+  selectDaily?: string[] | null;
+  remindMe?: string | null;
+  goalId?: string;
 }
 
 interface GoalContextProps {

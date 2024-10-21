@@ -68,7 +68,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   function isValidRoute(path: string) {
-    return path === "/login" || path === "/start";
+    return path === "/login" || path === "/start" || path === "/new";
   }
 
   const drawer = (

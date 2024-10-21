@@ -18,8 +18,7 @@ import RoundedSelectGoalField from "../../features/RoundedSelectGoalField";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
-import { addObjectivesToGoal } from "../../services/goal";
-import { useDataUser } from "../../context/UserContext/useUser";
+// import { addObjectivesToGoal } from "../../services/goal";
 
 export default function NewObjetive() {
   const { t } = useTranslation();
@@ -36,7 +35,6 @@ export default function NewObjetive() {
   const [selectedHour, setSelectedHour] = useState<string>("6 am");
   const { goals, setGoals } = useGoals();
   const snack = useSnack();
-  const { userData } = useDataUser();
 
   const toggleDaySelection = (day: string) => {
     setSelectedDailyDays((prevSelectedDays) =>

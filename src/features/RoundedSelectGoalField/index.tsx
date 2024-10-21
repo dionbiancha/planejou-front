@@ -68,7 +68,7 @@ const RoundedSelectGoalField: React.FC<RoundedSelectGoalFieldProps> = ({
           )}
           {items.slice(0, 5).map((item) => (
             <MenuItem key={item.id} value={item.id}>
-              {item.content}
+              {item.name}
             </MenuItem>
           ))}
         </Select>

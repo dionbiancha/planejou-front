@@ -3,28 +3,34 @@ import { useNavigate } from "react-router-dom";
 export function useCustomNavigate() {
   const navigate = useNavigate();
 
+  function validateNavigate(route: string) {
+    return localStorage.getItem("accessToken")
+      ? navigate(route)
+      : navigate("/login");
+  }
+
   function goBack() {
     navigate(-1);
   }
 
   function goToLogin() {
-    navigate("/login");
+    validateNavigate("/login");
   }
 
   function goToHome() {
-    navigate("/");
+    validateNavigate("/");
   }
 
   function goToStart() {
-    navigate("/start");
+    validateNavigate("/start");
   }
 
   function goToList() {
-    navigate("/list");
+    validateNavigate("/list");
   }
 
   function goToNewObjetive() {
-    navigate("/new");
+    validateNavigate("/new");
   }
 
   return {

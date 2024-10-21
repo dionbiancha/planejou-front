@@ -8,7 +8,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import Layout from "../../components/Layout";
 import { useTranslation } from "react-i18next";
 import { Add, MoreVertOutlined } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
@@ -33,7 +32,7 @@ export function Objectives() {
   }, []);
 
   return (
-    <Layout>
+    <>
       <Stack flexDirection={"row"}>
         <Box sx={{ width: "100%" }}>
           <Stack flexDirection="column" sx={{ marginRight: "20px" }}>
@@ -102,6 +101,6 @@ export function Objectives() {
           }}
         ></Box>
       </Stack>
-    </Layout>
+    </>
   );
 }

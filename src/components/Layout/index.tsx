@@ -25,6 +25,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CustomButton from "../Button/CustomButton";
 import BorderLinearProgress from "../BorderLinearProgress";
+import { useAuthValidation } from "../../hooks/useAuthValidation";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -42,6 +43,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  useAuthValidation();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -62,6 +65,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       return "#C8CACD";
     }
     return "inherit";
+  }
+
+  function isValidRoute(path: string) {
+    return path === "/login" || path === "/start";
   }
 
   const drawer = (
@@ -107,6 +114,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </List>
     </Box>
   );
+
+  if (isValidRoute(location.pathname)) {
+    return (
+      <Container
+        maxWidth="lg"
+        sx={{
+          width: "100%",
+        }}
+      >
+        {children}
+      </Container>
+    );
+  }
 
   return (
     <>

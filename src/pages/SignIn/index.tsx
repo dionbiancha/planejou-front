@@ -5,6 +5,7 @@ import {
   Divider,
   FormControlLabel,
   Link,
+  Skeleton,
   Stack,
   TextField,
 } from "@mui/material";
@@ -12,13 +13,30 @@ import { useTranslation } from "react-i18next";
 import CustomButton from "../../components/Button/CustomButton";
 import LoginButton from "../../features/LoginButton";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
+import { googleSignIn } from "../../services/signIn";
+import { useDataUser } from "../../context/UserContext/useUser";
+import { useLoading } from "../../context/LoadingContext/useLoading";
 
 export function SignIn() {
   const { t } = useTranslation();
   const { goToHome } = useCustomNavigate();
+  const { setUserData } = useDataUser();
+  const loading = useLoading();
 
   async function handleSignIn() {
     goToHome();
+  }
+
+  async function handleSignInGoogle() {
+    loading.show();
+    try {
+      const response = await googleSignIn();
+      setUserData(response.user);
+      goToHome();
+    } catch (error) {
+      console.error(error);
+    }
+    loading.hide();
   }
 
   return (
@@ -40,32 +58,75 @@ export function SignIn() {
         <Stack spacing={3}>
           <LoginButton
             handleSignInApple={() => {}}
-            handleSignInGoogle={() => {}}
+            handleSignInGoogle={handleSignInGoogle}
           />
           <Divider sx={{ color: "#E8E9EA" }}>{t("OU")}</Divider>
-          <TextField
-            label="Email"
-            variant="outlined"
-            placeholder="your@email.com"
-          />
-          <TextField
-            label={t("Senha")}
-            variant="outlined"
-            type="password"
-            placeholder="••••••••••"
-          />
-          <FormControlLabel control={<Checkbox />} label={t("Me lembre")} />
+          {loading.state ? (
+            <>
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"50px"}
+                sx={{ borderRadius: "10px" }}
+              />
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"50px"}
+                sx={{ borderRadius: "10px" }}
+              />
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"30px"}
+                sx={{ borderRadius: "10px" }}
+              />
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"50px"}
+                sx={{ borderRadius: "10px" }}
+              />
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"20px"}
+                sx={{ borderRadius: "10px" }}
+              />
+            </>
+          ) : (
+            <>
+              <TextField
+                disabled={loading.state}
+                label="Email"
+                variant="outlined"
+                placeholder="your@email.com"
+              />
+              <TextField
+                disabled={loading.state}
+                label={t("Senha")}
+                variant="outlined"
+                type="password"
+                placeholder="••••••••••"
+              />
+              <FormControlLabel
+                control={<Checkbox disabled={loading.state} />}
+                label={t("Me lembre")}
+              />
 
-          <CustomButton
-            variant="contained"
-            size="large"
-            onClick={handleSignIn}
-            label="Entrar"
-          />
+              <CustomButton
+                variant="contained"
+                size="large"
+                onClick={handleSignIn}
+                label="Entrar"
+                disabled={loading.state}
+              />
 
-          <Box sx={{ textAlign: "center" }}>
-            {t("Não possui conta?")} <Link>{t("Criar conta")}</Link>
-          </Box>
+              <Box sx={{ textAlign: "center" }}>
+                {t("Não possui conta?")} <Link>{t("Criar conta")}</Link>
+              </Box>
+            </>
+          )}
         </Stack>
       </Card>
     </Stack>

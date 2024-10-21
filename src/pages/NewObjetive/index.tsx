@@ -18,6 +18,8 @@ import RoundedSelectGoalField from "../../features/RoundedSelectGoalField";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
+import { addObjectivesToGoal } from "../../services/goal";
+import { useDataUser } from "../../context/UserContext/useUser";
 
 export default function NewObjetive() {
   const { t } = useTranslation();
@@ -34,6 +36,7 @@ export default function NewObjetive() {
   const [selectedHour, setSelectedHour] = useState<string>("6 am");
   const { goals, setGoals } = useGoals();
   const snack = useSnack();
+  const { userData } = useDataUser();
 
   const toggleDaySelection = (day: string) => {
     setSelectedDailyDays((prevSelectedDays) =>
@@ -88,9 +91,9 @@ export default function NewObjetive() {
     }
   }
 
-  function handleAddObjective() {
+  async function handleAddObjective() {
     setGoals((prevGoals) => {
-      const goalToUpdate = prevGoals.find((g) => g.id === goal?.id);
+      const goalToUpdate = prevGoals.find((g) => g.position === goal?.position);
       if (goalToUpdate) {
         const newObjective: Objective = {
           name: objective,
@@ -98,7 +101,7 @@ export default function NewObjetive() {
           perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
           selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
           remindMe: remindMe ? selectedHour : undefined,
-          goalId: goalToUpdate.id,
+          goalId: goalToUpdate.position,
         };
 
         if (!goalToUpdate.objectives) {
@@ -110,6 +113,27 @@ export default function NewObjetive() {
       }
       return [...prevGoals];
     });
+    // try {
+
+    //   const newObjective: Objective = {
+    //     name: objective,
+    //     repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
+    //     perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
+    //     selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
+    //     remindMe: remindMe ? selectedHour : undefined,
+    //     goalId: goal?.position ?? "0",
+    //   };
+
+    //   const data = {
+    //     userId: userData.uid,
+    //     position: goal?.position ?? "0",
+    //     objectives: newObjective,
+    //   };
+    //   const res = await addObjectivesToGoal(data);
+    //   console.log(res);
+    // } catch (e) {
+    //   console.error("Erro ao adicionar documento: ", e);
+    // }
   }
 
   useEffect(() => {

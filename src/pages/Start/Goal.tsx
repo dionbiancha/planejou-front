@@ -42,14 +42,14 @@ export default function Goal({ handleStep }: StartProps) {
       }
       setGoals([
         ...goals,
-        { id: `goal-${goals.length}`, content: goal, months: 24 },
+        { position: `${goals.length}`, name: goal, months: 24 },
       ]);
       setGoal("");
     }
   };
 
-  const handleRemoveGoal = (id: string) => {
-    setGoals(goals.filter((goal) => goal.id !== id)); // Remove o item da lista
+  const handleRemoveGoal = (p: string) => {
+    setGoals(goals.filter((goal) => goal.position !== p)); // Remove o item da lista
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -136,8 +136,8 @@ export default function Goal({ handleStep }: StartProps) {
                     setGoals([
                       ...goals,
                       {
-                        id: `goal-${goals.length}`,
-                        content: exempleGoal,
+                        position: `${goals.length}`,
+                        name: exempleGoal,
                         months: 24,
                       },
                     ]);
@@ -183,8 +183,8 @@ export default function Goal({ handleStep }: StartProps) {
                     >
                       {goals.map((goal, index) => (
                         <Draggable
-                          key={goal.id}
-                          draggableId={goal.id}
+                          key={index}
+                          draggableId={goal.position}
                           index={index}
                         >
                           {(provided, snapshot) => (
@@ -222,12 +222,12 @@ export default function Goal({ handleStep }: StartProps) {
                                 >
                                   {index + 1}.
                                 </Box>
-                                {goal.content}
+                                {goal.name}
                               </Typography>
                               <IconButton
                                 size="small"
                                 aria-label="delete"
-                                onClick={() => handleRemoveGoal(goal.id)}
+                                onClick={() => handleRemoveGoal(goal.position)}
                               >
                                 <DeleteIcon sx={{ height: "20px" }} />
                               </IconButton>

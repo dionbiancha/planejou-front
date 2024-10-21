@@ -1,8 +1,9 @@
 import React, { createContext, useState, ReactNode } from "react";
 
 export interface Goal {
-  id: string;
-  content: string;
+  id?: string;
+  position: string;
+  name: string;
   months: number;
   objectives?: Objective[];
 }

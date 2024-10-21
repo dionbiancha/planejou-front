@@ -13,6 +13,9 @@ import { List } from "./pages/List";
 import NewObjetive from "./pages/NewObjetive";
 import { SnackProvider } from "./context/SnackContext";
 import Snack from "./components/Snack";
+import { UserProvider } from "./context/UserContext";
+import Layout from "./components/Layout";
+import { LoadingProvider } from "./context/LoadingContext";
 
 function App() {
   const [isDarkMode] = useState(false);
@@ -20,19 +23,25 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <SnackProvider>
-          <GoalProvider>
-            <Snack />
-            <CssBaseline />
-            <Routes>
-              <Route path="/" element={<Objectives />} />
-              <Route path="/login" element={<SignIn />} />
-              <Route path="/start" element={<Start />} />
-              <Route path="/list" element={<List />} />
-              <Route path="/new" element={<NewObjetive />} />
-            </Routes>
-          </GoalProvider>
-        </SnackProvider>
+        <UserProvider>
+          <LoadingProvider>
+            <SnackProvider>
+              <GoalProvider>
+                <Snack />
+                <CssBaseline />
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Objectives />} />
+                    <Route path="/login" element={<SignIn />} />
+                    <Route path="/start" element={<Start />} />
+                    <Route path="/list" element={<List />} />
+                    <Route path="/new" element={<NewObjetive />} />
+                  </Routes>
+                </Layout>
+              </GoalProvider>
+            </SnackProvider>
+          </LoadingProvider>
+        </UserProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

@@ -1,6 +1,7 @@
 import {
   Box,
   Card,
+  Collapse,
   Divider,
   IconButton,
   Stack,
@@ -47,59 +48,66 @@ export function List() {
   return (
     <>
       <Stack flexDirection={"row"}>
-        <Stack width={"100%"} spacing={3}>
-          {goals.map((goal, index) => (
-            <>
-              <Card
-                key={index}
-                sx={{
-                  boxShadow: "none",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  width: "99%",
-                  opacity: doLater(index) ? 0.5 : 1,
-                }}
-              >
-                <Stack
-                  spacing={3}
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
+        <Collapse
+          sx={{ width: "100%" }}
+          in={goals.length > 0}
+          timeout="auto"
+          unmountOnExit
+        >
+          <Stack width={"100%"} spacing={3}>
+            {goals.map((goal, index) => (
+              <>
+                <Card
+                  key={index}
+                  sx={{
+                    boxShadow: "none",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    width: "99%",
+                    opacity: doLater(index) ? 0.5 : 1,
+                  }}
                 >
                   <Stack
+                    spacing={3}
                     direction="row"
                     alignItems="center"
-                    justifyContent="center"
+                    justifyContent="space-between"
                   >
-                    <IconButton onClick={() => {}}>
-                      <MoreVertOutlined />
-                    </IconButton>
-
-                    <Typography
-                      noWrap={false} // Permite a quebra de linha
-                      sx={{ wordBreak: "break-word" }}
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="center"
                     >
-                      <b>{goal.name}</b>
-                    </Typography>
+                      <IconButton onClick={() => {}}>
+                        <MoreVertOutlined />
+                      </IconButton>
+
+                      <Typography
+                        noWrap={false} // Permite a quebra de linha
+                        sx={{ wordBreak: "break-word" }}
+                      >
+                        <b>{goal.name}</b>
+                      </Typography>
+                    </Stack>
+                    <Typography variant="h4">{index + 1}</Typography>
                   </Stack>
-                  <Typography variant="h4">{index + 1}</Typography>
-                </Stack>
-                <Box sx={{ width: "100%", padding: "5px" }}>
-                  <BorderLinearProgress
-                    sx={{ height: "5px" }}
-                    variant="determinate"
-                    value={35}
-                  />
-                </Box>
-              </Card>
-              {showDivider(index) && (
-                <Divider sx={{ color: theme.palette.divider }}>
-                  {t("DEPOIS")}
-                </Divider>
-              )}
-            </>
-          ))}
-        </Stack>
+                  <Box sx={{ width: "100%", padding: "5px" }}>
+                    <BorderLinearProgress
+                      sx={{ height: "5px" }}
+                      variant="determinate"
+                      value={35}
+                    />
+                  </Box>
+                </Card>
+                {showDivider(index) && (
+                  <Divider sx={{ color: theme.palette.divider }}>
+                    {t("DEPOIS")}
+                  </Divider>
+                )}
+              </>
+            ))}
+          </Stack>
+        </Collapse>
         <Box
           sx={{
             display: { xs: "none", lg: "block" },

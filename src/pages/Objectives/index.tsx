@@ -2,13 +2,15 @@ import {
   Box,
   Card,
   Checkbox,
+  Collapse,
   Grid,
   IconButton,
   Stack,
   Typography,
   useTheme,
 } from "@mui/material";
-
+import { format, startOfWeek, subDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 import { Add, MoreVertOutlined } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
@@ -21,17 +23,46 @@ import {
 } from "../../services/objective";
 import { useEffect, useState } from "react";
 
+function generateNextSevenDays() {
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const date = subDays(new Date(), 6 - i); // Para começar do dia atual e ir para trás
+    days.push({
+      dayOfWeek: format(date, "EEE", { locale: ptBR }), // Seg, Ter, etc.
+      dayOfMonth: format(date, "d"), // Dia do mês
+      date: format(date, "yyyy-MM-dd"),
+    });
+  }
+  return days; // Não é necessário inverter, pois já está na ordem correta
+}
+
+function getLastMonday() {
+  const today = new Date();
+  const lastMonday = startOfWeek(today, { weekStartsOn: 1 }); // 1 representa segunda-feira
+  return lastMonday;
+}
+
 export function Objectives() {
   const { t } = useTranslation();
   const { goToNewObjetive } = useCustomNavigate();
   const theme = useTheme();
   const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
   const { goals } = useGoals();
+  const [showDetails, setShowDetails] = useState<string[]>([]);
 
   const totalObjectives = goals.reduce(
     (acc, goal) => acc + (goal.objectives?.length || 0),
     0
   );
+
+  function handleShowDetails(id: string | undefined) {
+    if (!id) return;
+    if (showDetails.includes(id)) {
+      setShowDetails(showDetails.filter((showId) => showId !== id));
+    } else {
+      setShowDetails([...showDetails, id]);
+    }
+  }
 
   async function listObjectives() {
     try {
@@ -103,67 +134,195 @@ export function Objectives() {
                 />
               </IconButton>
             </Stack>
-            <Grid container spacing={2}>
-              {objectives.map((o) =>
-                o.objectives?.map((objective, index) => {
-                  const objectiveDone = objective.completedDays?.includes(
-                    new Date().toISOString().split("T")[0]
-                  );
-                  return (
-                    <Grid item xs={12} md={6} sm={12} key={index}>
-                      <Card
-                        sx={{
-                          boxShadow: "none",
-                          padding: "10px",
-                          borderRadius: "10px",
-                          width: "100%",
-                          opacity: objectiveDone ? 0.5 : 1,
-                        }}
-                      >
-                        <Stack
-                          spacing={3}
-                          direction="row"
-                          alignItems="center"
-                          justifyContent="space-between"
+            <Collapse
+              sx={{ width: "100%" }}
+              in={objectives.length > 0}
+              timeout="auto"
+              unmountOnExit
+            >
+              <Grid container spacing={2}>
+                {objectives.map((o) =>
+                  o.objectives?.map((objective, index) => {
+                    const objectiveDone = objective.completedDays?.includes(
+                      new Date().toISOString().split("T")[0]
+                    );
+
+                    function getLastObjectiveDone(date: string) {
+                      return objective.completedDays?.includes(date);
+                    }
+
+                    function getNumberMissingDays() {
+                      const lastMonday = getLastMonday();
+
+                      const objectiveDays = objective.selectDaily;
+                      const numberOfDays = objective.perWeek;
+
+                      const weekDays = [];
+                      for (
+                        let i = 0;
+                        i <= (objectiveDays?.length ?? numberOfDays ?? 0);
+                        i++
+                      ) {
+                        const day = new Date(lastMonday);
+                        day.setDate(lastMonday.getDate() + i);
+                        weekDays.push(format(day, "yyyy-MM-dd"));
+                      }
+
+                      const completedCount = weekDays.filter((day) =>
+                        objective?.completedDays?.includes(day)
+                      ).length;
+
+                      return completedCount;
+                    }
+                    return (
+                      <Grid item xs={12} md={6} sm={12} key={index}>
+                        <Card
+                          sx={{
+                            boxShadow: "none",
+                            padding: "10px",
+                            borderRadius: "10px",
+                            width: "100%",
+                            opacity: objectiveDone ? 0.5 : 1,
+                          }}
                         >
                           <Stack
+                            spacing={3}
                             direction="row"
                             alignItems="center"
-                            justifyContent="center"
+                            justifyContent="space-between"
                           >
-                            <IconButton onClick={() => {}}>
-                              <MoreVertOutlined />
-                            </IconButton>
-
-                            <Typography
-                              noWrap={false} // Permite a quebra de linha
-                              sx={{
-                                wordBreak: "break-word",
-                                textDecoration: objectiveDone
-                                  ? "line-through"
-                                  : "none",
-                              }}
+                            <Stack
+                              direction="row"
+                              alignItems="center"
+                              justifyContent="center"
+                              sx={{ width: "100%" }}
                             >
-                              <b>{objective?.name}</b>
-                            </Typography>
+                              <IconButton onClick={() => {}}>
+                                <MoreVertOutlined />
+                              </IconButton>
+
+                              <Typography
+                                onClick={() => handleShowDetails(objective.id)}
+                                noWrap={false} // Permite a quebra de linha
+                                sx={{
+                                  cursor: "pointer",
+                                  width: "100%",
+                                  wordBreak: "break-word",
+                                  textDecoration: objectiveDone
+                                    ? "line-through"
+                                    : "none",
+                                }}
+                              >
+                                <b>{objective?.name}</b>
+                              </Typography>
+                            </Stack>
+                            <Checkbox
+                              size="large"
+                              checked={objectiveDone}
+                              onChange={() =>
+                                markObjective({
+                                  goalId: o.goalId,
+                                  objectiveId: objective.id,
+                                })
+                              }
+                            />
                           </Stack>
-                          <Checkbox
-                            size="large"
-                            checked={objectiveDone}
-                            onChange={() =>
-                              markObjective({
-                                goalId: o.goalId,
-                                objectiveId: objective.id,
-                              })
-                            }
-                          />
-                        </Stack>
-                      </Card>
-                    </Grid>
-                  );
-                })
-              )}
-            </Grid>
+                          <Collapse
+                            in={showDetails?.includes(objective.id ?? "")}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <>
+                              {(objective.repeat === "Diariamente" ||
+                                objective.repeat === "Semanalmente") && (
+                                <Stack>
+                                  <Stack
+                                    flexDirection={"row"}
+                                    justifyContent={"space-between"}
+                                    padding={2}
+                                  >
+                                    {generateNextSevenDays()
+                                      .reverse()
+                                      .map((day, index) => (
+                                        <Stack key={index} alignItems="center">
+                                          <Typography
+                                            sx={{
+                                              fontSize: "10px",
+                                              color: getLastObjectiveDone(
+                                                day.date
+                                              )
+                                                ? theme.palette.primary.main
+                                                : "",
+                                              textDecoration:
+                                                getLastObjectiveDone(day.date)
+                                                  ? "line-through"
+                                                  : "none",
+                                            }}
+                                            variant="subtitle2"
+                                          >
+                                            {day.dayOfWeek.slice(0, 3)}
+                                          </Typography>
+                                          <Typography
+                                            sx={{
+                                              fontSize: "15px",
+                                              color: getLastObjectiveDone(
+                                                day.date
+                                              )
+                                                ? theme.palette.primary.main
+                                                : "",
+                                              textDecoration:
+                                                getLastObjectiveDone(day.date)
+                                                  ? "line-through"
+                                                  : "none",
+                                            }}
+                                            variant="h6"
+                                          >
+                                            {day.dayOfMonth}
+                                          </Typography>
+                                        </Stack>
+                                      ))}
+                                  </Stack>
+                                  <Stack
+                                    flexDirection={"row"}
+                                    justifyContent={"space-between"}
+                                    mt={1}
+                                  >
+                                    <Typography
+                                      sx={{
+                                        fontSize: "13px",
+                                        color: objectiveDone
+                                          ? theme.palette.primary.main
+                                          : theme.palette.error.main,
+                                      }}
+                                    >
+                                      <b>Ofensiva</b>
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: "13px",
+                                        color: objectiveDone
+                                          ? theme.palette.primary.main
+                                          : theme.palette.error.main,
+                                      }}
+                                    >
+                                      <b>
+                                        {getNumberMissingDays()} de{" "}
+                                        {objective.perWeek ??
+                                          objective.selectDaily?.length}
+                                      </b>
+                                    </Typography>
+                                  </Stack>
+                                </Stack>
+                              )}
+                            </>
+                          </Collapse>
+                        </Card>
+                      </Grid>
+                    );
+                  })
+                )}
+              </Grid>
+            </Collapse>
           </Stack>
         </Box>
         <Box

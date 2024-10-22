@@ -102,24 +102,16 @@ export async function markObjectiveAsCompleted({
 
     if (docSnap.exists()) {
       const existingObjectives = docSnap.data()?.objectives || [];
-
-      // Obter a data atual no formato YYYY-MM-DD
       const today = new Date().toISOString().split("T")[0];
-
-      // Atualiza o array de objectives, localizando o objetivo pelo id
       const updatedObjectives = existingObjectives.map(
         (objective: Objective) => {
           if (objective.id === objectiveId) {
             let updatedCompletedDays = objective.completedDays || [];
-
-            // Verifica se a data de hoje já está no array
             if (updatedCompletedDays.includes(today)) {
-              // Remove a data de hoje
               updatedCompletedDays = updatedCompletedDays.filter(
                 (day) => day !== today
               );
             } else {
-              // Adiciona a data de hoje
               updatedCompletedDays = [...updatedCompletedDays, today];
             }
 
@@ -132,7 +124,6 @@ export async function markObjectiveAsCompleted({
         }
       );
 
-      // Atualiza o documento com o array modificado
       await updateDoc(docRef, {
         objectives: updatedObjectives,
       });

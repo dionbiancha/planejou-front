@@ -7,6 +7,7 @@ import {
   Link,
   Stack,
   TextField,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import CustomButton from "../../components/Button/CustomButton";
@@ -18,6 +19,7 @@ import { useLoading } from "../../context/LoadingContext/useLoading";
 
 export function SignIn() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { goToHome } = useCustomNavigate();
   const { setUserData } = useDataUser();
   const loading = useLoading();
@@ -59,7 +61,7 @@ export function SignIn() {
             handleSignInApple={() => {}}
             handleSignInGoogle={handleSignInGoogle}
           />
-          <Divider sx={{ color: "#E8E9EA" }}>{t("OU")}</Divider>
+          <Divider sx={{ color: theme.palette.divider }}>{t("OU")}</Divider>
           <TextField
             disabled={loading.state}
             label="Email"

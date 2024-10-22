@@ -19,8 +19,9 @@ import RoundedSelectGoalField from "../../features/RoundedSelectGoalField";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
-import { addObjective, listGoalsByUserId } from "../../services/goal";
+import { listGoalsByUserId } from "../../services/goal";
 import { useLoading } from "../../context/LoadingContext/useLoading";
+import { addObjective } from "../../services/objective";
 
 export default function NewObjetive() {
   const { t } = useTranslation();
@@ -93,27 +94,6 @@ export default function NewObjetive() {
   }
 
   async function handleAddObjective() {
-    // setGoals((prevGoals) => {
-    //   const goalToUpdate = prevGoals.find((g) => g.position === goal?.position);
-    //   if (goalToUpdate) {
-    //     const newObjective: Objective = {
-    //       name: objective,
-    //       repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
-    //       perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
-    //       selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
-    //       remindMe: remindMe ? selectedHour : undefined,
-    //       goalId: goalToUpdate.position,
-    //     };
-
-    //     if (!goalToUpdate.objectives) {
-    //       goalToUpdate.objectives = [];
-    //     }
-    //     goalToUpdate.objectives.push(newObjective);
-    //     snack.success("Objetivo criado com sucesso!");
-    //     goToHome();
-    //   }
-    //   return [...prevGoals];
-    // });
     try {
       if (!goal?.id || !goal) return;
       const newObjective: Objective = {
@@ -128,6 +108,8 @@ export default function NewObjetive() {
         objectives: newObjective,
       };
       await addObjective(data);
+      snack.success("Objetivo criado com sucesso!");
+      goToHome();
     } catch (e) {
       console.error(e);
     }

@@ -13,11 +13,17 @@ import { useTranslation } from "react-i18next";
 import { Add, MoreVertOutlined } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 import { useGoals } from "../../context";
+import {
+  listObjectivesByUserId,
+  ObjectiveListProps,
+} from "../../services/objective";
+import { useEffect, useState } from "react";
 
 export function Objectives() {
   const { t } = useTranslation();
   const { goToNewObjetive } = useCustomNavigate();
   const theme = useTheme();
+  const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
   const { goals } = useGoals();
 
   const totalObjectives = goals.reduce(
@@ -25,11 +31,18 @@ export function Objectives() {
     0
   );
 
-  // useEffect(() => {
-  //   if (goals.length === 0) {
-  //     goToStart();
-  //   }
-  // }, []);
+  async function listObjectives() {
+    try {
+      const res = await listObjectivesByUserId();
+      setObjectives(res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    listObjectives();
+  }, []);
 
   return (
     <>
@@ -51,8 +64,8 @@ export function Objectives() {
               </IconButton>
             </Stack>
             <Grid container spacing={2}>
-              {goals.map((goal) =>
-                goal.objectives?.map((objective, index) => (
+              {objectives.map((o) =>
+                o.objectives?.map((objective, index) => (
                   <Grid item xs={12} md={6} sm={12} key={index}>
                     <Card
                       sx={{
@@ -97,7 +110,6 @@ export function Objectives() {
           sx={{
             display: { xs: "none", lg: "block" },
             width: "300px",
-            backgroundColor: "#000",
           }}
         ></Box>
       </Stack>

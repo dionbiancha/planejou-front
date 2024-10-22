@@ -1,17 +1,7 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { v4 as uuidv4 } from "uuid";
-import { Goal, Objective } from "../context/GoalContext/GoalContext";
+import { Goal } from "../context/GoalContext/GoalContext";
 import { calculateEstimatedCompletion } from "../utils/time";
 import { validateAuth } from "./authService";
 
@@ -53,38 +43,5 @@ export async function listGoalsByUserId() {
   } catch (e) {
     console.error("Erro ao buscar metas:", e);
     return null;
-  }
-}
-
-export async function addObjective({
-  goalId,
-  objectives,
-}: {
-  goalId: string;
-  objectives: Objective;
-}) {
-  try {
-    const auth = validateAuth();
-    const docRef = doc(db, "objectives", goalId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      await updateDoc(docRef, {
-        objectives: {
-          ...docSnap.data()?.objectives,
-          ...objectives,
-        },
-      });
-      console.log("Objectives adicionados com sucesso!");
-    } else {
-      await setDoc(docRef, {
-        goalId,
-        userId: auth.userId,
-        objectives,
-      });
-      console.log("Novo objetivo adicionado com sucesso!");
-    }
-  } catch (e) {
-    console.error("Erro ao adicionar objectives: ", e);
   }
 }

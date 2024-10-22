@@ -18,6 +18,11 @@ export interface ObjectiveListProps {
   objectives: Objective[];
 }
 
+export interface MarkObjectiveAsCompletedProps {
+  goalId: string;
+  objectiveId: string | undefined;
+}
+
 export async function addObjective({
   goalId,
   objectives,
@@ -84,5 +89,58 @@ export async function listObjectivesByUserId(): Promise<ObjectiveListProps[]> {
   } catch (e) {
     console.error("Erro ao listar objetivos por userId: ", e);
     return [];
+  }
+}
+
+export async function markObjectiveAsCompleted({
+  goalId,
+  objectiveId,
+}: MarkObjectiveAsCompletedProps) {
+  try {
+    const docRef = doc(db, "objectives", goalId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const existingObjectives = docSnap.data()?.objectives || [];
+
+      // Obter a data atual no formato YYYY-MM-DD
+      const today = new Date().toISOString().split("T")[0];
+
+      // Atualiza o array de objectives, localizando o objetivo pelo id
+      const updatedObjectives = existingObjectives.map(
+        (objective: Objective) => {
+          if (objective.id === objectiveId) {
+            let updatedCompletedDays = objective.completedDays || [];
+
+            // Verifica se a data de hoje já está no array
+            if (updatedCompletedDays.includes(today)) {
+              // Remove a data de hoje
+              updatedCompletedDays = updatedCompletedDays.filter(
+                (day) => day !== today
+              );
+            } else {
+              // Adiciona a data de hoje
+              updatedCompletedDays = [...updatedCompletedDays, today];
+            }
+
+            return {
+              ...objective,
+              completedDays: updatedCompletedDays,
+            };
+          }
+          return objective;
+        }
+      );
+
+      // Atualiza o documento com o array modificado
+      await updateDoc(docRef, {
+        objectives: updatedObjectives,
+      });
+      console.log("Objetivo atualizado com sucesso!");
+    } else {
+      console.error("Objetivo não encontrado!");
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar o objetivo: ", e);
   }
 }

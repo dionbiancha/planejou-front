@@ -9,12 +9,14 @@ export interface Goal {
 }
 
 export interface Objective {
+  id?: string;
   name: string;
   repeat: "Diariamente" | "Semanalmente" | "Uma vez";
   perWeek?: number | null;
   selectDaily?: string[] | null;
   remindMe?: string | null;
   goalId?: string;
+  completedDays?: string[];
 }
 
 interface GoalContextProps {

@@ -15,6 +15,8 @@ import { useCustomNavigate } from "../../context/NavigationContext/navigationCon
 import { useGoals } from "../../context";
 import {
   listObjectivesByUserId,
+  markObjectiveAsCompleted,
+  MarkObjectiveAsCompletedProps,
   ObjectiveListProps,
 } from "../../services/objective";
 import { useEffect, useState } from "react";
@@ -35,6 +37,44 @@ export function Objectives() {
     try {
       const res = await listObjectivesByUserId();
       setObjectives(res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function markObjective(data: MarkObjectiveAsCompletedProps) {
+    try {
+      setObjectives((prev) => {
+        const newObjectives = prev.map((o) => {
+          if (o.goalId === data.goalId) {
+            return {
+              ...o,
+              objectives: o.objectives?.map((objective) => {
+                if (objective.id === data.objectiveId) {
+                  return {
+                    ...objective,
+                    completedDays: objective.completedDays?.includes(
+                      new Date().toISOString().split("T")[0]
+                    )
+                      ? objective.completedDays?.filter(
+                          (day) =>
+                            day !== new Date().toISOString().split("T")[0]
+                        )
+                      : [
+                          ...(objective.completedDays || []),
+                          new Date().toISOString().split("T")[0],
+                        ],
+                  };
+                }
+                return objective;
+              }),
+            };
+          }
+          return o;
+        });
+        return newObjectives;
+      });
+      await markObjectiveAsCompleted(data);
     } catch (e) {
       console.log(e);
     }
@@ -65,43 +105,63 @@ export function Objectives() {
             </Stack>
             <Grid container spacing={2}>
               {objectives.map((o) =>
-                o.objectives?.map((objective, index) => (
-                  <Grid item xs={12} md={6} sm={12} key={index}>
-                    <Card
-                      sx={{
-                        boxShadow: "none",
-                        padding: "10px",
-                        borderRadius: "10px",
-                        width: "100%",
-                      }}
-                    >
-                      <Stack
-                        spacing={3}
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
+                o.objectives?.map((objective, index) => {
+                  const objectiveDone = objective.completedDays?.includes(
+                    new Date().toISOString().split("T")[0]
+                  );
+                  return (
+                    <Grid item xs={12} md={6} sm={12} key={index}>
+                      <Card
+                        sx={{
+                          boxShadow: "none",
+                          padding: "10px",
+                          borderRadius: "10px",
+                          width: "100%",
+                          opacity: objectiveDone ? 0.5 : 1,
+                        }}
                       >
                         <Stack
+                          spacing={3}
                           direction="row"
                           alignItems="center"
-                          justifyContent="center"
+                          justifyContent="space-between"
                         >
-                          <IconButton onClick={() => {}}>
-                            <MoreVertOutlined />
-                          </IconButton>
-
-                          <Typography
-                            noWrap={false} // Permite a quebra de linha
-                            sx={{ wordBreak: "break-word" }}
+                          <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="center"
                           >
-                            <b>{objective?.name}</b>
-                          </Typography>
+                            <IconButton onClick={() => {}}>
+                              <MoreVertOutlined />
+                            </IconButton>
+
+                            <Typography
+                              noWrap={false} // Permite a quebra de linha
+                              sx={{
+                                wordBreak: "break-word",
+                                textDecoration: objectiveDone
+                                  ? "line-through"
+                                  : "none",
+                              }}
+                            >
+                              <b>{objective?.name}</b>
+                            </Typography>
+                          </Stack>
+                          <Checkbox
+                            size="large"
+                            checked={objectiveDone}
+                            onChange={() =>
+                              markObjective({
+                                goalId: o.goalId,
+                                objectiveId: objective.id,
+                              })
+                            }
+                          />
                         </Stack>
-                        <Checkbox size="large" onChange={() => {}} />
-                      </Stack>
-                    </Card>
-                  </Grid>
-                ))
+                      </Card>
+                    </Grid>
+                  );
+                })
               )}
             </Grid>
           </Stack>

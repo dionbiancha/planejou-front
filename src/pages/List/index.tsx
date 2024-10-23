@@ -15,12 +15,17 @@ import { listGoalsByUserId } from "../../services/goal";
 import { MoreVertOutlined } from "@mui/icons-material";
 import BorderLinearProgress from "../../components/BorderLinearProgress";
 import { useTranslation } from "react-i18next";
+import {
+  listObjectivesByUserId,
+  ObjectiveListProps,
+} from "../../services/objective";
 
 export function List() {
   const loading = useLoading();
   const theme = useTheme();
   const { t } = useTranslation();
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
 
   async function listGoals() {
     loading.show();
@@ -41,8 +46,38 @@ export function List() {
     return position + 1 === 5;
   }
 
+  async function listObjectives() {
+    try {
+      const res = await listObjectivesByUserId();
+      setObjectives(res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  function getCompletedObjectives(goalId: string) {
+    const objectivesByGoal = objectives.find((obj) => obj.goalId === goalId);
+    if (!objectivesByGoal) return 0;
+    let totalRepeat = 0;
+    let completedDays = 0;
+    objectivesByGoal.objectives.map((value) => {
+      totalRepeat += value.totalRepeat || 0;
+      completedDays += value.completedDays?.length || 0;
+    });
+    console.log("totalRepeat", totalRepeat);
+    console.log("completedDays", completedDays);
+    console.log(
+      "completedDays",
+      ((totalRepeat - completedDays) * 100) / totalRepeat
+    );
+    // totalRepeat 100
+    // completedDays x
+    return (completedDays * 100) / totalRepeat;
+  }
+
   useEffect(() => {
     listGoals();
+    listObjectives();
   }, []);
 
   return (
@@ -95,7 +130,7 @@ export function List() {
                     <BorderLinearProgress
                       sx={{ height: "5px" }}
                       variant="determinate"
-                      value={35}
+                      value={getCompletedObjectives(goal.id || "")}
                     />
                   </Box>
                 </Card>

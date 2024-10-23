@@ -5,10 +5,11 @@ import {
   getDocs,
   query,
   setDoc,
+  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Objective } from "../context/GoalContext/GoalContext";
+import { Goal, Objective } from "../context/GoalContext/GoalContext";
 import { validateAuth } from "./authService";
 import { db } from "../config/firebase";
 import { v4 as uuidv4 } from "uuid";
@@ -23,44 +24,78 @@ export interface MarkObjectiveAsCompletedProps {
   objectiveId: string | undefined;
 }
 
+function calculateRepetitions(
+  startDate: Date,
+  endDate: Date,
+  timesPerWeek: number
+): number {
+  // Check if the end date is earlier than the start date
+  if (endDate < startDate) {
+    return 0;
+  }
+
+  // Calculate the difference in milliseconds and convert to days
+  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  // Calculate the number of weeks in the range
+  const weeks = diffDays / 7;
+
+  // Multiply the number of weeks by the number of times per week
+  const repetitions = Math.floor(weeks * timesPerWeek);
+
+  return repetitions;
+}
+
 export async function addObjective({
-  goalId,
+  goal,
   objectives,
 }: {
-  goalId: string;
+  goal: Goal;
   objectives: Objective;
 }) {
   try {
     const auth = validateAuth();
-    const docRef = doc(db, "objectives", goalId);
+    const docRef = doc(db, "objectives", goal.id ?? "");
     const docSnap = await getDoc(docRef);
 
-    // Gerar um UUID e adicionar ao objetivo
+    const startDate = (goal.createdAt as Timestamp).toDate();
+    const endDate = (goal.estimatedCompletion as Timestamp).toDate();
+
+    const timesPerWeek =
+      objectives.selectDaily?.length || objectives.perWeek || 1;
+
+    const numberOfRepetitions = calculateRepetitions(
+      startDate,
+      endDate,
+      timesPerWeek
+    );
+
     const newObjectiveWithId = {
       ...objectives,
-      id: uuidv4(), // Gera um novo UUID para cada objetivo
+      id: uuidv4(),
+      totalRepeat: numberOfRepetitions,
     };
 
     if (docSnap.exists()) {
       const existingObjectives = docSnap.data()?.objectives || [];
 
-      // Verifica se o campo 'objectives' já é um array, e adiciona o novo objetivo
       await updateDoc(docRef, {
         objectives: Array.isArray(existingObjectives)
           ? [...existingObjectives, newObjectiveWithId]
-          : [newObjectiveWithId], // Se não for um array, cria um novo array com o novo objetivo
+          : [newObjectiveWithId],
       });
-      console.log("Objectives adicionados com sucesso!");
+      console.log("Objectives added successfully!");
     } else {
       await setDoc(docRef, {
-        goalId,
+        goalId: goal.id,
         userId: auth.userId,
-        objectives: [newObjectiveWithId], // Cria o array com o novo objetivo
+        objectives: [newObjectiveWithId],
       });
-      console.log("Novo objetivo adicionado com sucesso!");
+      console.log("New objective added successfully!");
     }
   } catch (e) {
-    console.error("Erro ao adicionar objectives: ", e);
+    console.error("Error adding objectives: ", e);
   }
 }
 

@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import CustomButton from "../Button/CustomButton";
 import BorderLinearProgress from "../BorderLinearProgress";
 import { useAuthValidation } from "../../hooks/useAuthValidation";
+import { useDataUser } from "../../context/UserContext/useUser";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -43,6 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { incompleteObjectivesToday } = useDataUser();
 
   useAuthValidation();
 
@@ -71,6 +73,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return path === "/login" || path === "/start" || path === "/new";
   }
 
+  const styles = {
+    menuButton: {
+      height: "25px",
+      width: "25px",
+    },
+  };
+
+  const menu = [
+    {
+      text: "Objetivos",
+      icon: <CheckBoxOutlined sx={styles.menuButton} />,
+      info: incompleteObjectivesToday,
+      url: "/",
+    },
+    {
+      text: "Lista",
+      icon: <ChecklistRounded sx={styles.menuButton} />,
+      url: "/list",
+    },
+  ];
+
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
       <Toolbar />
@@ -78,36 +101,95 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {menu.map((value) => (
           <ListItem key={value.text}>
             {drawerOpen ? (
-              <Button
-                variant="text"
-                color="primary"
-                sx={{
-                  display: "flex",
-                  justifyContent: "left",
-                  fontWeight: "bold",
-                  color: theme.palette.text.secondary,
-                  backgroundColor: isSelected(value.url),
-                  padding: "10px",
-                  paddingX: "20px",
-                  width: "100%",
-                }}
-                startIcon={value.icon}
-                onClick={() => {
-                  navigate(value.url);
-                }}
-              >
-                {value.text}
-              </Button>
+              <Box sx={{ position: "relative" }}>
+                <Button
+                  variant="text"
+                  color="primary"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "left",
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isSelected(value.url),
+                    padding: "10px",
+                    paddingX: "20px",
+                    width: "100%",
+                  }}
+                  startIcon={value.icon}
+                  onClick={() => {
+                    navigate(value.url);
+                  }}
+                >
+                  {value.text}
+                </Button>
+                {value.info && value.info !== 0 ? (
+                  <Box
+                    onClick={() => {
+                      navigate(value.url);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      top: 3,
+                      right: 100,
+                      position: "absolute",
+                      backgroundColor: theme.palette.primary.main,
+                      borderRadius: "20px",
+                      color: "#FFF",
+                      fontSize: "12px",
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  >
+                    <b>{value.info}</b>
+                  </Box>
+                ) : (
+                  <></>
+                )}
+              </Box>
             ) : (
-              <IconButton
-                sx={{
-                  color: theme.palette.text.secondary,
-                  backgroundColor: isSelected(value.url),
-                  borderRadius: "8px",
-                }}
-              >
-                {value.icon}
-              </IconButton>
+              <Box sx={{ position: "relative" }}>
+                <IconButton
+                  onClick={() => {
+                    navigate(value.url);
+                  }}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isSelected(value.url),
+                    borderRadius: "8px",
+                  }}
+                >
+                  {value.icon}
+                </IconButton>
+                {value.info && value.info !== 0 ? (
+                  <Box
+                    onClick={() => {
+                      navigate(value.url);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      top: 3,
+                      right: 2,
+                      position: "absolute",
+                      backgroundColor: theme.palette.primary.main,
+                      borderRadius: "20px",
+                      color: "#FFF",
+                      fontSize: "12px",
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  >
+                    <b>{value.info}</b>
+                  </Box>
+                ) : (
+                  <></>
+                )}
+              </Box>
             )}
           </ListItem>
         ))}
@@ -262,23 +344,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-
-const styles = {
-  menuButton: {
-    height: "25px",
-    width: "25px",
-  },
-};
-
-const menu = [
-  {
-    text: "Objetivos",
-    icon: <CheckBoxOutlined sx={styles.menuButton} />,
-    url: "/",
-  },
-  {
-    text: "Lista",
-    icon: <ChecklistRounded sx={styles.menuButton} />,
-    url: "/list",
-  },
-];

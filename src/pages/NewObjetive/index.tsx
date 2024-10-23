@@ -104,7 +104,7 @@ export default function NewObjetive() {
         remindMe: remindMe ? selectedHour : null,
       };
       const data = {
-        goalId: goal.id,
+        goal: goal,
         objectives: newObjective,
       };
       await addObjective(data);

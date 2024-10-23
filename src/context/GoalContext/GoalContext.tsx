@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import React, { createContext, useState, ReactNode } from "react";
 
 export interface Goal {
@@ -6,6 +7,8 @@ export interface Goal {
   name: string;
   months: number;
   objectives?: Objective[];
+  createdAt?: Timestamp;
+  estimatedCompletion?: Timestamp;
 }
 
 export interface Objective {
@@ -17,6 +20,7 @@ export interface Objective {
   remindMe?: string | null;
   goalId?: string;
   completedDays?: string[];
+  totalRepeat?: number;
 }
 
 interface GoalContextProps {

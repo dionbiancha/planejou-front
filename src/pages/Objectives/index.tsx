@@ -3,6 +3,7 @@ import {
   Card,
   Checkbox,
   Collapse,
+  Divider,
   Grid,
   IconButton,
   Stack,
@@ -22,6 +23,7 @@ import {
   ObjectiveListProps,
 } from "../../services/objective";
 import { useEffect, useState } from "react";
+import { useDataUser } from "../../context/UserContext/useUser";
 
 function generateNextSevenDays() {
   const days = [];
@@ -49,11 +51,25 @@ export function Objectives() {
   const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
   const { goals } = useGoals();
   const [showDetails, setShowDetails] = useState<string[]>([]);
+  const { setIncompleteObjectivesToday } = useDataUser();
 
   const totalObjectives = goals.reduce(
     (acc, goal) => acc + (goal.objectives?.length || 0),
     0
   );
+
+  function getIncompleteObjectivesToday() {
+    const today = new Date().toISOString().split("T")[0];
+    const incompleteObjectivesToday = objectives.reduce((acc, goal) => {
+      return (
+        acc +
+        (goal.objectives?.filter((o) => !o.completedDays?.includes(today))
+          ?.length || 0)
+      );
+    }, 0);
+    setIncompleteObjectivesToday(incompleteObjectivesToday);
+    console.log("incompleteObjectivesToday", incompleteObjectivesToday);
+  }
 
   function handleShowDetails(id: string | undefined) {
     if (!id) return;
@@ -114,6 +130,10 @@ export function Objectives() {
   useEffect(() => {
     listObjectives();
   }, []);
+
+  useEffect(() => {
+    getIncompleteObjectivesToday();
+  }, [objectives]);
 
   return (
     <>
@@ -227,72 +247,93 @@ export function Objectives() {
                               }
                             />
                           </Stack>
+
                           <Collapse
                             in={showDetails?.includes(objective.id ?? "")}
                             timeout="auto"
                             unmountOnExit
                           >
-                            <>
-                              {(objective.repeat === "Diariamente" ||
-                                objective.repeat === "Semanalmente") && (
-                                <Stack>
-                                  <Stack
-                                    flexDirection={"row"}
-                                    justifyContent={"space-between"}
-                                    padding={2}
-                                  >
-                                    {generateNextSevenDays()
-                                      .reverse()
-                                      .map((day, index) => (
-                                        <Stack key={index} alignItems="center">
-                                          <Typography
-                                            sx={{
-                                              fontSize: "10px",
-                                              color: getLastObjectiveDone(
-                                                day.date
-                                              )
-                                                ? theme.palette.primary.main
-                                                : "",
-                                              textDecoration:
-                                                getLastObjectiveDone(day.date)
-                                                  ? "line-through"
-                                                  : "none",
-                                            }}
-                                            variant="subtitle2"
-                                          >
-                                            {day.dayOfWeek.slice(0, 3)}
-                                          </Typography>
-                                          <Typography
-                                            sx={{
-                                              fontSize: "15px",
-                                              color: getLastObjectiveDone(
-                                                day.date
-                                              )
-                                                ? theme.palette.primary.main
-                                                : "",
-                                              textDecoration:
-                                                getLastObjectiveDone(day.date)
-                                                  ? "line-through"
-                                                  : "none",
-                                            }}
-                                            variant="h6"
-                                          >
-                                            {day.dayOfMonth}
-                                          </Typography>
-                                        </Stack>
-                                      ))}
-                                  </Stack>
-                                  <Stack
-                                    flexDirection={"row"}
-                                    justifyContent={"space-between"}
-                                    mt={1}
-                                  >
+                            <Stack>
+                              <Stack
+                                flexDirection={"row"}
+                                justifyContent={"space-between"}
+                                padding={2}
+                              >
+                                {generateNextSevenDays()
+                                  .reverse()
+                                  .map((day, index) => (
+                                    <Stack key={index} alignItems="center">
+                                      <Typography
+                                        sx={{
+                                          fontSize: "10px",
+                                          color: getLastObjectiveDone(day.date)
+                                            ? theme.palette.primary.main
+                                            : "",
+                                          textDecoration: getLastObjectiveDone(
+                                            day.date
+                                          )
+                                            ? "line-through"
+                                            : "none",
+                                        }}
+                                        variant="subtitle2"
+                                      >
+                                        {day.dayOfWeek.slice(0, 3)}
+                                      </Typography>
+                                      <Typography
+                                        sx={{
+                                          fontSize: "15px",
+                                          color: getLastObjectiveDone(day.date)
+                                            ? theme.palette.primary.main
+                                            : "",
+                                          textDecoration: getLastObjectiveDone(
+                                            day.date
+                                          )
+                                            ? "line-through"
+                                            : "none",
+                                        }}
+                                        variant="h6"
+                                      >
+                                        {day.dayOfMonth}
+                                      </Typography>
+                                    </Stack>
+                                  ))}
+                              </Stack>
+                              <Divider sx={{ opacity: 0.5, marginY: "5px" }} />
+                              <Stack
+                                flexDirection={"row"}
+                                justifyContent={"space-between"}
+                                mt={1}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontSize: "13px",
+                                    color: theme.palette.text.secondary,
+                                  }}
+                                >
+                                  <b>Ganhos</b>
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: "13px",
+                                    color: theme.palette.text.secondary,
+                                  }}
+                                >
+                                  <b>+30 XP</b>
+                                </Typography>
+                              </Stack>
+                              <Stack
+                                flexDirection={"row"}
+                                justifyContent={"space-between"}
+                                mt={1}
+                              >
+                                {objective.repeat !== "Uma vez" && (
+                                  <>
                                     <Typography
                                       sx={{
                                         fontSize: "13px",
                                         color: objectiveDone
                                           ? theme.palette.primary.main
-                                          : theme.palette.error.main,
+                                          : theme.palette.warning.main,
                                       }}
                                     >
                                       <b>Ofensiva</b>
@@ -302,7 +343,7 @@ export function Objectives() {
                                         fontSize: "13px",
                                         color: objectiveDone
                                           ? theme.palette.primary.main
-                                          : theme.palette.error.main,
+                                          : theme.palette.warning.main,
                                       }}
                                     >
                                       <b>
@@ -311,10 +352,10 @@ export function Objectives() {
                                           objective.selectDaily?.length}
                                       </b>
                                     </Typography>
-                                  </Stack>
-                                </Stack>
-                              )}
-                            </>
+                                  </>
+                                )}
+                              </Stack>
+                            </Stack>
                           </Collapse>
                         </Card>
                       </Grid>

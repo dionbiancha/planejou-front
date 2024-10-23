@@ -3,6 +3,8 @@ import React, { createContext, useState, ReactNode } from "react";
 
 interface UserContextProps {
   userData: User;
+  incompleteObjectivesToday: number;
+  setIncompleteObjectivesToday: React.Dispatch<React.SetStateAction<number>>;
   setUserData: React.Dispatch<React.SetStateAction<User>>;
   clearUserData: () => void;
 }
@@ -17,6 +19,7 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [userData, setUserData] = useState<User>({} as User);
+  const [incompleteObjectivesToday, setIncompleteObjectivesToday] = useState(0);
 
   function clearUserData() {
     setUserData({} as User);
@@ -25,6 +28,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
+        setIncompleteObjectivesToday,
+        incompleteObjectivesToday,
         clearUserData,
         setUserData,
         userData,

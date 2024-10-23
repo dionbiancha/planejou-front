@@ -21,6 +21,9 @@ export const lightTheme = createTheme({
     error: {
       main: "#f87272", // Cor principal para os erros
     },
+    warning: {
+      main: "#FBBD23", // Cor principal para os avisos
+    },
   },
 });
 
@@ -43,6 +46,9 @@ export const darkTheme = createTheme({
     },
     error: {
       main: "#f87272", // Cor principal para os erros
+    },
+    warning: {
+      main: "#FBBD23", // Cor principal para os avisos
     },
   },
 });

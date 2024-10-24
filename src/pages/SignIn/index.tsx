@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import CustomButton from "../../components/Button/CustomButton";
 import LoginButton from "../../features/LoginButton";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { googleSignIn } from "../../services/signIn";
+import { googleSignIn } from "../../services/user";
 import { useDataUser } from "../../context/UserContext/useUser";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 
@@ -32,7 +32,8 @@ export function SignIn() {
     loading.show();
     try {
       const response = await googleSignIn();
-      setUserData(response.user);
+      console.log(response.user);
+      setUserData((prev) => ({ ...prev, userData: response.user }));
       goToHome();
     } catch (error) {
       console.error(error);

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import {
   Toolbar,
   Drawer,
@@ -27,6 +27,9 @@ import CustomButton from "../Button/CustomButton";
 import BorderLinearProgress from "../BorderLinearProgress";
 import { useAuthValidation } from "../../hooks/useAuthValidation";
 import { useDataUser } from "../../context/UserContext/useUser";
+import { getUserData } from "../../services/user";
+import { useLoading } from "../../context/LoadingContext/useLoading";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -44,7 +47,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { incompleteObjectivesToday } = useDataUser();
+  const { userData, setUserData } = useDataUser();
+  const loading = useLoading();
 
   useAuthValidation();
 
@@ -70,7 +74,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   function isValidRoute(path: string) {
-    return path === "/login" || path === "/start" || path === "/new";
+    return (
+      path === "/login" ||
+      path === "/start" ||
+      path === "/new" ||
+      path.includes("/edit")
+    );
   }
 
   const styles = {
@@ -84,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     {
       text: "Objetivos",
       icon: <CheckBoxOutlined sx={styles.menuButton} />,
-      info: incompleteObjectivesToday,
+      info: userData.incompleteObjectivesToday,
       url: "/",
     },
     {
@@ -92,7 +101,56 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       icon: <ChecklistRounded sx={styles.menuButton} />,
       url: "/list",
     },
+    {
+      text: "Social",
+      icon: <EmojiEventsIcon sx={styles.menuButton} />,
+      url: "/social",
+    },
   ];
+
+  function calculateTestProgress(): {
+    progress: number;
+    daysRemaining: number;
+  } {
+    if (!userData.testEndDate) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const now = new Date();
+    const totalDuration = 7 * 24 * 60 * 60 * 1000;
+    const endDate = userData.testEndDate.toDate();
+    const remainingTime = endDate.getTime() - now.getTime();
+
+    const daysRemaining = Math.ceil(remainingTime / (24 * 60 * 60 * 1000));
+
+    if (remainingTime <= 0) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const progress = Math.min((remainingTime / totalDuration) * 100, 100);
+
+    return { progress, daysRemaining };
+  }
+
+  async function handleUserData() {
+    loading.show();
+    try {
+      const res = await getUserData();
+      setUserData((prev) => ({
+        ...prev,
+        xp: res.xp,
+        testEndDate: res.testEndDate,
+        name: res.name,
+      }));
+    } catch (e) {
+      console.log(e);
+    }
+    loading.hide();
+  }
+
+  useEffect(() => {
+    handleUserData();
+  }, []);
 
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
@@ -212,45 +270,58 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
-      <Stack
-        position="fixed"
-        zIndex={1201}
-        flexDirection={"row"}
-        justifyContent={{ xs: "space-between", md: "center" }}
-        alignItems={"center"}
-        sx={{
-          height: "50px",
-          width: "100%",
-          backgroundColor: "#2A303C",
-          padding: "20px",
-        }}
-      >
-        <Typography variant="body2" color="#fff">
-          <b>{t("7 dias de teste gratuito")}</b>
-        </Typography>
-        <Box
+      {!loading.state && (
+        <Stack
+          position="fixed"
+          zIndex={1201}
+          flexDirection={"row"}
+          justifyContent={{ xs: "space-between", md: "center" }}
+          alignItems={"center"}
           sx={{
-            display: {
-              xs: "none",
-              md: "block",
-            },
-            maxWidth: "300px",
+            height: "50px",
             width: "100%",
-            marginX: "20px",
+            backgroundColor: "#2A303C",
+            padding: "20px",
           }}
         >
-          <BorderLinearProgress rtl variant="determinate" value={90} />
-        </Box>
+          <Typography variant="body2" color="#fff">
+            <b>
+              {calculateTestProgress().daysRemaining}{" "}
+              {calculateTestProgress().daysRemaining === 1
+                ? t("dia")
+                : t("dias")}{" "}
+              {t("de teste gratuito")}
+            </b>
+          </Typography>
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                md: "block",
+              },
+              maxWidth: "300px",
+              width: "100%",
+              marginX: "20px",
+            }}
+          >
+            <BorderLinearProgress
+              rtl
+              variant="determinate"
+              value={calculateTestProgress().progress}
+            />
+          </Box>
 
-        <CustomButton
-          onClick={() => {}}
-          variant="contained"
-          borderRadius={2}
-          size="small"
-          label={t("Atualize agora")}
-          // disabled={disabledButton()}
-        />
-      </Stack>
+          <CustomButton
+            onClick={() => {}}
+            variant="contained"
+            borderRadius={2}
+            size="small"
+            label={t("Atualize agora")}
+            // disabled={disabledButton()}
+          />
+        </Stack>
+      )}
+
       <Box
         sx={{
           display: "flex",

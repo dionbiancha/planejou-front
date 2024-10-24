@@ -33,6 +33,10 @@ export function useCustomNavigate() {
     validateNavigate("/new");
   }
 
+  function goToEditObjetive(id: string) {
+    validateNavigate(`/edit/${id}`);
+  }
+
   return {
     goBack,
     goToLogin,
@@ -40,5 +44,6 @@ export function useCustomNavigate() {
     goToList,
     goToStart,
     goToNewObjetive,
+    goToEditObjetive,
   };
 }

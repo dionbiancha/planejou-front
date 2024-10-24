@@ -6,6 +6,9 @@ import {
   Divider,
   Grid,
   IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
   useTheme,
@@ -17,6 +20,7 @@ import { Add, MoreVertOutlined } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 import { useGoals } from "../../context";
 import {
+  deleteObjective,
   listObjectivesByUserId,
   markObjectiveAsCompleted,
   MarkObjectiveAsCompletedProps,
@@ -24,6 +28,13 @@ import {
 } from "../../services/objective";
 import { useEffect, useState } from "react";
 import { useDataUser } from "../../context/UserContext/useUser";
+import { getHasList } from "../../services/goal";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import ReplayIcon from "@mui/icons-material/Replay";
+import DeleteDialog from "../../components/Dialog/DeleteDialog";
+import { useLoading } from "../../context/LoadingContext/useLoading";
+import { useSnack } from "../../context/SnackContext";
 
 function generateNextSevenDays() {
   const days = [];
@@ -44,19 +55,51 @@ function getLastMonday() {
   return lastMonday;
 }
 
+interface selectObjectiveProps {
+  goalId: string;
+  objectiveId: string;
+  name: string;
+}
+
 export function Objectives() {
   const { t } = useTranslation();
-  const { goToNewObjetive } = useCustomNavigate();
+  const loading = useLoading();
+  const snack = useSnack();
+  const { goToNewObjetive, goToStart, goToEditObjetive } = useCustomNavigate();
   const theme = useTheme();
   const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
-  const { goals } = useGoals();
+  const { setGoals } = useGoals();
   const [showDetails, setShowDetails] = useState<string[]>([]);
-  const { setIncompleteObjectivesToday } = useDataUser();
-
-  const totalObjectives = goals.reduce(
-    (acc, goal) => acc + (goal.objectives?.length || 0),
-    0
+  const { setUserData } = useDataUser();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectObjective, setSelectObjective] = useState<selectObjectiveProps>(
+    {} as selectObjectiveProps
   );
+  const [menuState, setMenuState] = useState<{
+    [key: string]: { anchorEl: HTMLElement | null; open: boolean };
+  }>({});
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>, name: string) => {
+    setMenuState({
+      ...menuState,
+      [name]: {
+        anchorEl: event.currentTarget,
+        open: true,
+      },
+    });
+  };
+
+  const handleClose = (name: string) => {
+    setMenuState({
+      ...menuState,
+      [name]: {
+        anchorEl: null,
+        open: false,
+      },
+    });
+  };
+
+  const totalObjectives = objectives.length;
 
   function getIncompleteObjectivesToday() {
     const today = new Date().toISOString().split("T")[0];
@@ -67,8 +110,7 @@ export function Objectives() {
           ?.length || 0)
       );
     }, 0);
-    setIncompleteObjectivesToday(incompleteObjectivesToday);
-    console.log("incompleteObjectivesToday", incompleteObjectivesToday);
+    setUserData((prev) => ({ ...prev, incompleteObjectivesToday }));
   }
 
   function handleShowDetails(id: string | undefined) {
@@ -89,7 +131,10 @@ export function Objectives() {
     }
   }
 
-  async function markObjective(data: MarkObjectiveAsCompletedProps) {
+  async function markObjective(
+    data: MarkObjectiveAsCompletedProps,
+    objectiveDone?: boolean
+  ) {
     try {
       setObjectives((prev) => {
         const newObjectives = prev.map((o) => {
@@ -121,13 +166,49 @@ export function Objectives() {
         });
         return newObjectives;
       });
+      if (objectiveDone) {
+        setUserData((prev) => ({ ...prev, xp: prev.xp + data.xp }));
+      } else {
+        setUserData((prev) => ({ ...prev, xp: prev.xp - data.xp }));
+      }
+
       await markObjectiveAsCompleted(data);
     } catch (e) {
       console.log(e);
     }
   }
 
+  async function handleHasList() {
+    try {
+      const res = await getHasList();
+      setUserData((prev) => ({ ...prev, hasList: res }));
+      if (!res) {
+        goToStart();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function handleDeleteObjective() {
+    loading.show();
+    setOpenDeleteDialog(false);
+    try {
+      await deleteObjective({
+        goalId: selectObjective.goalId,
+        objectiveId: selectObjective.objectiveId,
+      });
+      listObjectives();
+      snack.success("Objetivo excluído com sucesso!");
+    } catch (e) {
+      console.log(e);
+      snack.error("Erro ao excluir objetivo!");
+    }
+    loading.hide();
+  }
+
   useEffect(() => {
+    handleHasList();
     listObjectives();
   }, []);
 
@@ -137,6 +218,16 @@ export function Objectives() {
 
   return (
     <>
+      <DeleteDialog
+        open={openDeleteDialog}
+        handleClose={() => setOpenDeleteDialog(false)}
+        title="Tem certeza?"
+        description="Se você excluir esse objetivo, todos os seus registros serão perdidos para sempre."
+        textButtonCancel="Cancelar"
+        textButtonConfirm={`Excluir`}
+        objetive={selectObjective.name}
+        onConfirm={handleDeleteObjective}
+      />
       <Stack flexDirection={"row"}>
         <Box sx={{ width: "100%" }}>
           <Stack flexDirection="column" sx={{ marginRight: "20px" }}>
@@ -191,9 +282,10 @@ export function Objectives() {
                       const completedCount = weekDays.filter((day) =>
                         objective?.completedDays?.includes(day)
                       ).length;
-
+                      if (completedCount === 0) return 1;
                       return completedCount;
                     }
+
                     return (
                       <Grid item xs={12} md={6} sm={12} key={index}>
                         <Card
@@ -217,10 +309,78 @@ export function Objectives() {
                               justifyContent="center"
                               sx={{ width: "100%" }}
                             >
-                              <IconButton onClick={() => {}}>
+                              <IconButton
+                                onClick={(event) =>
+                                  handleClick(event, objective.name)
+                                }
+                              >
                                 <MoreVertOutlined />
                               </IconButton>
-
+                              <Menu
+                                id={`basic-menu-${objective.name}`}
+                                anchorEl={menuState[objective.name]?.anchorEl}
+                                open={menuState[objective.name]?.open || false}
+                                onClose={() => handleClose(objective.name)}
+                                PaperProps={{
+                                  sx: {
+                                    padding: "5px",
+                                    marginLeft: "20px",
+                                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                                  },
+                                }}
+                              >
+                                <MenuItem
+                                  onClick={() => handleClose(objective.name)}
+                                >
+                                  <ListItemIcon>
+                                    <ReplayIcon
+                                      sx={{
+                                        width: "20px",
+                                      }}
+                                    />
+                                  </ListItemIcon>
+                                  {t("Lembrar")}
+                                </MenuItem>
+                                <MenuItem
+                                  onClick={() => {
+                                    setGoals([
+                                      {
+                                        position: "",
+                                        name: "",
+                                        months: 1,
+                                        objectives: [objective],
+                                      },
+                                    ]);
+                                    goToEditObjetive(o.goalId ?? "");
+                                    handleClose(objective.name);
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <EditIcon
+                                      sx={{
+                                        width: "20px",
+                                      }}
+                                    />
+                                  </ListItemIcon>
+                                  {t("Editar")}
+                                </MenuItem>
+                                <MenuItem
+                                  onClick={() => {
+                                    setSelectObjective({
+                                      goalId: o.goalId,
+                                      objectiveId: objective.id ?? "",
+                                      name: objective.name,
+                                    });
+                                    setOpenDeleteDialog(true);
+                                    handleClose(objective.name);
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <DeleteIcon sx={{ width: "20px" }} />
+                                  </ListItemIcon>
+                                  {t("Excluir")}
+                                </MenuItem>
+                              </Menu>
                               <Typography
                                 onClick={() => handleShowDetails(objective.id)}
                                 noWrap={false} // Permite a quebra de linha
@@ -239,12 +399,21 @@ export function Objectives() {
                             <Checkbox
                               size="large"
                               checked={objectiveDone}
-                              onChange={() =>
-                                markObjective({
-                                  goalId: o.goalId,
-                                  objectiveId: objective.id,
-                                })
-                              }
+                              onChange={() => {
+                                markObjective(
+                                  {
+                                    goalId: o.goalId,
+                                    objectiveId: objective.id,
+                                    xp:
+                                      (objectiveDone
+                                        ? getNumberMissingDays() === 1
+                                          ? 1
+                                          : getNumberMissingDays() - 1
+                                        : getNumberMissingDays()) * 30,
+                                  },
+                                  objectiveDone
+                                );
+                              }}
                             />
                           </Stack>
 
@@ -310,7 +479,7 @@ export function Objectives() {
                                     color: theme.palette.text.secondary,
                                   }}
                                 >
-                                  <b>Ganhos</b>
+                                  <b>{objectiveDone ? "Próximo" : "Ganhos"}</b>
                                 </Typography>
                                 <Typography
                                   sx={{
@@ -318,7 +487,7 @@ export function Objectives() {
                                     color: theme.palette.text.secondary,
                                   }}
                                 >
-                                  <b>+30 XP</b>
+                                  <b>{`+${getNumberMissingDays() * 30} XP`}</b>
                                 </Typography>
                               </Stack>
                               <Stack

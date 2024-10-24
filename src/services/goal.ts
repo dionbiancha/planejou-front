@@ -1,4 +1,13 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import { v4 as uuidv4 } from "uuid";
 import { Goal } from "../context/GoalContext/GoalContext";
@@ -18,8 +27,30 @@ export async function addGoalList(goals: Goal[]) {
       goals: goalsWithIds,
       userId: auth.userId,
     });
+    const userDocRef = doc(db, "users", auth.userId);
+    await updateDoc(userDocRef, {
+      hasList: true,
+    });
   } catch (e) {
     console.error(e);
+  }
+}
+
+export async function getHasList() {
+  try {
+    const auth = validateAuth();
+    const userDocRef = doc(db, "users", auth.userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      return userData.hasList; // Retorna hasList se existir, ou null
+    } else {
+      console.log("Usuário não encontrado.");
+      return false;
+    }
+  } catch (e) {
+    console.error("Erro ao recuperar hasList:", e);
   }
 }
 

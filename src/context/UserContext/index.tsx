@@ -1,11 +1,19 @@
 import { User } from "firebase/auth";
+import { Timestamp } from "firebase/firestore";
 import React, { createContext, useState, ReactNode } from "react";
 
-interface UserContextProps {
+interface UserProps {
   userData: User;
   incompleteObjectivesToday: number;
-  setIncompleteObjectivesToday: React.Dispatch<React.SetStateAction<number>>;
-  setUserData: React.Dispatch<React.SetStateAction<User>>;
+  xp: number;
+  name: string;
+  testEndDate: Timestamp;
+  hasList: boolean;
+}
+
+interface UserContextProps {
+  userData: UserProps;
+  setUserData: React.Dispatch<React.SetStateAction<UserProps>>;
   clearUserData: () => void;
 }
 
@@ -18,18 +26,14 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [userData, setUserData] = useState<User>({} as User);
-  const [incompleteObjectivesToday, setIncompleteObjectivesToday] = useState(0);
-
+  const [userData, setUserData] = useState<UserProps>({} as UserProps);
   function clearUserData() {
-    setUserData({} as User);
+    setUserData({} as UserProps);
   }
 
   return (
     <UserContext.Provider
       value={{
-        setIncompleteObjectivesToday,
-        incompleteObjectivesToday,
         clearUserData,
         setUserData,
         userData,

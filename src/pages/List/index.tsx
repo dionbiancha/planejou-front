@@ -64,14 +64,6 @@ export function List() {
       totalRepeat += value.totalRepeat || 0;
       completedDays += value.completedDays?.length || 0;
     });
-    console.log("totalRepeat", totalRepeat);
-    console.log("completedDays", completedDays);
-    console.log(
-      "completedDays",
-      ((totalRepeat - completedDays) * 100) / totalRepeat
-    );
-    // totalRepeat 100
-    // completedDays x
     return (completedDays * 100) / totalRepeat;
   }
 

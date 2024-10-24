@@ -3,6 +3,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  increment,
   query,
   setDoc,
   Timestamp,
@@ -22,6 +23,12 @@ export interface ObjectiveListProps {
 export interface MarkObjectiveAsCompletedProps {
   goalId: string;
   objectiveId: string | undefined;
+  xp: number;
+}
+
+interface DeleteObjectiveProps {
+  goalId: string;
+  objectiveId: string;
 }
 
 function calculateRepetitions(
@@ -29,19 +36,15 @@ function calculateRepetitions(
   endDate: Date,
   timesPerWeek: number
 ): number {
-  // Check if the end date is earlier than the start date
   if (endDate < startDate) {
     return 0;
   }
 
-  // Calculate the difference in milliseconds and convert to days
   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Calculate the number of weeks in the range
   const weeks = diffDays / 7;
 
-  // Multiply the number of weeks by the number of times per week
   const repetitions = Math.floor(weeks * timesPerWeek);
 
   return repetitions;
@@ -130,24 +133,30 @@ export async function listObjectivesByUserId(): Promise<ObjectiveListProps[]> {
 export async function markObjectiveAsCompleted({
   goalId,
   objectiveId,
+  xp,
 }: MarkObjectiveAsCompletedProps) {
   try {
+    const auth = validateAuth();
     const docRef = doc(db, "objectives", goalId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const existingObjectives = docSnap.data()?.objectives || [];
       const today = new Date().toISOString().split("T")[0];
+      let isCompletedToday = false; // Variável para controlar o estado de completude
       const updatedObjectives = existingObjectives.map(
         (objective: Objective) => {
           if (objective.id === objectiveId) {
             let updatedCompletedDays = objective.completedDays || [];
             if (updatedCompletedDays.includes(today)) {
+              // Se o dia de hoje já está marcado, remove-o (objetivo desmarcado)
               updatedCompletedDays = updatedCompletedDays.filter(
                 (day) => day !== today
               );
             } else {
+              // Marca o dia de hoje (objetivo completo)
               updatedCompletedDays = [...updatedCompletedDays, today];
+              isCompletedToday = true;
             }
 
             return {
@@ -162,11 +171,97 @@ export async function markObjectiveAsCompleted({
       await updateDoc(docRef, {
         objectives: updatedObjectives,
       });
-      console.log("Objetivo atualizado com sucesso!");
+
+      // Agora, atualiza o XP do usuário
+      const userRef = doc(db, "users", auth.userId);
+
+      if (isCompletedToday) {
+        // Objetivo foi marcado como completo, soma o XP
+        console.log("Incrementando XP: ", xp);
+        await updateDoc(userRef, {
+          xp: increment(xp), // Incrementa o XP no valor passado
+        });
+      } else {
+        // Objetivo foi desmarcado, subtrai o XP
+        console.log("decrementando XP: ", xp);
+        await updateDoc(userRef, {
+          xp: increment(-xp), // Subtrai o XP no valor passado
+        });
+      }
+
+      console.log("Objetivo e XP atualizados com sucesso!");
     } else {
       console.error("Objetivo não encontrado!");
     }
   } catch (e) {
     console.error("Erro ao atualizar o objetivo: ", e);
+  }
+}
+
+export async function deleteObjective({
+  goalId,
+  objectiveId,
+}: DeleteObjectiveProps) {
+  try {
+    const docRef = doc(db, "objectives", goalId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const existingObjectives = docSnap.data()?.objectives || [];
+      const updatedObjectives = existingObjectives.filter(
+        (objective: Objective) => objective.id !== objectiveId
+      );
+
+      await updateDoc(docRef, {
+        objectives: updatedObjectives,
+      });
+
+      console.log(`Objective with ID ${objectiveId} deleted successfully.`);
+    } else {
+      console.error("No such document!");
+    }
+  } catch (error) {
+    console.error("Error deleting objective: ", error);
+  }
+}
+
+export async function updateObjective({
+  goalId,
+  objectiveId,
+  updatedData,
+}: {
+  goalId: string;
+  objectiveId: string;
+  updatedData: Partial<Objective>;
+}) {
+  try {
+    const docRef = doc(db, "objectives", goalId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const existingObjectives = docSnap.data()?.objectives || [];
+      const updatedObjectives = existingObjectives.map((objective: Objective) =>
+        objective.id === objectiveId
+          ? {
+              ...objective,
+              name: updatedData.name,
+              repeat: updatedData.repeat,
+              perWeek: updatedData.perWeek,
+              selectDaily: updatedData.selectDaily,
+              remindMe: updatedData.remindMe,
+            }
+          : objective
+      );
+
+      await updateDoc(docRef, {
+        objectives: updatedObjectives,
+      });
+
+      console.log(`Objective with ID ${objectiveId} updated successfully.`);
+    } else {
+      console.error("No such document!");
+    }
+  } catch (error) {
+    console.error("Error updating objective: ", error);
   }
 }

@@ -10,7 +10,8 @@ import Start from "./pages/Start";
 import { GoalProvider } from "./context";
 import { Objectives } from "./pages/Objectives";
 import { List } from "./pages/List";
-import NewObjetive from "./pages/NewObjetive";
+import NewObjective from "./pages/NewObjective";
+import EditObjective from "./pages/EditObjective";
 import { SnackProvider } from "./context/SnackContext";
 import Snack from "./components/Snack";
 import { UserProvider } from "./context/UserContext";
@@ -35,7 +36,8 @@ function App() {
                     <Route path="/login" element={<SignIn />} />
                     <Route path="/start" element={<Start />} />
                     <Route path="/list" element={<List />} />
-                    <Route path="/new" element={<NewObjetive />} />
+                    <Route path="/new" element={<NewObjective />} />
+                    <Route path="/edit/:id" element={<EditObjective />} />
                   </Routes>
                 </Layout>
               </GoalProvider>

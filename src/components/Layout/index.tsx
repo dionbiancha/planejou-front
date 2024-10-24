@@ -155,6 +155,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
       <Toolbar />
+      <Box component="img" src="logo.png" width="40px" marginLeft={"20px"} />
       <List>
         {menu.map((value) => (
           <ListItem key={value.text}>

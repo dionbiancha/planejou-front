@@ -142,19 +142,25 @@ export async function markObjectiveAsCompleted({
 
     if (docSnap.exists()) {
       const existingObjectives = docSnap.data()?.objectives || [];
-      const today = new Date().toISOString().split("T")[0];
-      let isCompletedToday = false; // Variável para controlar o estado de completude
+      const today = new Date()
+        .toLocaleDateString("pt-BR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .split("/")
+        .reverse()
+        .join("-");
+      let isCompletedToday = false;
       const updatedObjectives = existingObjectives.map(
         (objective: Objective) => {
           if (objective.id === objectiveId) {
             let updatedCompletedDays = objective.completedDays || [];
             if (updatedCompletedDays.includes(today)) {
-              // Se o dia de hoje já está marcado, remove-o (objetivo desmarcado)
               updatedCompletedDays = updatedCompletedDays.filter(
                 (day) => day !== today
               );
             } else {
-              // Marca o dia de hoje (objetivo completo)
               updatedCompletedDays = [...updatedCompletedDays, today];
               isCompletedToday = true;
             }
@@ -167,29 +173,23 @@ export async function markObjectiveAsCompleted({
           return objective;
         }
       );
-
       await updateDoc(docRef, {
         objectives: updatedObjectives,
       });
 
-      // Agora, atualiza o XP do usuário
       const userRef = doc(db, "users", auth.userId);
 
       if (isCompletedToday) {
-        // Objetivo foi marcado como completo, soma o XP
-        console.log("Incrementando XP: ", xp);
         await updateDoc(userRef, {
-          xp: increment(xp), // Incrementa o XP no valor passado
+          xp: increment(xp),
+          totalXp: increment(xp),
         });
       } else {
-        // Objetivo foi desmarcado, subtrai o XP
-        console.log("decrementando XP: ", xp);
         await updateDoc(userRef, {
-          xp: increment(-xp), // Subtrai o XP no valor passado
+          xp: increment(-xp),
+          totalXp: increment(-xp),
         });
       }
-
-      console.log("Objetivo e XP atualizados com sucesso!");
     } else {
       console.error("Objetivo não encontrado!");
     }

@@ -17,6 +17,10 @@ import Snack from "./components/Snack";
 import { UserProvider } from "./context/UserContext";
 import Layout from "./components/Layout";
 import { LoadingProvider } from "./context/LoadingContext";
+import { League } from "./pages/League";
+import Missions from "./pages/Missions";
+import Profile from "./pages/Profile";
+import Social from "./pages/Social";
 
 function App() {
   const [isDarkMode] = useState(false);
@@ -37,7 +41,11 @@ function App() {
                     <Route path="/start" element={<Start />} />
                     <Route path="/list" element={<List />} />
                     <Route path="/new" element={<NewObjective />} />
+                    <Route path="/league" element={<League />} />
                     <Route path="/edit/:id" element={<EditObjective />} />
+                    <Route path="/missions" element={<Missions />} />
+                    <Route path="/social" element={<Social />} />
+                    <Route path="/profile" element={<Profile />} />
                   </Routes>
                 </Layout>
               </GoalProvider>

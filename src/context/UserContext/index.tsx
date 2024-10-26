@@ -9,6 +9,9 @@ interface UserProps {
   name: string;
   testEndDate: Timestamp;
   hasList: boolean;
+  totalXp: number;
+  league: number;
+  createdAt: Timestamp;
 }
 
 interface UserContextProps {

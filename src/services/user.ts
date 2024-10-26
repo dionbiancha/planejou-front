@@ -1,7 +1,23 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth, db } from "../config/firebase";
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+} from "firebase/firestore";
 import { validateAuth } from "./authService";
+
+// Praia
+// Tartaruguinha
+// Casco Lento
+// Casco Duro
+// Turbo Tartaruga
 
 export async function googleSignIn() {
   const provider = new GoogleAuthProvider();
@@ -22,6 +38,9 @@ export async function googleSignIn() {
       xp: 0,
       testEndDate,
       hasList: false,
+      urlImage: res.user.photoURL || "",
+      league: 1,
+      totalXp: 0,
     };
 
     // Referência ao documento do usuário
@@ -56,6 +75,71 @@ export async function getUserData() {
     } else {
       throw new Error("User not found");
     }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export async function getUserRanking() {
+  try {
+    const auth = validateAuth();
+    const userDocRef = doc(db, "users", auth.userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      throw new Error("User not found");
+    }
+
+    const userData = userDoc.data();
+    const usersCollection = collection(db, "users");
+    const usersSnapshot = await getDocs(usersCollection);
+
+    // Cria um array de usuários com XP
+    const users = usersSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      xp: doc.data().xp || 0, // Define XP padrão como 0 caso não exista
+    }));
+
+    // Ordena por XP em ordem decrescente
+    users.sort((a, b) => b.xp - a.xp);
+
+    // Encontra a posição do usuário autenticado
+    const userPosition = users.findIndex((user) => user.id === auth.userId) + 1;
+
+    return {
+      ...userData,
+      position: userPosition,
+      totalUsers: users.length,
+    };
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "An unknown error occurred"
+    );
+  }
+}
+
+export async function getTopUsersByXP() {
+  try {
+    const auth = validateAuth();
+    const usersCollectionRef = collection(db, "users");
+    const q = query(usersCollectionRef, orderBy("xp", "desc"), limit(30));
+    const querySnapshot = await getDocs(q);
+
+    const topUsers = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      const firstName = data.name.split(" ")[0];
+      return {
+        name: firstName,
+        xp: data.xp,
+        myAccount: data.id === auth.userId,
+      };
+    });
+
+    return topUsers;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);

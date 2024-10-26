@@ -32,7 +32,6 @@ export function SignIn() {
     loading.show();
     try {
       const response = await googleSignIn();
-      console.log(response.user);
       setUserData((prev) => ({ ...prev, userData: response.user }));
       goToHome();
     } catch (error) {

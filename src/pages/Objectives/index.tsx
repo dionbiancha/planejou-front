@@ -35,6 +35,8 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import DeleteDialog from "../../components/Dialog/DeleteDialog";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useSnack } from "../../context/SnackContext";
+import { getUserData } from "../../services/user";
+import MyDivision from "../../features/MyDivision";
 
 function generateNextSevenDays() {
   const days = [];
@@ -71,13 +73,25 @@ export function Objectives() {
   const { setGoals } = useGoals();
   const [showDetails, setShowDetails] = useState<string[]>([]);
   const { setUserData } = useDataUser();
+
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
   const [selectObjective, setSelectObjective] = useState<selectObjectiveProps>(
     {} as selectObjectiveProps
   );
   const [menuState, setMenuState] = useState<{
     [key: string]: { anchorEl: HTMLElement | null; open: boolean };
   }>({});
+
+  const newDate = new Date()
+    .toLocaleDateString("pt-BR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+    .split("/")
+    .reverse()
+    .join("-");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>, name: string) => {
     setMenuState({
@@ -99,10 +113,17 @@ export function Objectives() {
     });
   };
 
-  const totalObjectives = objectives.length;
+  function totalObjectives() {
+    return (
+      objectives?.reduce(
+        (acc, goal) => acc + (goal.objectives?.length || 0),
+        0
+      ) || 0
+    );
+  }
 
   function getIncompleteObjectivesToday() {
-    const today = new Date().toISOString().split("T")[0];
+    const today = newDate;
     const incompleteObjectivesToday = objectives.reduce((acc, goal) => {
       return (
         acc +
@@ -131,6 +152,21 @@ export function Objectives() {
     }
   }
 
+  async function handleGetUserData() {
+    loading.show();
+    try {
+      const res = await getUserData();
+      setUserData((prev) => ({ ...prev, ...res }));
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("An unknown error occurred");
+      }
+    }
+    loading.hide();
+  }
+
   async function markObjective(
     data: MarkObjectiveAsCompletedProps,
     objectiveDone?: boolean
@@ -145,17 +181,11 @@ export function Objectives() {
                 if (objective.id === data.objectiveId) {
                   return {
                     ...objective,
-                    completedDays: objective.completedDays?.includes(
-                      new Date().toISOString().split("T")[0]
-                    )
+                    completedDays: objective.completedDays?.includes(newDate)
                       ? objective.completedDays?.filter(
-                          (day) =>
-                            day !== new Date().toISOString().split("T")[0]
+                          (day) => day !== newDate
                         )
-                      : [
-                          ...(objective.completedDays || []),
-                          new Date().toISOString().split("T")[0],
-                        ],
+                      : [...(objective.completedDays || []), newDate],
                   };
                 }
                 return objective;
@@ -167,9 +197,17 @@ export function Objectives() {
         return newObjectives;
       });
       if (objectiveDone) {
-        setUserData((prev) => ({ ...prev, xp: prev.xp + data.xp }));
+        setUserData((prev) => ({
+          ...prev,
+          xp: prev.xp - data.xp,
+          totalXp: prev.totalXp - data.xp,
+        }));
       } else {
-        setUserData((prev) => ({ ...prev, xp: prev.xp - data.xp }));
+        setUserData((prev) => ({
+          ...prev,
+          xp: prev.xp + data.xp,
+          totalXp: prev.totalXp + data.xp,
+        }));
       }
 
       await markObjectiveAsCompleted(data);
@@ -210,6 +248,7 @@ export function Objectives() {
   useEffect(() => {
     handleHasList();
     listObjectives();
+    handleGetUserData();
   }, []);
 
   useEffect(() => {
@@ -230,10 +269,10 @@ export function Objectives() {
       />
       <Stack flexDirection={"row"}>
         <Box sx={{ width: "100%" }}>
-          <Stack flexDirection="column" sx={{ marginRight: "20px" }}>
+          <Stack flexDirection="column">
             <Stack direction="row" alignItems="center" justifyContent="start">
               <Box sx={{ color: theme.palette.text.secondary }} component={"b"}>
-                {totalObjectives} {t("OBJETIVOS")}
+                {totalObjectives()} {t("OBJETIVOS")}
               </Box>
               <IconButton color="inherit" onClick={() => goToNewObjetive()}>
                 <Add
@@ -254,9 +293,8 @@ export function Objectives() {
               <Grid container spacing={2}>
                 {objectives.map((o) =>
                   o.objectives?.map((objective, index) => {
-                    const objectiveDone = objective.completedDays?.includes(
-                      new Date().toISOString().split("T")[0]
-                    );
+                    const objectiveDone =
+                      objective.completedDays?.includes(newDate);
 
                     function getLastObjectiveDone(date: string) {
                       return objective.completedDays?.includes(date);
@@ -490,40 +528,42 @@ export function Objectives() {
                                   <b>{`+${getNumberMissingDays() * 30} XP`}</b>
                                 </Typography>
                               </Stack>
-                              <Stack
-                                flexDirection={"row"}
-                                justifyContent={"space-between"}
-                                mt={1}
-                              >
-                                {objective.repeat !== "Uma vez" && (
-                                  <>
-                                    <Typography
-                                      sx={{
-                                        fontSize: "13px",
-                                        color: objectiveDone
-                                          ? theme.palette.primary.main
-                                          : theme.palette.warning.main,
-                                      }}
-                                    >
-                                      <b>Ofensiva</b>
-                                    </Typography>
-                                    <Typography
-                                      sx={{
-                                        fontSize: "13px",
-                                        color: objectiveDone
-                                          ? theme.palette.primary.main
-                                          : theme.palette.warning.main,
-                                      }}
-                                    >
-                                      <b>
-                                        {getNumberMissingDays()} de{" "}
-                                        {objective.perWeek ??
-                                          objective.selectDaily?.length}
-                                      </b>
-                                    </Typography>
-                                  </>
-                                )}
-                              </Stack>
+                              {getNumberMissingDays() > 1 && (
+                                <Stack
+                                  flexDirection={"row"}
+                                  justifyContent={"space-between"}
+                                  mt={1}
+                                >
+                                  {objective.repeat !== "Uma vez" && (
+                                    <>
+                                      <Typography
+                                        sx={{
+                                          fontSize: "13px",
+                                          color: objectiveDone
+                                            ? theme.palette.primary.main
+                                            : theme.palette.warning.main,
+                                        }}
+                                      >
+                                        <b>Bonus</b>
+                                      </Typography>
+                                      <Typography
+                                        sx={{
+                                          fontSize: "13px",
+                                          color: objectiveDone
+                                            ? theme.palette.primary.main
+                                            : theme.palette.warning.main,
+                                        }}
+                                      >
+                                        <b>
+                                          {getNumberMissingDays()} de{" "}
+                                          {objective.perWeek ??
+                                            objective.selectDaily?.length}
+                                        </b>
+                                      </Typography>
+                                    </>
+                                  )}
+                                </Stack>
+                              )}
                             </Stack>
                           </Collapse>
                         </Card>
@@ -538,9 +578,12 @@ export function Objectives() {
         <Box
           sx={{
             display: { xs: "none", lg: "block" },
-            width: "300px",
+            width: "500px",
+            mt: 5,
           }}
-        ></Box>
+        >
+          <MyDivision />
+        </Box>
       </Stack>
     </>
   );

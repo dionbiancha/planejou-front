@@ -16,11 +16,6 @@ import {
 import { useTheme } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {
-  CheckBoxOutlined,
-  ChecklistRounded,
-  Settings,
-} from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CustomButton from "../Button/CustomButton";
@@ -29,7 +24,6 @@ import { useAuthValidation } from "../../hooks/useAuthValidation";
 import { useDataUser } from "../../context/UserContext/useUser";
 import { getUserData } from "../../services/user";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -92,19 +86,74 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menu = [
     {
       text: "Objetivos",
-      icon: <CheckBoxOutlined sx={styles.menuButton} />,
-      info: userData.incompleteObjectivesToday,
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/objective.png"
+          sx={styles.menuButton}
+        />
+      ),
+      number: userData.incompleteObjectivesToday,
       url: "/",
     },
     {
       text: "Lista",
-      icon: <ChecklistRounded sx={styles.menuButton} />,
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/checklist.png"
+          sx={styles.menuButton}
+        />
+      ),
       url: "/list",
     },
     {
+      text: "Liga",
+      icon: (
+        <Box component={"img"} src="icons/badge.png" sx={styles.menuButton} />
+      ),
+      url: "/league",
+    },
+    {
+      text: "Missões",
+
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/treasure.png"
+          sx={[
+            styles.menuButton,
+            {
+              filter: "grayscale(100%)",
+            },
+          ]}
+        />
+      ),
+      url: "/missions",
+    },
+    {
       text: "Social",
-      icon: <EmojiEventsIcon sx={styles.menuButton} />,
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/football.png"
+          sx={[
+            styles.menuButton,
+            {
+              filter: "grayscale(100%)",
+            },
+          ]}
+        />
+      ),
       url: "/social",
+    },
+
+    {
+      text: "Perfil",
+      icon: (
+        <Box component={"img"} src="icons/profile.png" sx={styles.menuButton} />
+      ),
+      url: "/profile",
     },
   ];
 
@@ -155,7 +204,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
       <Toolbar />
-      <Box component="img" src="logo.png" width="40px" marginLeft={"20px"} />
+
       <List>
         {menu.map((value) => (
           <ListItem key={value.text}>
@@ -176,14 +225,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   }}
                   startIcon={value.icon}
                   onClick={() => {
+                    if (value.url === "/missions" || value.url === "/social")
+                      return;
                     navigate(value.url);
                   }}
                 >
-                  {value.text}
+                  <Box ml={1}>{value.text}</Box>
                 </Button>
-                {value.info && value.info !== 0 ? (
+                {value.number && value.number !== 0 ? (
                   <Box
                     onClick={() => {
+                      if (value.url === "/missions" || value.url === "/social")
+                        return;
                       navigate(value.url);
                     }}
                     sx={{
@@ -202,7 +255,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       height: "20px",
                     }}
                   >
-                    <b>{value.info}</b>
+                    <b>{value.number}</b>
                   </Box>
                 ) : (
                   <></>
@@ -212,6 +265,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Box sx={{ position: "relative" }}>
                 <IconButton
                   onClick={() => {
+                    if (value.url === "/missions" || value.url === "/social")
+                      return;
                     navigate(value.url);
                   }}
                   sx={{
@@ -222,9 +277,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   {value.icon}
                 </IconButton>
-                {value.info && value.info !== 0 ? (
+                {value.number && value.number !== 0 ? (
                   <Box
                     onClick={() => {
+                      if (value.url === "/missions" || value.url === "/social")
+                        return;
                       navigate(value.url);
                     }}
                     sx={{
@@ -243,7 +300,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       height: "20px",
                     }}
                   >
-                    <b>{value.info}</b>
+                    <b>{value.number}</b>
                   </Box>
                 ) : (
                   <></>
@@ -336,6 +393,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           sx={{
             display: isLogged && !isMobile ? "flex" : "none",
             justifyContent: "space-between",
+            backgroundColor: theme.palette.background.default,
             padding: "10px",
             marginTop: "50px",
             boxShadow: "none",
@@ -358,10 +416,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             }}
           >
             {drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-
-          <IconButton color="inherit">
-            <Settings />
           </IconButton>
         </Box>
 

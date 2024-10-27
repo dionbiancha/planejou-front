@@ -1,19 +1,26 @@
+import { Timestamp } from "firebase/firestore";
 import React, { createContext, useState, ReactNode } from "react";
 
 export interface Goal {
-  id: string;
-  content: string;
+  id?: string;
+  position: string;
+  name: string;
   months: number;
   objectives?: Objective[];
+  createdAt?: Timestamp;
+  estimatedCompletion?: Timestamp;
 }
 
 export interface Objective {
+  id?: string;
   name: string;
   repeat: "Diariamente" | "Semanalmente" | "Uma vez";
-  perWeek?: number;
-  selectDaily?: string[];
-  remindMe?: string;
-  goalId: string;
+  perWeek?: number | null;
+  selectDaily?: string[] | null;
+  remindMe?: string | null;
+  goalId?: string;
+  completedDays?: string[];
+  totalRepeat?: number;
 }
 
 interface GoalContextProps {

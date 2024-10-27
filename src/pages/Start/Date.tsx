@@ -13,6 +13,7 @@ import { useGoals } from "../../context";
 import { ArrowBack, Add, Remove } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
+import { addGoalList } from "../../services/goal";
 
 export default function Date({ handleStep }: StartProps) {
   const { goals, setGoals } = useGoals();
@@ -67,6 +68,15 @@ export default function Date({ handleStep }: StartProps) {
     if (month === 3) return "#c2052e11";
     if (month === 6) return "#f28d0018";
     return "#05c26a13";
+  }
+
+  async function handleAddGoalList() {
+    try {
+      await addGoalList(goals);
+      goToHome();
+    } catch (e) {
+      console.error("Erro ao adicionar documento: ", e);
+    }
   }
 
   return (
@@ -139,7 +149,7 @@ export default function Date({ handleStep }: StartProps) {
                   >
                     {index + 1}.
                   </Box>
-                  {goal.content}
+                  {goal.name}
                 </Typography>
                 <Box
                   sx={{
@@ -183,7 +193,7 @@ export default function Date({ handleStep }: StartProps) {
             ))}
           </Box>
           <CustomButton
-            onClick={() => goToHome()}
+            onClick={handleAddGoalList}
             variant="contained"
             size="large"
             label={t("Pronto")}

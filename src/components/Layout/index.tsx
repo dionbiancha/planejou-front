@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import {
   Toolbar,
   Drawer,
@@ -16,15 +16,14 @@ import {
 import { useTheme } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {
-  CheckBoxOutlined,
-  ChecklistRounded,
-  Settings,
-} from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CustomButton from "../Button/CustomButton";
 import BorderLinearProgress from "../BorderLinearProgress";
+import { useAuthValidation } from "../../hooks/useAuthValidation";
+import { useDataUser } from "../../context/UserContext/useUser";
+import { getUserData } from "../../services/user";
+import { useLoading } from "../../context/LoadingContext/useLoading";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -42,6 +41,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { userData, setUserData } = useDataUser();
+  const loading = useLoading();
+
+  useAuthValidation();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -64,49 +67,276 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return "inherit";
   }
 
+  function isValidRoute(path: string) {
+    return (
+      path === "/login" ||
+      path === "/register" ||
+      path === "/start" ||
+      path === "/new" ||
+      path.includes("/edit")
+    );
+  }
+
+  const styles = {
+    menuButton: {
+      height: "25px",
+      width: "25px",
+    },
+  };
+
+  const menu = [
+    {
+      text: "Objetivos",
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/objective.png"
+          sx={styles.menuButton}
+        />
+      ),
+      number: userData.incompleteObjectivesToday,
+      url: "/",
+    },
+    {
+      text: "Lista",
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/checklist.png"
+          sx={styles.menuButton}
+        />
+      ),
+      url: "/list",
+    },
+    {
+      text: "Liga",
+      icon: (
+        <Box component={"img"} src="icons/badge.png" sx={styles.menuButton} />
+      ),
+      url: "/league",
+    },
+    {
+      text: "Missões",
+
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/treasure.png"
+          sx={[
+            styles.menuButton,
+            {
+              filter: "grayscale(100%)",
+            },
+          ]}
+        />
+      ),
+      url: "/missions",
+    },
+    {
+      text: "Social",
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/football.png"
+          sx={[
+            styles.menuButton,
+            {
+              filter: "grayscale(100%)",
+            },
+          ]}
+        />
+      ),
+      url: "/social",
+    },
+
+    {
+      text: "Perfil",
+      icon: (
+        <Box component={"img"} src="icons/profile.png" sx={styles.menuButton} />
+      ),
+      url: "/profile",
+    },
+    {
+      text: "Mais",
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/three-dots.png"
+          sx={styles.menuButton}
+        />
+      ),
+      url: "/config",
+    },
+  ];
+
+  function calculateTestProgress(): {
+    progress: number;
+    daysRemaining: number;
+  } {
+    if (!userData.testEndDate) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const now = new Date();
+    const totalDuration = 7 * 24 * 60 * 60 * 1000;
+    const endDate = userData.testEndDate.toDate();
+    const remainingTime = endDate.getTime() - now.getTime();
+
+    const daysRemaining = Math.ceil(remainingTime / (24 * 60 * 60 * 1000));
+
+    if (remainingTime <= 0) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const progress = Math.min((remainingTime / totalDuration) * 100, 100);
+
+    return { progress, daysRemaining };
+  }
+
+  async function handleUserData() {
+    loading.show();
+    try {
+      const res = await getUserData();
+      setUserData((prev) => ({
+        ...prev,
+        xp: res.xp,
+        testEndDate: res.testEndDate,
+        name: res.name,
+      }));
+    } catch (e) {
+      console.log(e);
+    }
+    loading.hide();
+  }
+
+  useEffect(() => {
+    handleUserData();
+  }, []);
+
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
       <Toolbar />
+
       <List>
         {menu.map((value) => (
           <ListItem key={value.text}>
             {drawerOpen ? (
-              <Button
-                variant="text"
-                color="primary"
-                sx={{
-                  display: "flex",
-                  justifyContent: "left",
-                  fontWeight: "bold",
-                  color: theme.palette.text.secondary,
-                  backgroundColor: isSelected(value.url),
-                  padding: "10px",
-                  paddingX: "20px",
-                  width: "100%",
-                }}
-                startIcon={value.icon}
-                onClick={() => {
-                  navigate(value.url);
-                }}
-              >
-                {value.text}
-              </Button>
+              <Box sx={{ position: "relative" }}>
+                <Button
+                  variant="text"
+                  color="primary"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "left",
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isSelected(value.url),
+                    padding: "10px",
+                    paddingX: "20px",
+                    width: "100%",
+                  }}
+                  startIcon={value.icon}
+                  onClick={() => {
+                    if (value.url === "/missions" || value.url === "/social")
+                      return;
+                    navigate(value.url);
+                  }}
+                >
+                  <Box ml={1}>{value.text}</Box>
+                </Button>
+                {value.number && value.number !== 0 ? (
+                  <Box
+                    onClick={() => {
+                      if (value.url === "/missions" || value.url === "/social")
+                        return;
+                      navigate(value.url);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      top: 3,
+                      right: 100,
+                      position: "absolute",
+                      backgroundColor: theme.palette.primary.main,
+                      borderRadius: "20px",
+                      color: "#FFF",
+                      fontSize: "12px",
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  >
+                    <b>{value.number}</b>
+                  </Box>
+                ) : (
+                  <></>
+                )}
+              </Box>
             ) : (
-              <IconButton
-                sx={{
-                  color: theme.palette.text.secondary,
-                  backgroundColor: isSelected(value.url),
-                  borderRadius: "8px",
-                }}
-              >
-                {value.icon}
-              </IconButton>
+              <Box sx={{ position: "relative" }}>
+                <IconButton
+                  onClick={() => {
+                    if (value.url === "/missions" || value.url === "/social")
+                      return;
+                    navigate(value.url);
+                  }}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isSelected(value.url),
+                    borderRadius: "8px",
+                  }}
+                >
+                  {value.icon}
+                </IconButton>
+                {value.number && value.number !== 0 ? (
+                  <Box
+                    onClick={() => {
+                      if (value.url === "/missions" || value.url === "/social")
+                        return;
+                      navigate(value.url);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      top: 3,
+                      right: 2,
+                      position: "absolute",
+                      backgroundColor: theme.palette.primary.main,
+                      borderRadius: "20px",
+                      color: "#FFF",
+                      fontSize: "12px",
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  >
+                    <b>{value.number}</b>
+                  </Box>
+                ) : (
+                  <></>
+                )}
+              </Box>
             )}
           </ListItem>
         ))}
       </List>
     </Box>
   );
+
+  if (isValidRoute(location.pathname)) {
+    return (
+      <Container
+        maxWidth="lg"
+        sx={{
+          width: "100%",
+        }}
+      >
+        {children}
+      </Container>
+    );
+  }
 
   return (
     <>
@@ -124,7 +354,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         }}
       >
         <Typography variant="body2" color="#fff">
-          <b>{t("7 dias de teste gratuito")}</b>
+          <b>
+            {calculateTestProgress().daysRemaining}{" "}
+            {calculateTestProgress().daysRemaining === 1 ? t("dia") : t("dias")}{" "}
+            {t("de teste gratuito")}
+          </b>
         </Typography>
         <Box
           sx={{
@@ -137,7 +371,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             marginX: "20px",
           }}
         >
-          <BorderLinearProgress rtl variant="determinate" value={90} />
+          <BorderLinearProgress
+            rtl
+            variant="determinate"
+            value={calculateTestProgress().progress}
+          />
         </Box>
 
         <CustomButton
@@ -146,9 +384,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           borderRadius={2}
           size="small"
           label={t("Atualize agora")}
-          // disabled={disabledButton()}
         />
       </Stack>
+
       <Box
         sx={{
           display: "flex",
@@ -162,6 +400,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           sx={{
             display: isLogged && !isMobile ? "flex" : "none",
             justifyContent: "space-between",
+            backgroundColor: theme.palette.background.default,
             padding: "10px",
             marginTop: "50px",
             boxShadow: "none",
@@ -184,10 +423,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             }}
           >
             {drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-
-          <IconButton color="inherit">
-            <Settings />
           </IconButton>
         </Box>
 
@@ -242,23 +477,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-
-const styles = {
-  menuButton: {
-    height: "25px",
-    width: "25px",
-  },
-};
-
-const menu = [
-  {
-    text: "Objetivos",
-    icon: <CheckBoxOutlined sx={styles.menuButton} />,
-    url: "/",
-  },
-  {
-    text: "Lista",
-    icon: <ChecklistRounded sx={styles.menuButton} />,
-    url: "/list",
-  },
-];

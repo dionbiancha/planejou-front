@@ -3,28 +3,49 @@ import { useNavigate } from "react-router-dom";
 export function useCustomNavigate() {
   const navigate = useNavigate();
 
+  function validateNavigate(route: string) {
+    return localStorage.getItem("accessToken")
+      ? navigate(route)
+      : navigate("/login");
+  }
+
   function goBack() {
     navigate(-1);
   }
 
   function goToLogin() {
-    navigate("/login");
+    validateNavigate("/login");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("themeMode");
   }
 
   function goToHome() {
-    navigate("/");
+    validateNavigate("/");
   }
 
   function goToStart() {
-    navigate("/start");
+    validateNavigate("/start");
   }
 
   function goToList() {
-    navigate("/list");
+    validateNavigate("/list");
   }
 
   function goToNewObjetive() {
-    navigate("/new");
+    validateNavigate("/new");
+  }
+
+  function goToLeague() {
+    validateNavigate("/league");
+  }
+
+  function goToRegister() {
+    validateNavigate("/register");
+  }
+
+  function goToEditObjetive(id: string) {
+    validateNavigate(`/edit/${id}`);
   }
 
   return {
@@ -34,5 +55,8 @@ export function useCustomNavigate() {
     goToList,
     goToStart,
     goToNewObjetive,
+    goToEditObjetive,
+    goToLeague,
+    goToRegister,
   };
 }

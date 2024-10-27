@@ -6,6 +6,7 @@ import {
   Button,
   Checkbox,
   useTheme,
+  Skeleton,
 } from "@mui/material";
 import CustomButton from "../../components/Button/CustomButton";
 import { useEffect, useState } from "react";
@@ -14,17 +15,21 @@ import { useGoals } from "../../context";
 import { ArrowBack } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 import { Goal, Objective } from "../../context/GoalContext/GoalContext";
-import RoundedSelectGoalField from "../../features/RoundedSelectGoalField";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
+import { useLoading } from "../../context/LoadingContext/useLoading";
+import { updateObjective } from "../../services/objective";
+import { useParams } from "react-router-dom";
+import { listGoalsByUserId } from "../../services/goal";
+import EditIcon from "@mui/icons-material/Edit";
 
 export default function NewObjetive() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { goals, setGoals } = useGoals();
   const { goToHome } = useCustomNavigate();
   const [goal, setGoal] = useState<Goal>();
-  const [currentTip, setCurrentTip] = useState(tips[0]);
   const [objective, setObjective] = useState("");
   const [objectiveError, setObjectiveError] = useState("");
   const [repeat, setRepeat] = useState<string>("Diariamente");
@@ -32,8 +37,10 @@ export default function NewObjetive() {
   const [timesPerWeek, setTimesPerWeek] = useState<string>("3");
   const [remindMe, setRemindMe] = useState<boolean>(false);
   const [selectedHour, setSelectedHour] = useState<string>("6 am");
-  const { goals, setGoals } = useGoals();
+
   const snack = useSnack();
+  const loading = useLoading();
+  const { id } = useParams<{ id: string }>();
 
   const toggleDaySelection = (day: string) => {
     setSelectedDailyDays((prevSelectedDays) =>
@@ -88,41 +95,74 @@ export default function NewObjetive() {
     }
   }
 
-  function handleAddObjective() {
-    setGoals((prevGoals) => {
-      const goalToUpdate = prevGoals.find((g) => g.id === goal?.id);
-      if (goalToUpdate) {
-        const newObjective: Objective = {
-          name: objective,
-          repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
-          perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : undefined,
-          selectDaily: repeat === "Diariamente" ? selectedDailyDays : undefined,
-          remindMe: remindMe ? selectedHour : undefined,
-          goalId: goalToUpdate.id,
-        };
+  async function handleEditObjective() {
+    try {
+      if (!goal?.id || !goal) return;
+      if (!goals[0]?.objectives) return;
 
-        if (!goalToUpdate.objectives) {
-          goalToUpdate.objectives = [];
+      const newObjective: Objective = {
+        name: objective,
+        repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
+        perWeek: repeat === "Semanalmente" ? Number(timesPerWeek) : null,
+        selectDaily: repeat === "Diariamente" ? selectedDailyDays : null,
+        remindMe: remindMe ? selectedHour : null,
+      };
+      const data = {
+        goalId: id ?? "",
+        objectiveId: goals[0]?.objectives[0]?.id ?? "",
+        updatedData: newObjective,
+      };
+      await updateObjective(data);
+      snack.success("Objetivo modificado com sucesso!");
+      goToHome();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function listGoals() {
+    loading.show();
+    try {
+      const res = await listGoalsByUserId();
+      const goalValues = res.find((g: Goal) => g.id === id);
+
+      if (goalValues) {
+        const updatedGoal: Goal[] = [
+          {
+            id: goalValues.id,
+            position: goalValues.position,
+            name: goalValues.name,
+            months: goalValues.months,
+            objectives: goals[0]?.objectives || [],
+          },
+        ];
+
+        setGoals(updatedGoal);
+        setObjective(goalValues.name);
+        setGoal(goalValues);
+
+        if (updatedGoal[0]?.objectives) {
+          const o: Objective = updatedGoal[0]?.objectives[0];
+
+          setObjective(o.name);
+          setRepeat(o.repeat);
+          setRemindMe(Boolean(o.remindMe));
+          setSelectedDailyDays(o.selectDaily ?? []);
         }
-        goalToUpdate.objectives.push(newObjective);
-        snack.success("Objetivo criado com sucesso!");
-        goToHome();
       }
-      return [...prevGoals];
-    });
+    } catch (e) {
+      console.error("Erro ao listar as metas:", e);
+    }
+    loading.hide();
+  }
+  function getContextValues() {
+    listGoals();
+    console.log(goals);
   }
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTip(tips[Math.floor(Math.random() * tips.length)]);
-    }, 8000);
-
-    return () => clearInterval(interval);
+    getContextValues();
   }, []);
-
-  useEffect(() => {
-    console.log("aqui", goals);
-  }, [goals]);
 
   return (
     <Stack direction={"column"} alignItems={"center"} height={"100%"}>
@@ -162,45 +202,60 @@ export default function NewObjetive() {
           sx={{ minHeight: "600px" }}
         >
           <Stack spacing={3}>
-            <RoundedSelectGoalField
-              items={goals}
-              label={t("Minha meta é...")}
-              onChange={(goal) => {
-                console.log("AQUI", goal);
-                setGoal(goal);
-              }}
-              value={goal}
-              fullWidth
-              placeholder={t("Selecione uma meta")}
-            />
-            <RoundedTextField
-              fullWidth
-              label={t("Objetivo")}
-              variant="outlined"
-              error={Boolean(objectiveError)}
-              helperText={objectiveError ? t(objectiveError) : ""}
-              value={objective}
-              onBlur={validateObjectiveName}
-              onChange={(event) => setObjective(event.target.value)}
-              placeholder={t("Vou alcançar minha meta se...")}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "15px",
-                },
-              }}
-            />
-            <Stack flexDirection={"row"} alignItems={"center"}>
-              <Typography mr={3} variant="subtitle2">
-                <b>{t("Repete")}</b>
+            <Stack flexDirection="row" alignItems={"center"}>
+              <EditIcon sx={{ marginRight: "5px", color: "text.secondary" }} />
+              <Typography variant="h6" color="text.secondary">
+                <b>{t("Editar objetivo")}</b>
               </Typography>
-              <RoundedSelectField
-                size="small"
-                items={REPEAT_OPTIONS}
-                onChange={(e) => setRepeat(e.target.value)}
-                value={repeat}
-                placeholder={t("Selecione uma opção")}
-              />
             </Stack>
+
+            {loading.state ? (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="50px"
+                sx={{ borderRadius: "15px" }}
+              />
+            ) : (
+              <RoundedTextField
+                fullWidth
+                label={t("Objetivo")}
+                variant="outlined"
+                error={Boolean(objectiveError)}
+                helperText={objectiveError ? t(objectiveError) : ""}
+                value={objective}
+                onBlur={validateObjectiveName}
+                onChange={(event) => setObjective(event.target.value)}
+                placeholder={t("Vou alcançar minha meta se...")}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "15px",
+                  },
+                }}
+              />
+            )}
+            {loading.state ? (
+              <Skeleton
+                variant="rectangular"
+                width="200px"
+                height="40px"
+                sx={{ borderRadius: "15px" }}
+              />
+            ) : (
+              <Stack flexDirection={"row"} alignItems={"center"}>
+                <Typography mr={3} variant="subtitle2">
+                  <b>{t("Repete")}</b>
+                </Typography>
+                <RoundedSelectField
+                  size="small"
+                  items={REPEAT_OPTIONS}
+                  onChange={(e) => setRepeat(e.target.value)}
+                  value={repeat}
+                  placeholder={t("Selecione uma opção")}
+                />
+              </Stack>
+            )}
+
             {repeat === "Diariamente" && (
               <Stack
                 sx={{ overflowX: "auto", paddingBottom: "20px" }}
@@ -209,11 +264,21 @@ export default function NewObjetive() {
               >
                 {DAYS.map((day) => (
                   <Stack alignItems={"center"} justifyContent={"center"}>
-                    <Checkbox
-                      size="large"
-                      checked={selectedDailyDays.includes(day)}
-                      onChange={() => toggleDaySelection(day)}
-                    />
+                    {loading.state ? (
+                      <Skeleton
+                        variant="rectangular"
+                        width="30px"
+                        height="30px"
+                        sx={{ borderRadius: "5px", margin: "13px" }}
+                      />
+                    ) : (
+                      <Checkbox
+                        size="large"
+                        checked={selectedDailyDays.includes(day)}
+                        onChange={() => toggleDaySelection(day)}
+                      />
+                    )}
+
                     <Typography variant="subtitle1">{day.charAt(0)}</Typography>
                   </Stack>
                 ))}
@@ -261,6 +326,10 @@ export default function NewObjetive() {
           </Stack>
 
           <Stack>
+            <Typography mb={3} variant="subtitle2">
+              <b>Meta:</b> {goal?.name}
+            </Typography>
+
             <Box
               sx={{
                 padding: "20px",
@@ -274,29 +343,15 @@ export default function NewObjetive() {
               <Typography variant="subtitle2">{getInfoText()}</Typography>
             </Box>
             <CustomButton
-              onClick={handleAddObjective}
+              onClick={handleEditObjective}
               variant="contained"
               size="large"
-              label={"Criar Objetivo"}
+              label={"Salvar"}
               disabled={disabledButton()}
             />
           </Stack>
         </Stack>
       </Card>
-
-      <Box
-        sx={{
-          maxWidth: "600px",
-          width: "100%",
-          textAlign: "center",
-          padding: "15px",
-          mt: "15px",
-        }}
-      >
-        <Typography color="textSecondary" variant="subtitle2">
-          "{t(currentTip)}"
-        </Typography>
-      </Box>
     </Stack>
   );
 }
@@ -338,12 +393,4 @@ const DAYS = [
   "Sexta",
   "Sábado",
   "Domingo",
-];
-
-const tips = [
-  "Garanta que seu objetivo possa ser medido, para acompanhar o progresso.",
-  "Seu objetivo tem que caber no bolso, no tempo e na energia. Nada de tentar comprar uma ferrari se você mal tem uma bicicleta!",
-  "Bora ser pé no chão: seu objetivo precisa ser viável. Não adianta querer subir o Everest se você ainda se perde no Google Maps!",
-  "O objetivo tem que fazer sentido com seus planos. Tipo, não adianta querer ser vegano se a sua comida favorita ainda é churrasco!",
-  "Comece seus objetivos com verbos que indicam ação, como 'implementar', 'aumentar', 'reduzir', ou 'melhorar'. Isso traz clareza sobre o que precisa ser feito.",
 ];

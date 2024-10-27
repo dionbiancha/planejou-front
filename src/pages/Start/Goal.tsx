@@ -94,7 +94,6 @@ export default function Goal({ handleStep }: StartProps) {
         >
           Voltar
         </Button>
-        <Box>Homologação?</Box>
       </Stack>
       <Card
         sx={{

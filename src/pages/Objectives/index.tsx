@@ -321,7 +321,7 @@ export function Objectives() {
                         objective?.completedDays?.includes(day)
                       ).length;
                       if (completedCount === 0) return 1;
-                      return completedCount;
+                      return completedCount + 1;
                     }
 
                     return (

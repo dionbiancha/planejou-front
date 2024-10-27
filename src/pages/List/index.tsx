@@ -214,10 +214,8 @@ export function List() {
                         <Stack direction={"column"}>
                           <Typography variant="h6">
                             <b>
-                              {
-                                objectives.find((g) => g.goalId === goal.id)
-                                  ?.objectives.length
-                              }
+                              {objectives.find((g) => g.goalId === goal.id)
+                                ?.objectives.length ?? 0}
                             </b>
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -252,7 +250,7 @@ export function List() {
                                   (acc, obj) =>
                                     acc + (obj.completedDays?.length || 0),
                                   0
-                                )}
+                                ) ?? 0}
                             </b>
                           </Typography>
                           <Typography variant="body2" color="text.secondary">

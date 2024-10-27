@@ -1,58 +1,27 @@
 import "./App.css";
 import "./translation/i18n";
 
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import { lightTheme, darkTheme } from "./theme";
-import { useState } from "react";
-import { SignIn } from "./pages/SignIn";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Start from "./pages/Start";
+import { BrowserRouter } from "react-router-dom";
 import { GoalProvider } from "./context";
-import { Objectives } from "./pages/Objectives";
-import { List } from "./pages/List";
-import NewObjective from "./pages/NewObjective";
-import EditObjective from "./pages/EditObjective";
 import { SnackProvider } from "./context/SnackContext";
-import Snack from "./components/Snack";
+
 import { UserProvider } from "./context/UserContext";
-import Layout from "./components/Layout";
+
 import { LoadingProvider } from "./context/LoadingContext";
-import { League } from "./pages/League";
-import Missions from "./pages/Missions";
-import Profile from "./pages/Profile";
-import Social from "./pages/Social";
+import Pages from "./pages";
 
 function App() {
-  const [isDarkMode] = useState(false);
-
   return (
     <BrowserRouter>
-      <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <UserProvider>
-          <LoadingProvider>
-            <SnackProvider>
-              <GoalProvider>
-                <Snack />
-                <CssBaseline />
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<Objectives />} />
-                    <Route path="/login" element={<SignIn />} />
-                    <Route path="/start" element={<Start />} />
-                    <Route path="/list" element={<List />} />
-                    <Route path="/new" element={<NewObjective />} />
-                    <Route path="/league" element={<League />} />
-                    <Route path="/edit/:id" element={<EditObjective />} />
-                    <Route path="/missions" element={<Missions />} />
-                    <Route path="/social" element={<Social />} />
-                    <Route path="/profile" element={<Profile />} />
-                  </Routes>
-                </Layout>
-              </GoalProvider>
-            </SnackProvider>
-          </LoadingProvider>
-        </UserProvider>
-      </ThemeProvider>
+      <UserProvider>
+        <LoadingProvider>
+          <SnackProvider>
+            <GoalProvider>
+              <Pages />
+            </GoalProvider>
+          </SnackProvider>
+        </LoadingProvider>
+      </UserProvider>
     </BrowserRouter>
   );
 }

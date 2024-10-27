@@ -9,7 +9,7 @@ interface RankingProps {
   name: string;
   xp: number;
   myAccount: boolean;
-  urlImage?: string;
+  photoURL?: string;
 }
 
 const randomColors = ["#FDCB89", "#99F8CA", "#FFA1AC", "#66E6AA", "#FAB658"];
@@ -55,7 +55,7 @@ export function League() {
     loading.show();
     try {
       const res = await getTopUsersByXP();
-      console.log(res);
+
       setTopUsers(res);
     } catch (error) {
       if (error instanceof Error) {
@@ -152,8 +152,18 @@ export function League() {
                 >
                   {getMedal(index + 1)}
                 </Stack>
-                {user.urlImage ? (
-                  <Box component={"img"} src={user.urlImage} />
+                {user.photoURL ? (
+                  <Box
+                    sx={{
+                      height: "50px",
+                      width: "50px",
+                      borderRadius: "100%",
+
+                      marginRight: 2,
+                    }}
+                    component={"img"}
+                    src={user.photoURL}
+                  />
                 ) : (
                   <Box
                     sx={{

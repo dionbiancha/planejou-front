@@ -115,8 +115,18 @@ export default function Profile() {
         }}
       >
         <Stack flexDirection={"row"} alignItems={"center"} mb={5}>
-          {userData?.userData?.photoURL ? (
-            <Box component={"img"} src={userData.userData?.photoURL} />
+          {userData?.photoURL ? (
+            <Box
+              sx={{
+                height: "80px",
+                width: "80px",
+                borderRadius: "100%",
+
+                marginRight: 2,
+              }}
+              component={"img"}
+              src={userData?.photoURL}
+            />
           ) : (
             <Box
               sx={{

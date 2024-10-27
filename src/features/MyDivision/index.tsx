@@ -1,11 +1,4 @@
-import {
-  Card,
-  Collapse,
-  Link,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Card, Collapse, Stack, Typography, useTheme } from "@mui/material";
 import { DIVISIONS, getTimeUntilNextSunday } from "../../pages/League";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -13,10 +6,13 @@ import { DocumentData } from "firebase/firestore";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { getUserRanking } from "../../services/user";
 import { useDataUser } from "../../context/UserContext/useUser";
+import CustomButton from "../../components/Button/CustomButton";
+import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 
 export default function MyDivision() {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { goToLeague } = useCustomNavigate();
   const loading = useLoading();
   const [myPosition, setMyPosition] = useState<DocumentData>();
   const { userData } = useDataUser();
@@ -84,12 +80,11 @@ export default function MyDivision() {
               {t("Divisão")} {t(`${DIVISIONS[userData?.league ?? 1]}`)}
             </b>
           </Typography>
-          <Link
-            href="/league"
-            sx={{ textDecoration: "none", fontSize: "15px" }}
-          >
-            <b>VER DIVISÃO</b>
-          </Link>
+          <CustomButton
+            label="VER DIVISÃO"
+            onClick={() => goToLeague()}
+            size="small"
+          />
         </Stack>
         <Stack mb={2} flexDirection={"row"}>
           <Typography variant="body1" mr={1}>

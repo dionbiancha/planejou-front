@@ -70,6 +70,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   function isValidRoute(path: string) {
     return (
       path === "/login" ||
+      path === "/register" ||
       path === "/start" ||
       path === "/new" ||
       path.includes("/edit")
@@ -154,6 +155,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Box component={"img"} src="icons/profile.png" sx={styles.menuButton} />
       ),
       url: "/profile",
+    },
+    {
+      text: "Mais",
+      icon: (
+        <Box
+          component={"img"}
+          src="icons/three-dots.png"
+          sx={styles.menuButton}
+        />
+      ),
+      url: "/config",
     },
   ];
 
@@ -328,57 +340,52 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
-      {!loading.state && (
-        <Stack
-          position="fixed"
-          zIndex={1201}
-          flexDirection={"row"}
-          justifyContent={{ xs: "space-between", md: "center" }}
-          alignItems={"center"}
+      <Stack
+        position="fixed"
+        zIndex={1201}
+        flexDirection={"row"}
+        justifyContent={{ xs: "space-between", md: "center" }}
+        alignItems={"center"}
+        sx={{
+          height: "50px",
+          width: "100%",
+          backgroundColor: "#2A303C",
+          padding: "20px",
+        }}
+      >
+        <Typography variant="body2" color="#fff">
+          <b>
+            {calculateTestProgress().daysRemaining}{" "}
+            {calculateTestProgress().daysRemaining === 1 ? t("dia") : t("dias")}{" "}
+            {t("de teste gratuito")}
+          </b>
+        </Typography>
+        <Box
           sx={{
-            height: "50px",
+            display: {
+              xs: "none",
+              md: "block",
+            },
+            maxWidth: "300px",
             width: "100%",
-            backgroundColor: "#2A303C",
-            padding: "20px",
+            marginX: "20px",
           }}
         >
-          <Typography variant="body2" color="#fff">
-            <b>
-              {calculateTestProgress().daysRemaining}{" "}
-              {calculateTestProgress().daysRemaining === 1
-                ? t("dia")
-                : t("dias")}{" "}
-              {t("de teste gratuito")}
-            </b>
-          </Typography>
-          <Box
-            sx={{
-              display: {
-                xs: "none",
-                md: "block",
-              },
-              maxWidth: "300px",
-              width: "100%",
-              marginX: "20px",
-            }}
-          >
-            <BorderLinearProgress
-              rtl
-              variant="determinate"
-              value={calculateTestProgress().progress}
-            />
-          </Box>
-
-          <CustomButton
-            onClick={() => {}}
-            variant="contained"
-            borderRadius={2}
-            size="small"
-            label={t("Atualize agora")}
-            // disabled={disabledButton()}
+          <BorderLinearProgress
+            rtl
+            variant="determinate"
+            value={calculateTestProgress().progress}
           />
-        </Stack>
-      )}
+        </Box>
+
+        <CustomButton
+          onClick={() => {}}
+          variant="contained"
+          borderRadius={2}
+          size="small"
+          label={t("Atualize agora")}
+        />
+      </Stack>
 
       <Box
         sx={{

@@ -1,4 +1,10 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  updateProfile,
+} from "firebase/auth";
 import { auth, db } from "../config/firebase";
 import {
   collection,
@@ -39,8 +45,10 @@ export async function googleSignIn() {
       testEndDate,
       hasList: false,
       urlImage: res.user.photoURL || "",
-      league: 1,
+      league: 0,
       totalXp: 0,
+      photoURL: res.user.photoURL || "",
+      createdAt: currentDate,
     };
 
     // Referência ao documento do usuário
@@ -136,6 +144,7 @@ export async function getTopUsersByXP() {
         name: firstName,
         xp: data.xp,
         myAccount: data.id === auth.userId,
+        photoURL: data.photoURL,
       };
     });
 
@@ -146,5 +155,66 @@ export async function getTopUsersByXP() {
     } else {
       throw new Error("An unknown error occurred");
     }
+  }
+}
+
+export async function createAccount(
+  email: string,
+  password: string,
+  name: string
+) {
+  try {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+
+    await updateProfile(res.user, {
+      displayName: name,
+    });
+
+    const currentDate = Timestamp.now();
+    const testEndDate = Timestamp.fromMillis(
+      currentDate.toMillis() + 7 * 24 * 60 * 60 * 1000
+    );
+
+    const userData = {
+      name: name,
+      id: res.user.uid,
+      xp: 0,
+      testEndDate,
+      hasList: false,
+      urlImage: res.user.photoURL || "",
+      league: 0,
+      totalXp: 0,
+      photoURL: res.user.photoURL || "",
+      createdAt: currentDate,
+    };
+
+    const userDocRef = doc(db, "users", res.user.uid);
+
+    await setDoc(userDocRef, userData);
+
+    const accessToken = await res.user.getIdToken();
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("userId", res.user.uid);
+
+    console.log("Conta criada com sucesso!");
+  } catch (error) {
+    console.error("Erro ao criar conta:", error);
+  }
+}
+
+export async function loginWithEmailAndPassword(
+  email: string,
+  password: string
+) {
+  try {
+    const res = await signInWithEmailAndPassword(auth, email, password);
+    const accessToken = await res.user.getIdToken();
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("userId", res.user.uid);
+
+    return { user: res.user, accessToken };
+  } catch (error) {
+    console.error("Erro ao fazer login com email e senha:", error);
+    throw error;
   }
 }

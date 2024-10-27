@@ -12,6 +12,8 @@ interface UserProps {
   totalXp: number;
   league: number;
   createdAt: Timestamp;
+  themeMode: string;
+  photoURL: string;
 }
 
 interface UserContextProps {

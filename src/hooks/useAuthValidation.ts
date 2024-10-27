@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const useAuthValidation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -10,8 +11,9 @@ export const useAuthValidation = () => {
 
     if (!accessToken || !userId) {
       localStorage.clear();
-      // Redirecionar para a página de login ou qualquer outra página
-      navigate("/login"); // Altere para a rota desejada
+      if (location.pathname !== "/register") {
+        navigate("/login"); // Redirecionar para a página de login
+      }
     }
-  }, [navigate]);
+  }, [location.pathname]);
 };

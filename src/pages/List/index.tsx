@@ -91,7 +91,6 @@ export function List() {
       totalRepeat += value.totalRepeat || 0;
       completedDays += value.completedDays?.length || 0;
     });
-    console.log((completedDays * 100) / totalRepeat);
     const value = (completedDays * 100) / totalRepeat;
     if (isNaN(value)) return 0;
     return value;

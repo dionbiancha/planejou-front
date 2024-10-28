@@ -195,8 +195,6 @@ export async function createAccount(
     const accessToken = await res.user.getIdToken();
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("userId", res.user.uid);
-
-    console.log("Conta criada com sucesso!");
   } catch (error) {
     console.error("Erro ao criar conta:", error);
   }

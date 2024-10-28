@@ -15,7 +15,7 @@ import {
 
 export default function Profile() {
   const { userData, setUserData } = useDataUser();
-  const { goals, setGoals } = useGoals();
+  const { setGoals } = useGoals();
   const theme = useTheme();
   const loading = useLoading();
   const { t } = useTranslation();
@@ -101,9 +101,7 @@ export default function Profile() {
     handleGetGoalList();
     listObjectives();
   }, []);
-  useEffect(() => {
-    console.log("aqui", goals);
-  }, [goals]);
+
   return (
     <Stack flexDirection={"row"}>
       <Card

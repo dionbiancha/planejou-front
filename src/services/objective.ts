@@ -88,14 +88,12 @@ export async function addObjective({
           ? [...existingObjectives, newObjectiveWithId]
           : [newObjectiveWithId],
       });
-      console.log("Objectives added successfully!");
     } else {
       await setDoc(docRef, {
         goalId: goal.id,
         userId: auth.userId,
         objectives: [newObjectiveWithId],
       });
-      console.log("New objective added successfully!");
     }
   } catch (e) {
     console.error("Error adding objectives: ", e);
@@ -215,10 +213,6 @@ export async function deleteObjective({
       await updateDoc(docRef, {
         objectives: updatedObjectives,
       });
-
-      console.log(`Objective with ID ${objectiveId} deleted successfully.`);
-    } else {
-      console.error("No such document!");
     }
   } catch (error) {
     console.error("Error deleting objective: ", error);
@@ -256,10 +250,6 @@ export async function updateObjective({
       await updateDoc(docRef, {
         objectives: updatedObjectives,
       });
-
-      console.log(`Objective with ID ${objectiveId} updated successfully.`);
-    } else {
-      console.error("No such document!");
     }
   } catch (error) {
     console.error("Error updating objective: ", error);

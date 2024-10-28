@@ -32,6 +32,7 @@ export const darkTheme = createTheme({
     mode: "dark",
     primary: {
       main: "#05c26a", // Cor principal para o modo escuro
+      light: "#05c26a13", // Cor de destaque para o modo claro
     },
     success: {
       main: "#05c26a", // Cor principal para os sucessos

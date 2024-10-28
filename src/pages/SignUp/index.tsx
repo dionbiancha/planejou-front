@@ -1,4 +1,12 @@
-import { Card, Divider, Stack, TextField, useTheme } from "@mui/material";
+import {
+  Box,
+  Card,
+  Divider,
+  Link,
+  Stack,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import CustomButton from "../../components/Button/CustomButton";
 import LoginButton from "../../features/LoginButton";
@@ -103,7 +111,8 @@ export function SignUp() {
     >
       <Card
         sx={{
-          minWidth: "550px",
+          maxWidth: "550px",
+          width: "100%",
           padding: "30px",
           borderRadius: "15px",
           boxShadow: "none",
@@ -154,6 +163,11 @@ export function SignUp() {
             label="Criar conta"
             disabled={disableButton()}
           />
+          {!loading.state && (
+            <Box sx={{ textAlign: "center" }}>
+              {t("Já possui conta?")} <Link href="/login">{t("Entrar")}</Link>
+            </Box>
+          )}
         </Stack>
       </Card>
     </Stack>

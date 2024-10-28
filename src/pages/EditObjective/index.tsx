@@ -56,14 +56,21 @@ export default function NewObjetive() {
         Boolean(objectiveError) ||
         !objective ||
         !goal ||
-        selectedDailyDays.length === 0
+        selectedDailyDays.length === 0 ||
+        loading.state
       );
     }
     if (repeat === "Semanalmente") {
-      return Boolean(objectiveError) || !objective || !goal || !timesPerWeek;
+      return (
+        Boolean(objectiveError) ||
+        !objective ||
+        !goal ||
+        !timesPerWeek ||
+        loading.state
+      );
     }
     if (repeat === "Uma vez") {
-      return Boolean(objectiveError) || !objective || !goal;
+      return Boolean(objectiveError) || !objective || !goal || loading.state;
     }
   }
 
@@ -99,7 +106,7 @@ export default function NewObjetive() {
     try {
       if (!goal?.id || !goal) return;
       if (!goals[0]?.objectives) return;
-
+      loading.show();
       const newObjective: Objective = {
         name: objective,
         repeat: repeat as "Diariamente" | "Semanalmente" | "Uma vez",
@@ -118,6 +125,7 @@ export default function NewObjetive() {
     } catch (e) {
       console.error(e);
     }
+    loading.hide();
   }
 
   async function listGoals() {
@@ -334,7 +342,7 @@ export default function NewObjetive() {
               sx={{
                 padding: "20px",
                 width: "100%",
-
+                color: "text.primary",
                 borderRadius: "15px",
                 mb: "20px",
                 backgroundColor: theme.palette.primary.light,

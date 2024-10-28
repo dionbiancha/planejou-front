@@ -88,7 +88,8 @@ export function SignIn() {
     >
       <Card
         sx={{
-          minWidth: "550px",
+          maxWidth: "550px",
+          width: "100%",
           padding: "30px",
           borderRadius: "15px",
           boxShadow: "none",

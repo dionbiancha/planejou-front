@@ -27,7 +27,7 @@ export default function Pages() {
       <CssBaseline />
       <Layout>
         <Routes>
-          <Route path="/" element={<Objectives />} />
+          <Route path="/*" element={<Objectives />} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="/start" element={<Start />} />

@@ -72,7 +72,7 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
       {/* Linha de meses no topo */}
       <Grid
         container
-        width={"100%"}
+        width={"700px"}
         item
         spacing={0.5}
         justifyContent="space-between"

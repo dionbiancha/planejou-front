@@ -183,7 +183,7 @@ export function List() {
                             sx={{ fontSize: "12px" }}
                             variant="subtitle2"
                           >
-                            {caption.name}
+                            {t(caption.name)}
                           </Typography>
                         </Stack>
                       ))}
@@ -192,7 +192,7 @@ export function List() {
                     <Typography variant="body2" color="text.secondary" m={1}>
                       <b>{t("Estatísticas")}</b>
                     </Typography>
-                    <Stack direction={"row"} spacing={3}>
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
                       <Stack
                         direction={"row"}
                         alignItems={"center"}
@@ -227,6 +227,7 @@ export function List() {
                         direction={"row"}
                         alignItems={"center"}
                         sx={{
+                          mt: { xs: 1, md: 0 },
                           width: "100%",
                           padding: "15px",
                           borderRadius: "10px",

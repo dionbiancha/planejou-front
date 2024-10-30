@@ -12,8 +12,9 @@ interface UserProps {
   totalXp: number;
   league: number;
   createdAt: Timestamp;
-  themeMode: string;
+  darkMode: string;
   photoURL: string;
+  language: string;
 }
 
 interface UserContextProps {
@@ -31,7 +32,12 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [userData, setUserData] = useState<UserProps>({} as UserProps);
+  const darkMode = localStorage.getItem("darkMode");
+
+  const [userData, setUserData] = useState<UserProps>({
+    darkMode: darkMode ?? "Desabilitado",
+  } as UserProps);
+
   function clearUserData() {
     setUserData({} as UserProps);
   }

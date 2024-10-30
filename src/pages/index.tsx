@@ -19,9 +19,10 @@ import { SignUp } from "./SignUp";
 
 export default function Pages() {
   const { userData } = useDataUser();
+
   return (
     <ThemeProvider
-      theme={userData.themeMode === "Habilitado" ? darkTheme : lightTheme}
+      theme={userData.darkMode === "Habilitado" ? darkTheme : lightTheme}
     >
       <Snack />
       <CssBaseline />

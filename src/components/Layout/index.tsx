@@ -242,7 +242,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     navigate(value.url);
                   }}
                 >
-                  <Box ml={1}>{value.text}</Box>
+                  <Box ml={1}>{t(value.text)}</Box>
                 </Button>
                 {value.number && value.number !== 0 ? (
                   <Box

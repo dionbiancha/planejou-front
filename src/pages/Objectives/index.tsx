@@ -37,6 +37,7 @@ import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useSnack } from "../../context/SnackContext";
 import { getUserData } from "../../services/user";
 import MyDivision from "../../features/MyDivision";
+import ConfettiExplosion from "react-confetti-explosion";
 
 function generateNextSevenDays() {
   const days = [];
@@ -73,6 +74,7 @@ export function Objectives() {
   const { setGoals } = useGoals();
   const [showDetails, setShowDetails] = useState<string[]>([]);
   const { setUserData } = useDataUser();
+  const [isExploding, setIsExploding] = useState(false);
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -237,10 +239,10 @@ export function Objectives() {
         objectiveId: selectObjective.objectiveId,
       });
       listObjectives();
-      snack.success("Objetivo excluído com sucesso!");
+      snack.success(t("Objetivo excluído com sucesso!"));
     } catch (e) {
       console.log(e);
-      snack.error("Erro ao excluir objetivo!");
+      snack.error(t("Erro ao excluir objetivo!"));
     }
     loading.hide();
   }
@@ -260,10 +262,12 @@ export function Objectives() {
       <DeleteDialog
         open={openDeleteDialog}
         handleClose={() => setOpenDeleteDialog(false)}
-        title="Tem certeza?"
-        description="Se você excluir esse objetivo, todos os seus registros serão perdidos para sempre."
-        textButtonCancel="Cancelar"
-        textButtonConfirm={`Excluir`}
+        title={t("Tem certeza?")}
+        description={t(
+          "Se você excluir esse objetivo, todos os seus registros serão perdidos para sempre."
+        )}
+        textButtonCancel={t("Cancelar")}
+        textButtonConfirm={t(`Excluir`)}
         objetive={selectObjective.name}
         onConfirm={handleDeleteObjective}
       />
@@ -434,10 +438,21 @@ export function Objectives() {
                                 <b>{objective?.name}</b>
                               </Typography>
                             </Stack>
+                            {isExploding && objectiveDone && (
+                              <ConfettiExplosion
+                                particleCount={50}
+                                particleSize={8}
+                              />
+                            )}
                             <Checkbox
                               size="large"
                               checked={objectiveDone}
                               onChange={() => {
+                                if (!objectiveDone) {
+                                  setIsExploding(true);
+                                } else {
+                                  setIsExploding(false);
+                                }
                                 markObjective(
                                   {
                                     goalId: o.goalId,
@@ -517,7 +532,9 @@ export function Objectives() {
                                     color: theme.palette.text.secondary,
                                   }}
                                 >
-                                  <b>{objectiveDone ? "Próximo" : "Ganhos"}</b>
+                                  <b>
+                                    {objectiveDone ? t("Próximo") : t("Ganhos")}
+                                  </b>
                                 </Typography>
                                 <Typography
                                   sx={{
@@ -544,7 +561,7 @@ export function Objectives() {
                                             : theme.palette.warning.main,
                                         }}
                                       >
-                                        <b>Bonus</b>
+                                        <b>{t("Bonus")}</b>
                                       </Typography>
                                       <Typography
                                         sx={{

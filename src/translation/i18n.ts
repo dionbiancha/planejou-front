@@ -4,6 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import enTranslation from "./locales/en/translation";
 import ptTranslation from "./locales/pt/translation";
+import esTranslation from "./locales/es/translation";
 
 i18n
   .use(LanguageDetector) // Detecta a linguagem automaticamente (opcional)
@@ -16,8 +17,11 @@ i18n
       pt: {
         translation: ptTranslation,
       },
+      es: {
+        translation: esTranslation,
+      },
     },
-    fallbackLng: "pt", // Idioma padrão se o detectado não estiver disponível
+    fallbackLng: "en", // Idioma padrão se o detectado não estiver disponível
     interpolation: {
       escapeValue: false, // React já escapa por padrão
     },

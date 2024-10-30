@@ -12,15 +12,31 @@ import { useDataUser } from "../../context/UserContext/useUser";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useTranslation } from "react-i18next";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
+import { useEffect } from "react";
+import { updateDarkMode } from "../../services/user";
+import { useLoading } from "../../context/LoadingContext/useLoading";
+import { useSnack } from "../../context/SnackContext";
 
 export default function Config() {
   const { t } = useTranslation();
+  const loading = useLoading();
+  const snack = useSnack();
   const { goToLogin } = useCustomNavigate();
   const { userData, setUserData } = useDataUser();
-  const handleThemeChange = (value: string) => {
-    setUserData((prev) => ({ ...prev, themeMode: value }));
-    localStorage.setItem("themeMode", value);
-  };
+
+  async function handleThemeChange(value: string) {
+    loading.show();
+    try {
+      const translatedValue =
+        value === t("Habilitado") ? "Habilitado" : "Desabilitado";
+      setUserData((prev) => ({ ...prev, darkMode: translatedValue }));
+      localStorage.setItem("darkMode", translatedValue);
+      await updateDarkMode(translatedValue);
+    } catch {
+      snack.error(t("Erro ao atualizar o tema"));
+    }
+    loading.hide();
+  }
 
   function calculateTestProgress(): {
     progress: number;
@@ -46,6 +62,10 @@ export default function Config() {
     return { progress, daysRemaining };
   }
 
+  useEffect(() => {
+    console.log(userData.darkMode);
+  }, [userData.darkMode]);
+
   return (
     <Stack flexDirection={"row"}>
       <Card
@@ -61,7 +81,7 @@ export default function Config() {
           color="text.secondary"
           sx={{ fontWeight: "bold" }}
         >
-          Preferencias
+          {t("Preferencias")}
         </Typography>
         <Typography
           mt={3}
@@ -70,13 +90,13 @@ export default function Config() {
           color="text.secondary"
           sx={{ fontWeight: "bold" }}
         >
-          Modo escuro
+          {t("Modo escuro")}
         </Typography>
         <RoundedSelectField
           size="medium"
-          items={["Habilitado", "Desabilitado"]}
+          items={[t("Habilitado"), t("Desabilitado")]}
           onChange={(e) => handleThemeChange(e.target.value)}
-          value={userData.themeMode ?? "Desabilitado"}
+          value={t(userData.darkMode ?? t("Desabilitado"))}
         />
         <Typography
           mt={3}
@@ -85,20 +105,20 @@ export default function Config() {
           color="text.secondary"
           sx={{ fontWeight: "bold" }}
         >
-          Inscrição
+          {t("Inscrição")}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Seu teste gratuito termina em{" "}
+          {t("Seu teste gratuito termina em")}{" "}
           <b>
             {calculateTestProgress().daysRemaining}{" "}
             {calculateTestProgress().daysRemaining === 1 ? t("dia") : t("dias")}
           </b>
-          . <Link>Atualize agora</Link>
+          . <Link>{t("Atualize agora")}</Link>
         </Typography>
         <Divider sx={{ my: 3 }} />
         <Stack direction="row" justifyContent="end">
           <Button variant="text" color="inherit" onClick={goToLogin}>
-            Sair
+            {t("Sair")}
           </Button>
         </Stack>
       </Card>

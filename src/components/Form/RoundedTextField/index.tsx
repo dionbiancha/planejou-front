@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, TextFieldProps } from "@mui/material";
+import { InputAdornment, TextField, TextFieldProps } from "@mui/material";
 
 // Define as props do componente
 interface RoundedTextFieldProps
@@ -12,6 +12,7 @@ interface RoundedTextFieldProps
   helperText?: string;
   fullWidth?: boolean;
   variant?: TextFieldProps["variant"];
+  endIcon?: React.ReactNode;
 }
 
 const RoundedTextField: React.FC<RoundedTextFieldProps> = ({
@@ -23,6 +24,7 @@ const RoundedTextField: React.FC<RoundedTextFieldProps> = ({
   variant = "outlined",
   error = false,
   helperText = "",
+  endIcon,
   ...props
 }) => {
   return (
@@ -35,6 +37,12 @@ const RoundedTextField: React.FC<RoundedTextFieldProps> = ({
       onChange={onChange}
       error={error}
       helperText={helperText}
+      autoComplete="off"
+      InputProps={{
+        endAdornment: endIcon ? (
+          <InputAdornment position="end">{endIcon}</InputAdornment>
+        ) : undefined,
+      }}
       sx={{
         "& .MuiOutlinedInput-root": {
           borderRadius: "15px", // Ajuste o valor conforme necessário

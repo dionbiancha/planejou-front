@@ -17,7 +17,6 @@ export function useCustomNavigate() {
     validateNavigate("/login");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
-    localStorage.removeItem("themeMode");
   }
 
   function goToHome() {

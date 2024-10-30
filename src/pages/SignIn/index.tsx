@@ -16,6 +16,7 @@ import { useDataUser } from "../../context/UserContext/useUser";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useState } from "react";
 import { useSnack } from "../../context/SnackContext";
+import HeaderControls from "../../components/HeaderControls";
 
 export function SignIn() {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ export function SignIn() {
 
   async function handleSignInWithEmailPassword() {
     if (!validateFields()) {
-      snackbar.error("Senha ou email inválidos");
+      snackbar.error(t("Senha ou email inválidos"));
       return;
     }
     loading.show();
@@ -86,6 +87,7 @@ export function SignIn() {
       minHeight={"100vh"}
       spacing={5}
     >
+      <HeaderControls />
       <Card
         sx={{
           maxWidth: "550px",
@@ -120,7 +122,7 @@ export function SignIn() {
             variant="contained"
             size="large"
             onClick={handleSignInWithEmailPassword}
-            label="Entrar"
+            label={t("Entrar")}
             disabled={loading.state || !email || !password}
           />
           {!loading.state && (

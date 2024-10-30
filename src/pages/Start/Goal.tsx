@@ -5,7 +5,6 @@ import {
   Typography,
   useTheme,
   IconButton,
-  Button,
 } from "@mui/material";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import CustomButton from "../../components/Button/CustomButton";
@@ -20,7 +19,8 @@ import { useTranslation } from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete"; // Novo ícone de exclusão
 import { StartProps, Step } from "../../types";
 import { useGoals } from "../../context";
-import { ArrowBack } from "@mui/icons-material";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import MediaDialog from "../../components/MediaDialog";
 
 export default function Goal({ handleStep }: StartProps) {
   const { t } = useTranslation();
@@ -29,6 +29,7 @@ export default function Goal({ handleStep }: StartProps) {
   const [errorGoal, setErrorGoal] = useState("");
   const [currentTip, setCurrentTip] = useState(tips[0]);
   const { goals, setGoals } = useGoals();
+  const [openDialog, setOpenDialog] = useState(false);
 
   function isDarkMode() {
     return theme.palette.mode === "dark";
@@ -37,7 +38,21 @@ export default function Goal({ handleStep }: StartProps) {
   const handleAddGoal = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && goal.trim()) {
       if (goals.length >= 25) {
-        setErrorGoal("Você atingiu o limite de 25 metas.");
+        setErrorGoal(t("Você atingiu o limite de 25 metas."));
+        return;
+      }
+      setGoals([
+        ...goals,
+        { position: `${goals.length}`, name: goal, months: 24 },
+      ]);
+      setGoal("");
+    }
+  };
+
+  const handleAddGoalClick = () => {
+    if (goal.trim()) {
+      if (goals.length >= 25) {
+        setErrorGoal(t("Você atingiu o limite de 25 metas."));
         return;
       }
       setGoals([
@@ -66,6 +81,16 @@ export default function Goal({ handleStep }: StartProps) {
     return goals.length <= 4;
   }
 
+  function labelButton() {
+    if (goals.length === 4) {
+      return `${t("Falta")} ${5 - goals.length} ${t("meta")}`;
+    }
+    if (goals.length <= 4) {
+      return `${t("Faltam")} ${5 - goals.length} ${t("metas")}`;
+    }
+    return t("Próximo");
+  }
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTip(tips[Math.floor(Math.random() * tips.length)]);
@@ -74,27 +99,18 @@ export default function Goal({ handleStep }: StartProps) {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    setOpenDialog(true);
+  }, []);
+
   return (
-    <Stack direction={"column"} alignItems={"center"} height={"100%"}>
-      <Stack
-        flexDirection={"row"}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-        sx={{
-          maxWidth: "600px",
-          width: "100%",
-          padding: "10px",
-        }}
-      >
-        <Button
-          variant="text"
-          color="inherit"
-          startIcon={<ArrowBack sx={{ height: "20px" }} />}
-          onClick={() => handleStep(Step.Goal)}
-        >
-          Voltar
-        </Button>
-      </Stack>
+    <Stack
+      mt={5}
+      direction={"column"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      <MediaDialog media={mediaArray} open={openDialog} />
       <Card
         sx={{
           maxWidth: "600px",
@@ -114,6 +130,11 @@ export default function Goal({ handleStep }: StartProps) {
           <Box>
             <RoundedTextField
               fullWidth
+              endIcon={
+                <IconButton onClick={handleAddGoalClick}>
+                  <KeyboardReturnIcon />
+                </IconButton>
+              }
               label={t("Minha meta é...")}
               variant="outlined"
               error={Boolean(errorGoal)}
@@ -137,7 +158,7 @@ export default function Goal({ handleStep }: StartProps) {
                       ...goals,
                       {
                         position: `${goals.length}`,
-                        name: exempleGoal,
+                        name: t(exempleGoal),
                         months: 24,
                       },
                     ]);
@@ -156,7 +177,7 @@ export default function Goal({ handleStep }: StartProps) {
                     },
                   }}
                 >
-                  {exempleGoal}
+                  {t(exempleGoal)}
                 </Box>
               ))}
             </Stack>
@@ -165,12 +186,22 @@ export default function Goal({ handleStep }: StartProps) {
                 maxHeight: "200px",
                 mt: "20px",
                 height: "100%",
+                pr: "20px",
                 overflowY: "auto",
                 "&::-webkit-scrollbar": {
-                  width: "0px", // Para Chrome, Safari e Opera
+                  width: "6px",
                 },
-                "-ms-overflow-style": "none", // Para IE e Edge
-                "scrollbar-width": "none",
+                "&::-webkit-scrollbar-track": {
+                  background: `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
+                  borderRadius: "10px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: `#e0e0e0`,
+                  borderRadius: "10px",
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  background: `${isDarkMode() ? "#f5f5f55a" : "#24293345"}`,
+                },
               }}
             >
               <DragDropContext onDragEnd={handleDragEnd}>
@@ -246,17 +277,14 @@ export default function Goal({ handleStep }: StartProps) {
             onClick={() => handleStep(Step.Date)}
             variant="contained"
             size="large"
-            label={"Próximo"}
+            label={labelButton()}
             disabled={disabledButton()}
           />
         </Stack>
       </Card>
 
       <Box mt="15px">
-        <Typography variant="subtitle2">
-          <b>Dica: </b>
-          {t(currentTip)}
-        </Typography>
+        <Typography variant="subtitle2">"{t(currentTip)}"</Typography>
       </Box>
     </Stack>
   );
@@ -277,4 +305,13 @@ const exempleGoals = [
   "🚗 Comprar um carro",
   "🏍️ Comprar uma moto",
   "🧳 Tirar um ano sabático",
+];
+
+const mediaArray = [
+  {
+    title: "Monte e organize suas metas!",
+    description:
+      "Adicione suas metas e deixe tudo na ordem que faz sentido pra você. É só arrastar e soltar para organizar!",
+    media: "tutorial/goal.gif",
+  },
 ];

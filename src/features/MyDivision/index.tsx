@@ -1,5 +1,5 @@
 import { Card, Collapse, Stack, Typography, useTheme } from "@mui/material";
-import { DIVISIONS, getTimeUntilNextSunday } from "../../pages/League";
+import { DIVISIONS } from "../../pages/League";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { DocumentData } from "firebase/firestore";
@@ -43,8 +43,28 @@ export default function MyDivision() {
       return `${t("Continue assim para subir para a divisão")} ${t(
         `${DIVISIONS[userData?.league + 1]}`
       )}`;
-    if (position > 23) return t("Bottom 7");
-    return t("Outros");
+    if (position > 23) return t("Continue assim para subir para a divisão");
+    return t("Você esta na zona de rebaixamento!");
+  }
+
+  function getTimeUntilNextSunday() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    if (dayOfWeek === 0) {
+      // Today is Sunday
+      const hoursLeft = 24 - now.getHours();
+      const minutesLeft = 60 - now.getMinutes();
+      return `${t("Faltam")} ${hoursLeft} ${t("horas")}, ${minutesLeft} ${t(
+        "minutos"
+      )}`;
+    } else {
+      // Calculate days until next Sunday
+      const daysUntilSunday = 7 - dayOfWeek;
+      return `${t("Faltam")} ${daysUntilSunday} ${
+        daysUntilSunday === 1 ? t("dia") : t("dias")
+      }`;
+    }
   }
 
   useEffect(() => {
@@ -81,14 +101,14 @@ export default function MyDivision() {
             </b>
           </Typography>
           <CustomButton
-            label="VER DIVISÃO"
+            label={t("VER DIVISÃO")}
             onClick={() => goToLeague()}
             size="small"
           />
         </Stack>
         <Stack mb={2} flexDirection={"row"}>
           <Typography variant="body1" mr={1}>
-            <b>Sua posição:</b>
+            <b>{t("Sua posição:")}</b>
           </Typography>
           <Typography
             variant="body1"

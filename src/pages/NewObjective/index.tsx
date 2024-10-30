@@ -156,7 +156,7 @@ export default function NewObjective() {
           startIcon={<ArrowBack sx={{ height: "20px" }} />}
           onClick={() => goToHome()}
         >
-          Voltar
+          {t("Voltar")}
         </Button>
       </Stack>
       <Card

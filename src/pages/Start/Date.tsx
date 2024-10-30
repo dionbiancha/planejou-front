@@ -14,12 +14,19 @@ import { ArrowBack, Add, Remove } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 import { addGoalList } from "../../services/goal";
+import { useEffect, useState } from "react";
+import MediaDialog from "../../components/MediaDialog";
+import { useLoading } from "../../context/LoadingContext/useLoading";
+import { useSnack } from "../../context/SnackContext";
 
 export default function Date({ handleStep }: StartProps) {
+  const loading = useLoading();
+  const snack = useSnack();
   const { goals, setGoals } = useGoals();
   const theme = useTheme();
   const { t } = useTranslation();
   const { goToHome } = useCustomNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
 
   // Função para incrementar os meses
   const incrementMonths = (months: number, id: number) => {
@@ -71,16 +78,23 @@ export default function Date({ handleStep }: StartProps) {
   }
 
   async function handleAddGoalList() {
+    loading.show();
     try {
       await addGoalList(goals);
       goToHome();
-    } catch (e) {
-      console.error("Erro ao adicionar documento: ", e);
+    } catch {
+      snack.error(t("Ocorreu um erro ao adicionar as metas"));
     }
+    loading.hide();
   }
+
+  useEffect(() => {
+    setOpenDialog(true);
+  }, []);
 
   return (
     <Stack direction={"column"} alignItems={"center"} height={"100%"}>
+      <MediaDialog media={mediaArray} open={openDialog} />
       <Stack
         flexDirection={"row"}
         justifyContent={"space-between"}
@@ -197,10 +211,19 @@ export default function Date({ handleStep }: StartProps) {
             variant="contained"
             size="large"
             label={t("Pronto")}
-            // disabled={disabledButton()}
+            disabled={loading.state}
           />
         </Stack>
       </Card>
     </Stack>
   );
 }
+
+const mediaArray = [
+  {
+    title: "Dê um tempo certo para suas metas!",
+    description:
+      "Escolha prazos que funcionem no seu ritmo e conquiste suas metas sem estresse.",
+    media: "tutorial/date.png",
+  },
+];

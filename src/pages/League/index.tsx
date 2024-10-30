@@ -26,24 +26,6 @@ export const DIVISIONS = [
   "Turbo Tartaruga",
 ];
 
-export function getTimeUntilNextSunday() {
-  const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 (Sunday) to 6 (Saturday)
-
-  if (dayOfWeek === 0) {
-    // Today is Sunday
-    const hoursLeft = 24 - now.getHours();
-    const minutesLeft = 60 - now.getMinutes();
-    return `Faltam ${hoursLeft} horas, ${minutesLeft} minutos`;
-  } else {
-    // Calculate days until next Sunday
-    const daysUntilSunday = 7 - dayOfWeek;
-    return `Faltam ${daysUntilSunday} ${
-      daysUntilSunday === 1 ? "dia" : "dias"
-    }`;
-  }
-}
-
 export function League() {
   const theme = useTheme();
   const loading = useLoading();
@@ -97,6 +79,26 @@ export function League() {
       );
     } else {
       return <b>{index}º</b>;
+    }
+  }
+
+  function getTimeUntilNextSunday() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    if (dayOfWeek === 0) {
+      // Today is Sunday
+      const hoursLeft = 24 - now.getHours();
+      const minutesLeft = 60 - now.getMinutes();
+      return `${t("Faltam")} ${hoursLeft} ${t("horas")}, ${minutesLeft} ${t(
+        "minutos"
+      )}`;
+    } else {
+      // Calculate days until next Sunday
+      const daysUntilSunday = 7 - dayOfWeek;
+      return `${t("Faltam")} ${daysUntilSunday} ${
+        daysUntilSunday === 1 ? t("dia") : t("dias")
+      }`;
     }
   }
 
@@ -174,6 +176,7 @@ export function League() {
                       alignItems: "center",
                       justifyContent: "center",
                       marginRight: 2,
+                      color: "#FFF",
                       backgroundColor: getRandomColor(),
                     }}
                   >
@@ -210,7 +213,7 @@ export function League() {
                   width="15px"
                   mr={1}
                 />
-                <span>ZONA DE PROMOÇÃO</span>
+                <span>{t("ZONA DE PROMOÇÃO")}</span>
                 <Box
                   ml={1}
                   component={"img"}
@@ -241,7 +244,7 @@ export function League() {
                   width="15px"
                   mr={1}
                 />
-                <span>ZONA DE REBAIXAMENTO</span>
+                <span>{t("ZONA DE REBAIXAMENTO")}</span>
                 <Box
                   ml={1}
                   component={"img"}
@@ -282,7 +285,7 @@ export function League() {
             </b>
           </Typography>
           <Typography variant="body2" mb={2}>
-            Os 7 primeiros avançam para a próxima divisão!
+            {t("Os 7 primeiros avançam para a próxima divisão!")}
           </Typography>
           <Typography variant="body2" color="warning">
             <b>{getTimeUntilNextSunday()}</b>

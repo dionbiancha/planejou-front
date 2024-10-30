@@ -16,6 +16,7 @@ import {
   query,
   setDoc,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { validateAuth } from "./authService";
 
@@ -33,7 +34,8 @@ export async function googleSignIn() {
     const accessToken = credential?.accessToken ?? "";
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("userId", res.user.uid);
-
+    const darkMode = localStorage.getItem("darkMode") || "Desabilitado";
+    const language = localStorage.getItem("language") || "pt-BR";
     const currentDate = Timestamp.now();
     const testEndDate = Timestamp.fromMillis(
       currentDate.toMillis() + 7 * 24 * 60 * 60 * 1000
@@ -49,6 +51,8 @@ export async function googleSignIn() {
       totalXp: 0,
       photoURL: res.user.photoURL || "",
       createdAt: currentDate,
+      darkMode: darkMode,
+      language: language,
     };
 
     // Referência ao documento do usuário
@@ -124,9 +128,11 @@ export async function getUserRanking() {
       totalUsers: users.length,
     };
   } catch (error) {
-    throw new Error(
-      error instanceof Error ? error.message : "An unknown error occurred"
-    );
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
   }
 }
 
@@ -196,7 +202,11 @@ export async function createAccount(
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("userId", res.user.uid);
   } catch (error) {
-    console.error("Erro ao criar conta:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
   }
 }
 
@@ -212,7 +222,38 @@ export async function loginWithEmailAndPassword(
 
     return { user: res.user, accessToken };
   } catch (error) {
-    console.error("Erro ao fazer login com email e senha:", error);
-    throw error;
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export async function updateDarkMode(darkMode: string) {
+  try {
+    const auth = validateAuth();
+    const userDocRef = doc(db, "users", auth.userId);
+    await updateDoc(userDocRef, { darkMode });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export async function updateLanguage(language: string) {
+  try {
+    const auth = validateAuth();
+    const userDocRef = doc(db, "users", auth.userId);
+    await updateDoc(userDocRef, { language });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
   }
 }

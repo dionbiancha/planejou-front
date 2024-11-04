@@ -15,11 +15,12 @@ import { createAccount, googleSignIn } from "../../services/user";
 import { useDataUser } from "../../context/UserContext/useUser";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useState } from "react";
+import HeaderControls from "../../components/HeaderControls";
 
 export function SignUp() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { goToHome } = useCustomNavigate();
+  const { goToObjectives } = useCustomNavigate();
   const { setUserData } = useDataUser();
   const loading = useLoading();
 
@@ -33,7 +34,7 @@ export function SignUp() {
       loading.show();
       try {
         await createAccount(email, password, name);
-        goToHome();
+        goToObjectives();
       } catch (error) {
         console.error(error);
       }
@@ -46,7 +47,7 @@ export function SignUp() {
     try {
       const response = await googleSignIn();
       setUserData((prev) => ({ ...prev, userData: response.user }));
-      goToHome();
+      goToObjectives();
     } catch (error) {
       console.error(error);
     }
@@ -103,74 +104,77 @@ export function SignUp() {
   }
 
   return (
-    <Stack
-      direction={"column"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      minHeight={"100vh"}
-      spacing={5}
-    >
-      <Card
-        sx={{
-          maxWidth: "550px",
-          width: "100%",
-          padding: "30px",
-          borderRadius: "15px",
-          boxShadow: "none",
-        }}
+    <Box>
+      <HeaderControls />
+      <Stack
+        direction={"column"}
+        alignItems={"center"}
+        justifyContent={"center"}
+        minHeight={"100vh"}
+        spacing={5}
       >
-        <Stack spacing={3}>
-          <LoginButton handleSignInGoogle={handleSignInGoogle} />
-          <Divider sx={{ color: theme.palette.divider }}>{t("OU")}</Divider>
+        <Card
+          sx={{
+            maxWidth: "550px",
+            width: "100%",
+            padding: "30px",
+            borderRadius: "15px",
+            boxShadow: "none",
+          }}
+        >
+          <Stack spacing={3}>
+            <LoginButton handleSignInGoogle={handleSignInGoogle} />
+            <Divider sx={{ color: theme.palette.divider }}>{t("OU")}</Divider>
 
-          <TextField
-            disabled={loading.state}
-            label={t("Nome completo")}
-            variant="outlined"
-            placeholder={t("Digite seu nome completo aqui...")}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            error={!!errors.name}
-            helperText={errors.name}
-          />
+            <TextField
+              disabled={loading.state}
+              label={t("Nome completo")}
+              variant="outlined"
+              placeholder={t("Digite seu nome completo aqui...")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              error={!!errors.name}
+              helperText={errors.name}
+            />
 
-          <TextField
-            disabled={loading.state}
-            label="Email"
-            variant="outlined"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!errors.email}
-            helperText={errors.email}
-          />
+            <TextField
+              disabled={loading.state}
+              label="Email"
+              variant="outlined"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={!!errors.email}
+              helperText={errors.email}
+            />
 
-          <TextField
-            disabled={loading.state}
-            label={t("Senha")}
-            variant="outlined"
-            type="password"
-            placeholder="••••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!errors.password}
-            helperText={errors.password}
-          />
+            <TextField
+              disabled={loading.state}
+              label={t("Senha")}
+              variant="outlined"
+              type="password"
+              placeholder="••••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!errors.password}
+              helperText={errors.password}
+            />
 
-          <CustomButton
-            variant="contained"
-            size="large"
-            onClick={handleSignIn}
-            label={t("Criar conta")}
-            disabled={disableButton()}
-          />
-          {!loading.state && (
-            <Box sx={{ textAlign: "center" }}>
-              {t("Já possui conta?")} <Link href="/login">{t("Entrar")}</Link>
-            </Box>
-          )}
-        </Stack>
-      </Card>
-    </Stack>
+            <CustomButton
+              variant="contained"
+              size="large"
+              onClick={handleSignIn}
+              label={t("Criar conta")}
+              disabled={disableButton()}
+            />
+            {!loading.state && (
+              <Box sx={{ textAlign: "center" }}>
+                {t("Já possui conta?")} <Link href="/login">{t("Entrar")}</Link>
+              </Box>
+            )}
+          </Stack>
+        </Card>
+      </Stack>
+    </Box>
   );
 }

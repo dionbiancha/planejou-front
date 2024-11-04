@@ -24,6 +24,7 @@ import { useAuthValidation } from "../../hooks/useAuthValidation";
 import { useDataUser } from "../../context/UserContext/useUser";
 import { getUserData } from "../../services/user";
 import { useLoading } from "../../context/LoadingContext/useLoading";
+import { getCheckoutUrl, getPremiumStatus } from "../../services/stripePayment";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -43,6 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { t } = useTranslation();
   const { userData, setUserData } = useDataUser();
   const loading = useLoading();
+  const [isPremium, setIsPremium] = useState(true);
 
   useAuthValidation();
 
@@ -73,6 +75,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       path === "/register" ||
       path === "/start" ||
       path === "/new" ||
+      path === "/" ||
+      path === "/update" ||
+      path === "/termsOfUse" ||
+      path === "/privacyPolicy" ||
       path.includes("/edit")
     );
   }
@@ -95,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         />
       ),
       number: userData.incompleteObjectivesToday,
-      url: "/",
+      url: "/objectives",
     },
     {
       text: "Lista",
@@ -209,13 +215,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     loading.hide();
   }
 
+  async function handleCheckout() {
+    loading.showScreen();
+    try {
+      const priceId = "price_1QGQFDEAZX87gM7L4D79TpEN";
+      const res = await getCheckoutUrl(priceId);
+      window.location.href = res;
+    } catch (e) {
+      console.log(e);
+    }
+    loading.hideScreen();
+  }
+
+  useEffect(() => {
+    const checkPremium = async () => {
+      const userId = localStorage.getItem("userId");
+      const newPremiumStatus = userId
+        ? await getPremiumStatus()
+        : {
+            isPremium: false,
+          };
+      setIsPremium(newPremiumStatus.isPremium);
+    };
+    checkPremium();
+  }, []);
+
   useEffect(() => {
     handleUserData();
   }, []);
 
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
-      <Toolbar />
+      {!isPremium && <Toolbar />}
 
       <List>
         {menu.map((value) => (
@@ -340,52 +371,56 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
-      <Stack
-        position="fixed"
-        zIndex={1201}
-        flexDirection={"row"}
-        justifyContent={{ xs: "space-between", md: "center" }}
-        alignItems={"center"}
-        sx={{
-          height: "50px",
-          width: "100%",
-          backgroundColor: "#2A303C",
-          padding: "20px",
-        }}
-      >
-        <Typography variant="body2" color="#fff">
-          <b>
-            {calculateTestProgress().daysRemaining}{" "}
-            {calculateTestProgress().daysRemaining === 1 ? t("dia") : t("dias")}{" "}
-            {t("de teste gratuito")}
-          </b>
-        </Typography>
-        <Box
+      {!isPremium && (
+        <Stack
+          position="fixed"
+          zIndex={1201}
+          flexDirection={"row"}
+          justifyContent={{ xs: "space-between", md: "center" }}
+          alignItems={"center"}
           sx={{
-            display: {
-              xs: "none",
-              md: "block",
-            },
-            maxWidth: "300px",
+            height: "50px",
             width: "100%",
-            marginX: "20px",
+            backgroundColor: "#2A303C",
+            padding: "20px",
           }}
         >
-          <BorderLinearProgress
-            rtl
-            variant="determinate"
-            value={calculateTestProgress().progress}
-          />
-        </Box>
+          <Typography variant="body2" color="#fff">
+            <b>
+              {calculateTestProgress().daysRemaining}{" "}
+              {calculateTestProgress().daysRemaining === 1
+                ? t("dia")
+                : t("dias")}{" "}
+              {t("de teste gratuito")}
+            </b>
+          </Typography>
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                md: "block",
+              },
+              maxWidth: "300px",
+              width: "100%",
+              marginX: "20px",
+            }}
+          >
+            <BorderLinearProgress
+              rtl
+              variant="determinate"
+              value={calculateTestProgress().progress}
+            />
+          </Box>
 
-        <CustomButton
-          onClick={() => {}}
-          variant="contained"
-          borderRadius={2}
-          size="small"
-          label={t("Atualize agora")}
-        />
-      </Stack>
+          <CustomButton
+            onClick={handleCheckout}
+            variant="contained"
+            borderRadius={2}
+            size="small"
+            label={t("Atualize agora")}
+          />
+        </Stack>
+      )}
 
       <Box
         sx={{
@@ -402,7 +437,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             justifyContent: "space-between",
             backgroundColor: theme.palette.background.default,
             padding: "10px",
-            marginTop: "50px",
+            marginTop: isPremium ? "" : "50px",
             boxShadow: "none",
             width: {
               sm: `calc(100% - ${
@@ -459,7 +494,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Container
           maxWidth="lg"
           sx={{
-            mt: isMobile ? "50px" : "60px",
+            mt: isPremium ? "" : isMobile ? "50px" : "60px",
             p: isMobile ? 3 : 10,
             width: {
               sm: "100%",

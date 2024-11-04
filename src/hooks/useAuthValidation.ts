@@ -11,7 +11,7 @@ export const useAuthValidation = () => {
 
     if (!accessToken || !userId) {
       localStorage.clear();
-      if (location.pathname !== "/register") {
+      if (location.pathname !== "/register" && location.pathname !== "/") {
         navigate("/login"); // Redirecionar para a página de login
       }
     }

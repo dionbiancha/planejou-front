@@ -19,8 +19,8 @@ export function useCustomNavigate() {
     localStorage.removeItem("userId");
   }
 
-  function goToHome() {
-    validateNavigate("/");
+  function goToObjectives() {
+    validateNavigate("/objectives");
   }
 
   function goToStart() {
@@ -43,6 +43,22 @@ export function useCustomNavigate() {
     validateNavigate("/register");
   }
 
+  function goToLandingPage() {
+    validateNavigate("/");
+  }
+
+  function goToUpdate() {
+    validateNavigate("/register");
+  }
+
+  function goToTermOfUse() {
+    validateNavigate("/termOfUse");
+  }
+
+  function goToPrivacyPolicy() {
+    validateNavigate("/privacyPolicy");
+  }
+
   function goToEditObjetive(id: string) {
     validateNavigate(`/edit/${id}`);
   }
@@ -50,12 +66,16 @@ export function useCustomNavigate() {
   return {
     goBack,
     goToLogin,
-    goToHome,
+    goToObjectives,
     goToList,
     goToStart,
     goToNewObjetive,
     goToEditObjetive,
     goToLeague,
     goToRegister,
+    goToUpdate,
+    goToLandingPage,
+    goToTermOfUse,
+    goToPrivacyPolicy,
   };
 }

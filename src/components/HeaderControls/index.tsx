@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
-import { Box, IconButton, Select, MenuItem } from "@mui/material";
+import { Box, IconButton, Select, MenuItem, useTheme } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import { useTranslation } from "react-i18next";
 import { useDataUser } from "../../context/UserContext/useUser";
 
-const HeaderControls: React.FC = () => {
+function HeaderControls() {
   const { t, i18n } = useTranslation();
   const { userData, setUserData } = useDataUser();
+  const theme = useTheme();
 
   function onToggleDarkMode() {
     setUserData((prev) => ({
@@ -42,7 +43,17 @@ const HeaderControls: React.FC = () => {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      sx={{ padding: "16px", position: "absolute", top: 0, left: 0, right: 0 }}
+      sx={{
+        backgroundColor: theme.palette.background.paper,
+        padding: "16px",
+        position: "absolute",
+        top: 10,
+        left: 0,
+        right: 0,
+        borderRadius: "15px",
+        maxWidth: "550px",
+        margin: "auto",
+      }}
     >
       <Box
         sx={{
@@ -88,7 +99,7 @@ const HeaderControls: React.FC = () => {
       </IconButton>
     </Box>
   );
-};
+}
 
 export default HeaderControls;
 

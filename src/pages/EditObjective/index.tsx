@@ -28,7 +28,7 @@ export default function NewObjetive() {
   const { t } = useTranslation();
   const theme = useTheme();
   const { goals, setGoals } = useGoals();
-  const { goToHome } = useCustomNavigate();
+  const { goToObjectives } = useCustomNavigate();
   const [goal, setGoal] = useState<Goal>();
   const [objective, setObjective] = useState("");
   const [objectiveError, setObjectiveError] = useState("");
@@ -121,7 +121,7 @@ export default function NewObjetive() {
       };
       await updateObjective(data);
       snack.success("Objetivo modificado com sucesso!");
-      goToHome();
+      goToObjectives();
     } catch (e) {
       console.error(e);
     }
@@ -188,7 +188,7 @@ export default function NewObjetive() {
           variant="text"
           color="inherit"
           startIcon={<ArrowBack sx={{ height: "20px" }} />}
-          onClick={() => goToHome()}
+          onClick={() => goToObjectives()}
         >
           Voltar
         </Button>

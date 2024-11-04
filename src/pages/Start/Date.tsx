@@ -25,7 +25,7 @@ export default function Date({ handleStep }: StartProps) {
   const { goals, setGoals } = useGoals();
   const theme = useTheme();
   const { t } = useTranslation();
-  const { goToHome } = useCustomNavigate();
+  const { goToObjectives } = useCustomNavigate();
   const [openDialog, setOpenDialog] = useState(false);
 
   // Função para incrementar os meses
@@ -81,7 +81,7 @@ export default function Date({ handleStep }: StartProps) {
     loading.show();
     try {
       await addGoalList(goals);
-      goToHome();
+      goToObjectives();
     } catch {
       snack.error(t("Ocorreu um erro ao adicionar as metas"));
     }

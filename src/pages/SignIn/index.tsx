@@ -21,7 +21,7 @@ import HeaderControls from "../../components/HeaderControls";
 export function SignIn() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { goToHome } = useCustomNavigate();
+  const { goToObjectives } = useCustomNavigate();
   const { setUserData } = useDataUser();
   const loading = useLoading();
   const snackbar = useSnack();
@@ -34,7 +34,7 @@ export function SignIn() {
     try {
       const response = await googleSignIn();
       setUserData((prev) => ({ ...prev, userData: response.user }));
-      goToHome();
+      goToObjectives();
     } catch (error) {
       console.error(error);
     }
@@ -49,7 +49,7 @@ export function SignIn() {
     loading.show();
     try {
       await loginWithEmailAndPassword(email, password);
-      goToHome();
+      goToObjectives();
     } catch {
       snackbar.error("Senha ou email inválidos");
     }
@@ -80,59 +80,61 @@ export function SignIn() {
   }
 
   return (
-    <Stack
-      direction={"column"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      minHeight={"100vh"}
-      spacing={5}
-    >
+    <Box>
       <HeaderControls />
-      <Card
-        sx={{
-          maxWidth: "550px",
-          width: "100%",
-          padding: "30px",
-          borderRadius: "15px",
-          boxShadow: "none",
-        }}
+      <Stack
+        direction={"column"}
+        alignItems={"center"}
+        justifyContent={"center"}
+        minHeight={"100vh"}
+        spacing={5}
       >
-        <Stack spacing={3}>
-          <LoginButton handleSignInGoogle={handleSignInGoogle} />
-          <Divider sx={{ color: theme.palette.divider }}>{t("OU")}</Divider>
-          <TextField
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading.state}
-            label="Email"
-            variant="outlined"
-            placeholder="your@email.com"
-          />
-          <TextField
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading.state}
-            label={t("Senha")}
-            variant="outlined"
-            type="password"
-            placeholder="••••••••••"
-          />
+        <Card
+          sx={{
+            maxWidth: "550px",
+            width: "100%",
+            padding: "30px",
+            borderRadius: "15px",
+            boxShadow: "none",
+          }}
+        >
+          <Stack spacing={3}>
+            <LoginButton handleSignInGoogle={handleSignInGoogle} />
+            <Divider sx={{ color: theme.palette.divider }}>{t("OU")}</Divider>
+            <TextField
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading.state}
+              label="Email"
+              variant="outlined"
+              placeholder="your@email.com"
+            />
+            <TextField
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading.state}
+              label={t("Senha")}
+              variant="outlined"
+              type="password"
+              placeholder="••••••••••"
+            />
 
-          <CustomButton
-            variant="contained"
-            size="large"
-            onClick={handleSignInWithEmailPassword}
-            label={t("Entrar")}
-            disabled={loading.state || !email || !password}
-          />
-          {!loading.state && (
-            <Box sx={{ textAlign: "center" }}>
-              {t("Não possui conta?")}{" "}
-              <Link href="/register">{t("Criar conta")}</Link>
-            </Box>
-          )}
-        </Stack>
-      </Card>
-    </Stack>
+            <CustomButton
+              variant="contained"
+              size="large"
+              onClick={handleSignInWithEmailPassword}
+              label={t("Entrar")}
+              disabled={loading.state || !email || !password}
+            />
+            {!loading.state && (
+              <Box sx={{ textAlign: "center" }}>
+                {t("Não possui conta?")}{" "}
+                <Link href="/register">{t("Criar conta")}</Link>
+              </Box>
+            )}
+          </Stack>
+        </Card>
+      </Stack>
+    </Box>
   );
 }

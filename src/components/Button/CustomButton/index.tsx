@@ -1,14 +1,15 @@
 import React from "react";
-import { Button } from "@mui/material";
-import { useTranslation } from "react-i18next"; // Supondo que você esteja usando i18next
+import { Button, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface CustomButtonProps {
-  onClick: () => void; // Função a ser chamada quando o botão é clicado
-  label: string; // Texto do botão
-  size?: "small" | "medium" | "large"; // Tamanhos do botão
-  variant?: "text" | "outlined" | "contained"; // Tipos de variante do botão
-  disabled?: boolean; // Botão desabilitado
-  borderRadius?: number; // Raio do botão
+  onClick: () => void;
+  label: string;
+  size?: "small" | "medium" | "large";
+  variant?: "text" | "outlined" | "contained";
+  disabled?: boolean;
+  borderRadius?: number;
+  loading?: boolean; // Nova prop para exibir o estado de carregamento
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -17,24 +18,29 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   size = "medium",
   variant = "contained",
   disabled,
-  borderRadius = "20px",
+  borderRadius = 20,
+  loading = false,
 }) => {
   const { t } = useTranslation();
 
   return (
     <Button
-      disabled={disabled}
+      disabled={disabled || loading}
       onClick={onClick}
       sx={{
         borderRadius: borderRadius,
         fontWeight: "bold",
         boxShadow: "none",
-        color: "#FFF", // Cor do texto baseado no modo
+        color: "#FFF",
       }}
       variant={variant}
       size={size}
     >
-      {t(label)} {/* Tradução do texto */}
+      {loading ? (
+        <CircularProgress color="inherit" size={20} sx={{ padding: "3px" }} />
+      ) : (
+        t(label) // Texto traduzido
+      )}
     </Button>
   );
 };

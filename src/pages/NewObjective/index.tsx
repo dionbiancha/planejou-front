@@ -26,7 +26,7 @@ import { addObjective } from "../../services/objective";
 export default function NewObjective() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { goToHome } = useCustomNavigate();
+  const { goToObjectives } = useCustomNavigate();
   const [goal, setGoal] = useState<Goal>();
   const [currentTip, setCurrentTip] = useState(tips[0]);
   const [objective, setObjective] = useState("");
@@ -109,7 +109,7 @@ export default function NewObjective() {
       };
       await addObjective(data);
       snack.success("Objetivo criado com sucesso!");
-      goToHome();
+      goToObjectives();
     } catch (e) {
       console.error(e);
     }
@@ -154,7 +154,7 @@ export default function NewObjective() {
           variant="text"
           color="inherit"
           startIcon={<ArrowBack sx={{ height: "20px" }} />}
-          onClick={() => goToHome()}
+          onClick={() => goToObjectives()}
         >
           {t("Voltar")}
         </Button>

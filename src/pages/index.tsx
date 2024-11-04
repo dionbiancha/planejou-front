@@ -16,6 +16,10 @@ import Config from "./Config";
 import EditObjective from "./EditObjective";
 import { useDataUser } from "../context/UserContext/useUser";
 import { SignUp } from "./SignUp";
+import LandingPage from "./LandingPage";
+import Update from "./Update";
+import TermsOfUse from "./TermsOfUse";
+import PrivacyPolicy from "./PrivacyPolicy";
 
 export default function Pages() {
   const { userData } = useDataUser();
@@ -28,7 +32,8 @@ export default function Pages() {
       <CssBaseline />
       <Layout>
         <Routes>
-          <Route path="/" element={<Objectives />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/objectives" element={<Objectives />} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="/start" element={<Start />} />
@@ -40,6 +45,9 @@ export default function Pages() {
           <Route path="/social" element={<Social />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/config" element={<Config />} />
+          <Route path="/update" element={<Update />} />
+          <Route path="/termsOfUse" element={<TermsOfUse />} />
+          <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
         </Routes>
       </Layout>
     </ThemeProvider>

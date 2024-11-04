@@ -20,6 +20,7 @@ import LandingPage from "./LandingPage";
 import Update from "./Update";
 import TermsOfUse from "./TermsOfUse";
 import PrivacyPolicy from "./PrivacyPolicy";
+import Loading from "../components/Loading";
 
 export default function Pages() {
   const { userData } = useDataUser();
@@ -28,6 +29,7 @@ export default function Pages() {
     <ThemeProvider
       theme={userData.darkMode === "Habilitado" ? darkTheme : lightTheme}
     >
+      <Loading />
       <Snack />
       <CssBaseline />
       <Layout>

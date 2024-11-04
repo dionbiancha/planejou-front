@@ -180,9 +180,11 @@ export async function createAccount(
     const testEndDate = Timestamp.fromMillis(
       currentDate.toMillis() + 7 * 24 * 60 * 60 * 1000
     );
+    const darkMode = localStorage.getItem("darkMode") || "Desabilitado";
+    const language = localStorage.getItem("language") || "pt-BR";
 
     const userData = {
-      name: name,
+      name: res.user.displayName || "",
       id: res.user.uid,
       xp: 0,
       testEndDate,
@@ -192,6 +194,8 @@ export async function createAccount(
       totalXp: 0,
       photoURL: res.user.photoURL || "",
       createdAt: currentDate,
+      darkMode: darkMode,
+      language: language,
     };
 
     const userDocRef = doc(db, "users", res.user.uid);

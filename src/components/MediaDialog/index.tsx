@@ -69,8 +69,8 @@ export default function MediaDialog({ media, open }: MediaDialogProps) {
           alt={`Mídia ${currentIndex + 1}`}
           style={{ maxWidth: "500px", height: "auto", width: "100%" }}
         />
-        <h2 id="media-dialog-description">{media[currentIndex].title}</h2>
-        <p>{media[currentIndex].description}</p>
+        <h2 id="media-dialog-description">{t(media[currentIndex].title)}</h2>
+        <p>{t(media[currentIndex].description)}</p>
       </DialogContent>
       {media.length !== 1 && (
         <Stack

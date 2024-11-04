@@ -147,6 +147,119 @@ const enTranslation = {
   Inglês: "English",
   Português: "Portuguese",
   Espanhol: "Spanish",
+  "Transforme sonhos": "Transform dreams",
+  "em conquistas": "into achievements",
+  "Dê o primeiro passo para organizar suas metas de vida com foco e diversão!":
+    "Take the first step to organize your life goals with focus and fun!",
+  "Planejar agora": "Plan now",
+  "Já tenho uma conta": "I already have an account",
+  "Planeje hoje, alcance amanhã": "Plan today, achieve tomorrow",
+  "Pessoas que utilizam métodos estruturados para definir metas têm até 2.5 vezes mais chances de atingir seus objetivos":
+    "People who use structured methods to set goals are up to 2.5 times more likely to achieve their objectives",
+  "Foco no que Importa: A Técnica 5/25":
+    "Focus on What Matters: The 5/25 Technique",
+  "Escolha suas metas principais e dê um ‘tchau’ para a distração":
+    "Choose your main goals and say 'goodbye' to distraction",
+  Inicio: "Home",
+  "Defina suas metas": "Set your goals",
+  "Comece listando 25 sonhos e desejos, mas não pare por aí. Selecione as 5 mais importantes e dê a elas o destaque que merecem. Cada meta se torna uma missão que você vai adorar conquistar, e a clareza trazida por essa escolha faz toda a diferença.":
+    "Start by listing 25 dreams and wishes, but don’t stop there. Select the 5 most important and give them the attention they deserve. Each goal becomes a mission you will love to achieve, and the clarity brought by this choice makes all the difference.",
+  "O Caminho para a Conquista: Método SMART":
+    "The Path to Achievement: SMART Method",
+  "Quebre a meta em objetivos menores e mais fáceis de alcançar":
+    "Break the goal into smaller, more achievable objectives",
+  "Defina seus objetivos": "Define your objectives",
+  "Dê vida à sua meta principal com passos estratégicos e bem definidos. A metodologia SMART transforma cada objetivo em algo específico, mensurável, alcançável, relevante e com um prazo claro. Assim, cada etapa ganha propósito e direção, tornando a jornada rumo a sua grande meta mais motivadora e cheia de conquistas!":
+    "Bring your main goal to life with strategic and well-defined steps. The SMART methodology transforms each objective into something specific, measurable, achievable, relevant, and with a clear timeline. Thus, each step gains purpose and direction, making the journey towards your big goal more motivating and filled with achievements!",
+  "Começe sua jornada agora mesmo": "Start your journey right now",
+  "Aproveite a oferta anual quando estiver pronto para conquistar o mundo!":
+    "Take advantage of the annual offer when you are ready to conquer the world!",
+  "Conquiste suas metas": "Achieve your goals",
+  "Objetivos ilimitados": "Unlimited objectives",
+  "Competição saudável com outros usuários":
+    "Healthy competition with other users",
+  "Estatísticas de progresso": "Progress statistics",
+  "Ranking de usuários": "User ranking",
+  "Ligas de competição": "Competition leagues",
+  Destaque: "Highlight",
+  "Plano mensal": "Monthly plan",
+  "Plano anual": "Annual plan",
+  "Melhor oferta": "Best offer",
+  R$: "R$",
+  Mês: "Month",
+  "por ano": "per year",
+  "Pagamento único. 12 meses de acesso.":
+    "One-time payment. 12 months of access.",
+  "Pagamento mensal com renovação automática.":
+    "Monthly payment with automatic renewal.",
+  "Teste gratuito": "Free trial",
+  "Começe um teste gratuito de 7 dias": "Start a 7-day free trial",
+  "Não é necessário cartão de crédito para começar":
+    "No credit card required to get started",
+  "Disponível em (quase) todos os lugares": "Available in (almost) all places",
+  "*Em breve disponível para Android e iOS": "*Coming soon to Android and iOS",
+  "Perguntas Frequentes": "Frequently Asked Questions",
+  "Outras perguntas ou solicitações? Envie um email para":
+    "Other questions or requests? Send an email to",
+  "A Técnica 5/25": "The 5/25 Technique",
+  "Liste 25 metas de vida, foque nas 5 mais importantes! Alcance uma a uma, e depois comece a próxima!":
+    "List 25 life goals, focus on the 5 most important! Achieve them one by one, and then start the next!",
+  "Método SMART": "SMART Method",
+  "Cada objetivo é pensado para ser SMART: específico, mensurável, atingível, relevante e com prazo definido.":
+    "Each goal is designed to be SMART: Specific, Measurable, Achievable, Relevant, and Time-bound.",
+  "Conquiste o Topo": "Conquer the Top",
+  "Com um sistema de ligas, cada meta alcançada leva você a novos níveis, incentivando um progresso contínuo e ainda mais motivador.":
+    "With a league system, each achieved goal takes you to new levels, encouraging continuous and even more motivating progress.",
+  "O que é o Planejou?": "What is Planejou?",
+  "Então, o Planejou é uma plataforma super prática para você organizar suas metas de vida. Ele usa a “Técnica 5/25” pra você listar as coisas mais importantes que quer alcançar na vida e focar só nos cinco mais importantes de cada vez. Também utiliza o “Método SMART”, que ajuda a planejar tudo de um jeito bem claro e objetivo!":
+    "So, Planejou is a super practical platform for organizing your life goals. It uses the '5/25 Technique' for you to list the most important things you want to achieve in life and focus only on the five most important at a time. It also uses the 'SMART Method,' which helps to plan everything in a clear and objective way!",
+  "Como funciona essa tal de “Técnica 5/25”?":
+    "How does this '5/25 Technique' work?",
+  "A ideia é simples: você anota até 25 coisas que quer muito fazer ou conquistar. Depois, escolhe as 5 mais importantes e começa a trabalhar nelas primeiro. Quando concluir uma delas, o próximo objetivo da lista é liberado pra você focar. É um jeito de manter o foco e não se perder tentando fazer tudo ao mesmo tempo.":
+    "The idea is simple: you write down up to 25 things you really want to do or achieve. Then, you choose the 5 most important ones and start working on them first. When you complete one, the next goal on the list is unlocked for you to focus on. It's a way to stay focused and not get lost trying to do everything at once.",
+  "O que é o Método SMART?": "What is the SMART Method?",
+  "O SMART ajuda você a definir cada objetivo com clareza e propósito. A ideia é que seu objetivo seja: Específico, Mensurável, Alcançável, Relevante e Com um prazo definido. Basicamente, cada meta fica mais concreta, o que facilita demais na hora de correr atrás!":
+    "The SMART helps you define each goal clearly and purposefully. The idea is that your goal should be: Specific, Measurable, Achievable, Relevant, and Time-bound. Basically, each goal becomes more concrete, which makes it much easier to chase!",
+  "Como funciona o período de teste?": "How does the trial period work?",
+  "Quando você cria sua conta no Planejou, você ganha 7 dias pra experimentar tudo o que a plataforma oferece, de graça. Depois desses 7 dias, você escolhe um dos planos (mensal, semestral ou anual) pra continuar usando as funcionalidades completas.":
+    "When you create your account on Planejou, you get 7 days to try everything the platform offers for free. After these 7 days, you choose one of the plans (monthly, semi-annual, or annual) to continue using the full features.",
+  "Como é o sistema de gamificação?": "How does the gamification system work?",
+  "Essa é a parte divertida! Cada vez que você completa um objetivo, ganha pontos de experiência (XP) e sobe no ranking. É tipo um joguinho, mas com suas metas de vida. Então, quanto mais você realiza, mais pontos você ganha!":
+    "This is the fun part! Each time you complete a goal, you earn experience points (XP) and move up the ranking. It's like a little game, but with your life goals. So, the more you achieve, the more points you earn!",
+  "E o sistema de ranking? Como funciona?":
+    "And the ranking system? How does it work?",
+  "Ah, temos um ranking onde você pode ver seu progresso e como está em relação aos outros usuários. É ótimo pra dar aquele gás extra e ver quem está alcançando mais metas.":
+    "Oh, we have a ranking where you can see your progress and how you compare to other users. It's great for giving that extra boost and seeing who is achieving more goals.",
+  "E tem sistema de missões?": "Is there a mission system?",
+  "Ainda não, mas essa funcionalidade está no forno! Logo teremos missões e recompensas para deixar seu planejamento ainda mais desafiador e divertido.":
+    "Not yet, but that feature is in the works! Soon we will have missions and rewards to make your planning even more challenging and fun.",
+  "O Planejou tem app pra celular?": "Does Planejou have a mobile app?",
+  "Ainda não, mas já estou trabalhando nos aplicativos para Android e iOS. Em breve, você vai poder acessar tudo direto do celular, onde quer que esteja!":
+    "Not yet, but I am already working on the apps for Android and iOS. Soon you will be able to access everything directly from your phone, wherever you are!",
+  "Com que frequência o Planejou é atualizado?":
+    "How often is Planejou updated?",
+  "Enquanto eu estiver respirando rsrs. Meu nome é Dionei e meu foco é trabalhar neste aplicativo todos os dias/noites. Última atualização: novembro de 2024.":
+    "As long as I'm breathing lol. My name is Dionei and my focus is to work on this app every day/night. Last update: November 2024.",
+  "Posso cancelar minha assinatura?": "Can I cancel my subscription?",
+  "Claro! Dá pra cancelar sua assinatura a qualquer momento pelo próprio site. O acesso continua até o fim do período que você pagou, então, você não perde nada do que já investiu.":
+    "Sure! You can cancel your subscription at any time through the website. Access continues until the end of the period you paid for, so you don't lose anything you've already invested.",
+  "Como falo com o suporte do Planejou?": "How do I contact Planejou support?",
+  "Se precisar de alguma ajuda estou sempre à disposição! Pode entrar em contato pelo e-mail contato@planejou.com. Estou aqui pra te ajudar no que precisar.":
+    "If you need any help, I am always available! You can contact me at contato@planejou.com. I am here to help you with whatever you need.",
+  "Bora começar!": "Let's get started!",
+  "Agora sim!": "Now we're talking!",
+  "Feito com 💚 por": "Made with 💚 by",
+  Produto: "Product",
+  Preços: "Pricing",
+  Atualizações: "Updates",
+  Jurídico: "Legal",
+  "Termos de uso": "Terms of Use",
+  "Política de Privacidade": "Privacy Policy",
+  Entendi: "Got it",
+  "Erro ao criar conta.": "Error creating account.",
+  Seg: "Mon",
+  Qua: "Wed",
+  Sex: "Fri",
 };
 
 export default enTranslation;

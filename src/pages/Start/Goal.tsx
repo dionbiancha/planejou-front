@@ -23,7 +23,7 @@ import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import MediaDialog from "../../components/MediaDialog";
 
 export default function Goal({ handleStep }: StartProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const [goal, setGoal] = useState("");
   const [errorGoal, setErrorGoal] = useState("");
@@ -34,6 +34,25 @@ export default function Goal({ handleStep }: StartProps) {
   function isDarkMode() {
     return theme.palette.mode === "dark";
   }
+
+  function goalImageSrc() {
+    if (i18n.language === "pt-BR") {
+      return "tutorial/goal.gif";
+    }
+    if (i18n.language === "en") {
+      return "tutorial/goal-en.gif";
+    }
+    return "tutorial/goal-es.gif";
+  }
+
+  const mediaArray = [
+    {
+      title: "Monte e organize suas metas!",
+      description:
+        "Adicione suas metas e deixe tudo na ordem que faz sentido pra você. É só arrastar e soltar para organizar!",
+      media: goalImageSrc(),
+    },
+  ];
 
   const handleAddGoal = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && goal.trim()) {
@@ -305,13 +324,4 @@ const exempleGoals = [
   "🚗 Comprar um carro",
   "🏍️ Comprar uma moto",
   "🧳 Tirar um ano sabático",
-];
-
-const mediaArray = [
-  {
-    title: "Monte e organize suas metas!",
-    description:
-      "Adicione suas metas e deixe tudo na ordem que faz sentido pra você. É só arrastar e soltar para organizar!",
-    media: "tutorial/goal.gif",
-  },
 ];

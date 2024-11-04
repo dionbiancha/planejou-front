@@ -7,6 +7,7 @@ import {
   InputLabel,
   Box,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 // Define as props do componente
 interface RoundedSelectFieldProps {
@@ -32,6 +33,7 @@ const RoundedSelectField: React.FC<RoundedSelectFieldProps> = ({
   size,
   ...props
 }) => {
+  const { t } = useTranslation();
   const handleChange = (event: SelectChangeEvent) => {
     if (onChange) {
       onChange(event);
@@ -47,7 +49,7 @@ const RoundedSelectField: React.FC<RoundedSelectFieldProps> = ({
       }}
     >
       <FormControl fullWidth={fullWidth} error={error}>
-        {label && <InputLabel>{label}</InputLabel>}
+        {label && <InputLabel>{t(label)}</InputLabel>}
         <Select
           label={label}
           value={value}
@@ -67,7 +69,7 @@ const RoundedSelectField: React.FC<RoundedSelectFieldProps> = ({
           )}
           {items.map((item, index) => (
             <MenuItem key={index} value={item}>
-              {item}
+              {t(item)}
             </MenuItem>
           ))}
         </Select>

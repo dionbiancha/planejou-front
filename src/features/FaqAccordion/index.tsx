@@ -8,6 +8,7 @@ import {
   ListItem,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { useTranslation } from "react-i18next";
 
 interface FaqAccordionItem {
   question: string;
@@ -19,6 +20,7 @@ interface FaqAccordionProps {
 }
 
 const FaqAccordion: React.FC<FaqAccordionProps> = ({ items }) => {
+  const { t } = useTranslation();
   return (
     <List sx={{ maxWidth: "800px", width: "100%" }}>
       {items.map((item, index) => (
@@ -37,10 +39,10 @@ const FaqAccordion: React.FC<FaqAccordionProps> = ({ items }) => {
               aria-controls={`panel${index}-content`}
               id={`panel${index}-header`}
             >
-              <Typography variant="h6">{item.question}</Typography>
+              <Typography variant="h6">{t(item.question)}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>{item.answer}</Typography>
+              <Typography>{t(item.answer)}</Typography>
             </AccordionDetails>
           </Accordion>
         </ListItem>

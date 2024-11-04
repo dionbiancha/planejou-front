@@ -51,7 +51,7 @@ export function SignIn() {
       await loginWithEmailAndPassword(email, password);
       goToObjectives();
     } catch {
-      snackbar.error("Senha ou email inválidos");
+      snackbar.error(t("Senha ou email inválidos"));
     }
     loading.hide();
   }

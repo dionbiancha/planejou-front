@@ -10,6 +10,7 @@ import {
   startOfMonth,
   addMonths,
 } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface CompletedDaysGridProps {
   completedDays?: string[];
@@ -20,6 +21,7 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
 }) => {
   const theme = useTheme();
   const today = startOfToday();
+  const { t } = useTranslation();
   const oneYearAgo = subDays(today, 365);
 
   // Gerar todos os dias dos últimos 12 meses, organizados por semana
@@ -56,17 +58,34 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
       : theme.palette.background.default;
   };
 
+  function isDarkMode() {
+    return theme.palette.mode === "dark";
+  }
+
   return (
     <Grid
       direction="column"
       spacing={0.5}
       sx={{
-        overflowX: "auto",
+        width: "100%",
+        maxWidth: "600px",
+        paddingBottom: "20px",
+        overflowY: "auto",
         "&::-webkit-scrollbar": {
-          display: "none",
+          height: "6px",
+          width: "6px",
         },
-        "-ms-overflow-style": "none", // IE and Edge
-        "scrollbar-width": "none", // Firefox
+        "&::-webkit-scrollbar-track": {
+          background: `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
+          borderRadius: "10px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: `#e0e0e0`,
+          borderRadius: "10px",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          background: `${isDarkMode() ? "#f5f5f55a" : "#24293345"}`,
+        },
       }}
     >
       {/* Linha de meses no topo */}
@@ -98,7 +117,7 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
         >
           {daysOfWeek.map((day) => (
             <Box key={day} height={15} display="flex" alignItems="center">
-              <Typography variant="caption">{day}</Typography>
+              <Typography variant="caption">{t(day)}</Typography>
             </Box>
           ))}
         </Grid>

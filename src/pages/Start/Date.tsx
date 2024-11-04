@@ -24,9 +24,28 @@ export default function Date({ handleStep }: StartProps) {
   const snack = useSnack();
   const { goals, setGoals } = useGoals();
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { goToObjectives } = useCustomNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+
+  function dateImageSrc() {
+    if (i18n.language === "pt-BR") {
+      return "tutorial/date.png";
+    }
+    if (i18n.language === "en") {
+      return "tutorial/date-en.png";
+    }
+    return "tutorial/date-es.png";
+  }
+
+  const mediaArray = [
+    {
+      title: "Dê um tempo certo para suas metas!",
+      description:
+        "Escolha prazos que funcionem no seu ritmo e conquiste suas metas sem estresse.",
+      media: dateImageSrc(),
+    },
+  ];
 
   // Função para incrementar os meses
   const incrementMonths = (months: number, id: number) => {
@@ -218,12 +237,3 @@ export default function Date({ handleStep }: StartProps) {
     </Stack>
   );
 }
-
-const mediaArray = [
-  {
-    title: "Dê um tempo certo para suas metas!",
-    description:
-      "Escolha prazos que funcionem no seu ritmo e conquiste suas metas sem estresse.",
-    media: "tutorial/date.png",
-  },
-];

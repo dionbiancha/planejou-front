@@ -203,12 +203,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     loading.show();
     try {
       const res = await getUserData();
+
       setUserData((prev) => ({
         ...prev,
         xp: res.xp,
         testEndDate: res.testEndDate,
         name: res.name,
+        language: res.language,
+        darkMode: res.darkMode,
+        urlImage: res.urlImage,
+        league: res.league,
+        totalXp: res.totalXp,
+        hasList: res.hasList,
       }));
+      localStorage.setItem("language", res.language);
+      localStorage.setItem("darkMode", res.darkMode);
     } catch (e) {
       console.log(e);
     }
@@ -433,6 +442,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Box
           position="fixed"
           sx={{
+            zIndex: 1201,
             display: isLogged && !isMobile ? "flex" : "none",
             justifyContent: "space-between",
             backgroundColor: theme.palette.background.default,
@@ -459,6 +469,72 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             {drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
+        </Box>
+        <Box
+          component="nav"
+          sx={{
+            display: isLogged && isMobile ? "flex" : "none",
+
+            backgroundColor: theme.palette.background.paper,
+
+            zIndex: 1201,
+            boxShadow: "none",
+            width: `100%`,
+            height: "60px",
+            position: "fixed",
+            bottom: 0,
+            overflowY: "auto",
+          }}
+        >
+          {menu.map((value) => (
+            <ListItem key={value.text}>
+              <Box sx={{ position: "relative" }}>
+                <IconButton
+                  onClick={() => {
+                    if (value.url === "/missions" || value.url === "/social")
+                      return;
+                    navigate(value.url);
+                  }}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isSelected(value.url),
+                    borderRadius: "8px",
+                    padding: "6px",
+                  }}
+                >
+                  {value.icon}
+                </IconButton>
+                {value.number && value.number !== 0 ? (
+                  <Box
+                    onClick={() => {
+                      if (value.url === "/missions" || value.url === "/social")
+                        return;
+                      navigate(value.url);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      top: 3,
+                      right: 2,
+                      position: "absolute",
+                      backgroundColor: theme.palette.primary.main,
+                      borderRadius: "20px",
+                      color: "#FFF",
+                      fontSize: "12px",
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  >
+                    <b>{value.number}</b>
+                  </Box>
+                ) : (
+                  <></>
+                )}
+              </Box>
+            </ListItem>
+          ))}
         </Box>
 
         <Box

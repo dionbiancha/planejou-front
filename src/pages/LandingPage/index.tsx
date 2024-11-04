@@ -17,15 +17,36 @@ import FaqAccordion from "../../features/FaqAccordion";
 import { useState } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import Footer from "../../components/Footer";
+import RandomImageMover from "../../components/RandomImageMover";
 
 export default function LandingPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { goToRegister, goToLogin } = useCustomNavigate();
   const textColor = theme.palette.mode === "light" ? "text.primary" : "#FFF";
   const [yearPlan, setYearPlan] = useState(true);
   const [confetti, setConfetti] = useState(false);
+
+  function goalImageSrc() {
+    if (i18n.language === "pt-BR") {
+      return "tutorial/goal.gif";
+    }
+    if (i18n.language === "en") {
+      return "tutorial/goal-en.gif";
+    }
+    return "tutorial/goal-es.gif";
+  }
+
+  function objectiveImageSrc() {
+    if (i18n.language === "pt-BR") {
+      return "tutorial/objective.gif";
+    }
+    if (i18n.language === "en") {
+      return "tutorial/objective-en.gif";
+    }
+    return "tutorial/objective-es.gif";
+  }
 
   return (
     <Box>
@@ -38,6 +59,7 @@ export default function LandingPage() {
         mt={{ xs: 15, md: 20 }}
         textAlign={"center"}
       >
+        <RandomImageMover />
         <Typography
           variant="h2"
           color="primary"
@@ -46,12 +68,13 @@ export default function LandingPage() {
           <b>{t("Transforme sonhos")}</b>
         </Typography>
         <Typography
-          sx={{ fontSize: { xs: "50px", md: "60px" } }}
+          sx={{ fontSize: { xs: "50px", md: "60px" }, zIndex: 1000 }}
           variant="h2"
           color={textColor}
         >
           <b>{t("em conquistas")}</b>
         </Typography>
+
         <Typography mt={3} mb={5} variant="body1" color="text.secondary">
           {t(
             "Dê o primeiro passo para organizar suas metas de vida com foco e diversão!"
@@ -65,7 +88,11 @@ export default function LandingPage() {
           label={t("Planejar agora")}
         />
 
-        <Link mt={2} sx={{ cursor: "pointer" }} onClick={goToLogin}>
+        <Link
+          mt={2}
+          sx={{ cursor: "pointer", zIndex: 1000 }}
+          onClick={goToLogin}
+        >
           {t("Já tenho uma conta")}
         </Link>
 
@@ -150,7 +177,7 @@ export default function LandingPage() {
         >
           <Box
             component={"img"}
-            src="tutorial/goal.gif"
+            src={goalImageSrc()}
             maxWidth="400px"
             width={"100%"}
             sx={{ borderRadius: "15px" }}
@@ -177,7 +204,7 @@ export default function LandingPage() {
               color="text.secondary"
             >
               {t(
-                " Comece listando 25 sonhos e desejos, mas não pare por aí. Selecione as 5 mais importantes e dê a elas o destaque que merecem. Cada meta se torna uma missão que você vai adorar conquistar, e a clareza trazida por essa escolha faz toda a diferença. "
+                "Comece listando 25 sonhos e desejos, mas não pare por aí. Selecione as 5 mais importantes e dê a elas o destaque que merecem. Cada meta se torna uma missão que você vai adorar conquistar, e a clareza trazida por essa escolha faz toda a diferença."
               )}
             </Typography>
             <Box>
@@ -211,7 +238,7 @@ export default function LandingPage() {
         >
           <Box
             component={"img"}
-            src="tutorial/objective.gif"
+            src={objectiveImageSrc()}
             width={"100%"}
             maxWidth="400px"
             sx={{ borderRadius: "15px" }}
@@ -378,110 +405,155 @@ export default function LandingPage() {
               {t("Ligas de competição")}
             </Typography>
           </Stack>
-          <Card
-            sx={{
-              padding: "30px",
-              borderRadius: "15px",
-              boxShadow: "none",
-              marginX: "10px",
-              mt: { xs: 5, md: 0 },
-            }}
-          >
-            <Stack width="100%" flexDirection={"column"} alignItems={"center"}>
-              <Typography variant="h6" color={"text.secondary"}>
-                <b>{yearPlan ? t("Plano anual") : t("Plano mensal")}</b>
-              </Typography>
-              <Stack
-                flexDirection={"row"}
-                mt={2}
-                alignItems={"center"}
-                justifyContent={"center"}
-              >
-                <Switch
-                  size="small"
-                  checked={yearPlan}
-                  onChange={() => {
-                    if (!yearPlan) {
-                      setConfetti(true);
-                    } else {
-                      setConfetti(false);
-                    }
-                    setYearPlan(!yearPlan);
+          <Box sx={{ position: "relative" }}>
+            <Card
+              sx={{
+                padding: "30px",
+                borderRadius: "15px",
+                boxShadow: "none",
+                marginX: "10px",
+                mt: { xs: 5, md: 0 },
+                border: yearPlan
+                  ? `1px solid ${theme.palette.primary.main}`
+                  : "",
+              }}
+            >
+              {yearPlan && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    backgroundColor: theme.palette.primary.main,
+                    borderRadius: "15px",
+                    color: "#FFF",
+                    paddingX: "10px",
+                    top: "-10px",
+                    right: "25px",
+                    fontSize: "12px",
                   }}
-                />
-                {confetti && (
-                  <ConfettiExplosion particleCount={50} particleSize={8} />
-                )}
-                <Typography
-                  variant="body2"
-                  color={"text.secondary"}
-                  sx={{ fontSize: "13px" }}
                 >
-                  <i>{t("Melhor oferta")}</i>
-                </Typography>
-              </Stack>
+                  {t("Destaque")}
+                </Box>
+              )}
               <Stack
                 width="100%"
-                flexDirection={"row"}
-                alignItems={"end"}
-                justifyContent={"center"}
-                mt={3}
+                flexDirection={"column"}
+                alignItems={"center"}
               >
                 <Typography
-                  sx={{ textDecoration: "line-through" }}
-                  variant="body2"
-                  color={"text.secondary"}
-                  mr={2}
-                  mb={"10px"}
-                >
-                  <b>$ {yearPlan ? 55 : 14}</b>
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "40px" }}
                   variant="h6"
-                  color={textColor}
+                  color={yearPlan ? "primary" : "text.secondary"}
+                  sx={{ fontSize: "26px" }}
                 >
-                  <b>$ {yearPlan ? 29 : 9}</b>
+                  <b>{yearPlan ? t("Plano anual") : t("Plano mensal")}</b>
                 </Typography>
+                <Stack
+                  flexDirection={"row"}
+                  mt={2}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                >
+                  <Switch
+                    size="small"
+                    checked={yearPlan}
+                    onChange={() => {
+                      if (!yearPlan) {
+                        setConfetti(true);
+                      } else {
+                        setConfetti(false);
+                      }
+                      setYearPlan(!yearPlan);
+                    }}
+                  />
+                  {confetti && (
+                    <ConfettiExplosion particleCount={50} particleSize={8} />
+                  )}
+                  <Typography
+                    variant="body2"
+                    color={"text.secondary"}
+                    sx={{ fontSize: "13px" }}
+                  >
+                    <i>{t("Melhor oferta")}</i>
+                  </Typography>
+                </Stack>
+                <Stack
+                  width="100%"
+                  flexDirection={"row"}
+                  alignItems={"end"}
+                  justifyContent={"center"}
+                  mt={3}
+                >
+                  <Typography
+                    sx={{ textDecoration: "line-through" }}
+                    variant="body2"
+                    color={"text.secondary"}
+                    mr={2}
+                    mb={"10px"}
+                  >
+                    <b>
+                      {t("R$")} {yearPlan ? `9,99` : "14,99"}
+                    </b>
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: "40px" }}
+                    variant="h6"
+                    color={textColor}
+                  >
+                    <b>
+                      {t("R$")} {yearPlan ? `2,99` : `9,99`}
+                    </b>
+                  </Typography>
+                  <Typography
+                    mb={"10px"}
+                    variant="body2"
+                    color={"text.secondary"}
+                    ml={2}
+                  >
+                    <b>/{t("Mês")}</b>
+                  </Typography>
+                </Stack>
+                {yearPlan && (
+                  <Typography
+                    mb={"10px"}
+                    variant="body2"
+                    color={"text.secondary"}
+                    ml={2}
+                  >
+                    <b>
+                      {t("R$")} 23,88 {t("por ano")}
+                    </b>
+                  </Typography>
+                )}
                 <Typography
-                  mb={"10px"}
+                  mt={3}
+                  mb={5}
                   variant="body2"
                   color={"text.secondary"}
-                  ml={2}
                 >
-                  <b>{t("BRL")}</b>
+                  {yearPlan
+                    ? t("Pagamento único. 12 meses de acesso.")
+                    : t("Pagamento mensal com renovação automática.")}
+                </Typography>
+                <CustomButton
+                  variant="contained"
+                  size="large"
+                  onClick={goToRegister}
+                  label={
+                    isMobile
+                      ? t("Teste gratuito")
+                      : t("Começe um teste gratuito de 7 dias")
+                  }
+                />
+                <Typography
+                  mt={1}
+                  sx={{ fontSize: "10px" }}
+                  variant="body2"
+                  color={"text.secondary"}
+                >
+                  <i>{t("Não é necessário cartão de crédito para começar")}</i>
                 </Typography>
               </Stack>
-              <Typography
-                mt={3}
-                mb={5}
-                variant="body2"
-                color={"text.secondary"}
-              >
-                {yearPlan
-                  ? t("Pagamento único. Sem assinatura")
-                  : t("Pagamento mensal. Sem compromisso")}
-              </Typography>
-              <CustomButton
-                variant="contained"
-                size="large"
-                onClick={goToRegister}
-                label={
-                  isMobile
-                    ? t("Teste gratuito")
-                    : t("Começe um teste gratuito de 7 dias")
-                }
-              />
-              <Typography
-                mt={1}
-                sx={{ fontSize: "10px" }}
-                variant="body2"
-                color={"text.secondary"}
-              >
-                <i>{t("Não é necessário cartão de crédito para começar")}</i>
-              </Typography>
-            </Stack>
-          </Card>
+            </Card>
+          </Box>
         </Stack>
         <Card
           sx={{

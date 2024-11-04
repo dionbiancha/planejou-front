@@ -3,7 +3,6 @@ import {
   Card,
   Collapse,
   Divider,
-  IconButton,
   Stack,
   Typography,
   useTheme,
@@ -12,7 +11,6 @@ import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useEffect, useState } from "react";
 import { Goal } from "../../context/GoalContext/GoalContext";
 import { listGoalsByUserId } from "../../services/goal";
-import { MoreVertOutlined } from "@mui/icons-material";
 import BorderLinearProgress from "../../components/BorderLinearProgress";
 import { useTranslation } from "react-i18next";
 import {
@@ -119,25 +117,32 @@ export function List() {
                     boxShadow: "none",
                     padding: "10px",
                     borderRadius: "10px",
-                    width: "99%",
+                    maxWidth: "800px",
+                    width: "100%",
                     opacity: doLater(index) ? 0.5 : 1,
-                    cursor: "pointer",
+                    cursor: doLater(index) ? "" : "pointer",
                   }}
                 >
                   <Stack direction="row" alignItems="center">
-                    <IconButton onClick={() => {}}>
+                    {/* <IconButton onClick={() => {}}>
                       <MoreVertOutlined />
-                    </IconButton>
+                    </IconButton> */}
                     <Stack
                       direction="row"
                       alignItems="center"
                       justifyContent="space-between"
                       width={"100%"}
-                      onClick={() => handleShowDetails(goal.id)}
+                      onClick={() => {
+                        if (!doLater(index)) {
+                          handleShowDetails(goal.id);
+                        }
+                      }}
                     >
                       <Typography
                         noWrap={false} // Permite a quebra de linha
                         sx={{ wordBreak: "break-word" }}
+                        mt={1}
+                        mb={1}
                       >
                         <b>{goal.name}</b>
                       </Typography>
@@ -192,7 +197,7 @@ export function List() {
                     <Typography variant="body2" color="text.secondary" m={1}>
                       <b>{t("Estatísticas")}</b>
                     </Typography>
-                    <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
                       <Stack
                         direction={"row"}
                         alignItems={"center"}

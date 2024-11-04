@@ -16,6 +16,7 @@ import { useDataUser } from "../../context/UserContext/useUser";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useState } from "react";
 import HeaderControls from "../../components/HeaderControls";
+import { useSnack } from "../../context/SnackContext";
 
 export function SignUp() {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export function SignUp() {
   const { goToObjectives } = useCustomNavigate();
   const { setUserData } = useDataUser();
   const loading = useLoading();
+  const snack = useSnack();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,8 +37,8 @@ export function SignUp() {
       try {
         await createAccount(email, password, name);
         goToObjectives();
-      } catch (error) {
-        console.error(error);
+      } catch {
+        snack.error(t("Erro ao criar conta."));
       }
       loading.hide();
     }

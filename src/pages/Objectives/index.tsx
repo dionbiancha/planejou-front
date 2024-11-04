@@ -65,7 +65,7 @@ interface selectObjectiveProps {
 }
 
 export function Objectives() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const loading = useLoading();
   const snack = useSnack();
   const { goToNewObjetive, goToStart, goToEditObjetive } = useCustomNavigate();
@@ -158,7 +158,13 @@ export function Objectives() {
     loading.show();
     try {
       const res = await getUserData();
+
       setUserData((prev) => ({ ...prev, ...res }));
+      localStorage.setItem("language", res.language);
+      localStorage.setItem("darkMode", res.darkMode);
+      if (res.language) {
+        i18n.changeLanguage(res.language);
+      }
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message);

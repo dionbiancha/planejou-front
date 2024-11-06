@@ -21,6 +21,7 @@ import Update from "./Update";
 import TermsOfUse from "./TermsOfUse";
 import PrivacyPolicy from "./PrivacyPolicy";
 import Loading from "../components/Loading";
+import Subscribe from "./Subscribe";
 
 export default function Pages() {
   const { userData } = useDataUser();
@@ -50,6 +51,7 @@ export default function Pages() {
           <Route path="/update" element={<Update />} />
           <Route path="/termsOfUse" element={<TermsOfUse />} />
           <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
+          <Route path="/subscribe" element={<Subscribe />} />
         </Routes>
       </Layout>
     </ThemeProvider>

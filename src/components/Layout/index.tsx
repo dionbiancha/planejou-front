@@ -86,6 +86,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       path === "/update" ||
       path === "/termsOfUse" ||
       path === "/privacyPolicy" ||
+      path === "/subscribe" ||
       path.includes("/edit")
     );
   }
@@ -232,6 +233,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   async function handleResetUserXpIfNeeded() {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
     try {
       await resetUserXpIfNeeded();
     } catch {

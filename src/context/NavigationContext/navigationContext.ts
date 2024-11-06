@@ -58,6 +58,9 @@ export function useCustomNavigate() {
   function goToPrivacyPolicy() {
     validateNavigate("/privacyPolicy");
   }
+  function goToSubscribe() {
+    validateNavigate("/subscribe");
+  }
 
   function goToEditObjetive(id: string) {
     validateNavigate(`/edit/${id}`);
@@ -77,5 +80,6 @@ export function useCustomNavigate() {
     goToLandingPage,
     goToTermOfUse,
     goToPrivacyPolicy,
+    goToSubscribe,
   };
 }

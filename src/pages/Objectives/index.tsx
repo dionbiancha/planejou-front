@@ -69,7 +69,7 @@ export function Objectives() {
   const loading = useLoading();
   const { userData } = useDataUser();
   const snack = useSnack();
-  const { goToNewObjetive, goToStart, goToEditObjetive, goToLandingPage } =
+  const { goToNewObjetive, goToStart, goToEditObjetive, goToSubscribe } =
     useCustomNavigate();
   const theme = useTheme();
   const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
@@ -186,7 +186,7 @@ export function Objectives() {
 
       if (currentDate > expirationDate) {
         // Redirecionar ou tomar alguma ação
-        goToLandingPage(); // ajuste o caminho conforme necessário
+        goToSubscribe(); // ajuste o caminho conforme necessário
         return true;
       }
     }

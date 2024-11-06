@@ -26,7 +26,6 @@ export default function Config() {
   const snack = useSnack();
   const { goToLogin, goToSubscribe } = useCustomNavigate();
   const { userData, setUserData } = useDataUser();
-  const { goToLandingPage } = useCustomNavigate();
   const [openCancelSubscriptionDialog, setOpenCancelSubscriptionDialog] =
     useState(false);
 
@@ -50,7 +49,7 @@ export default function Config() {
 
       if (currentDate > expirationDate) {
         // Redirecionar ou tomar alguma ação
-        goToLandingPage(); // ajuste o caminho conforme necessário
+        goToSubscribe(); // ajuste o caminho conforme necessário
         return true;
       }
     }

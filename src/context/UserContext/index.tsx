@@ -15,6 +15,10 @@ interface UserProps {
   darkMode: string;
   photoURL: string;
   language: string;
+  isPremium?: boolean;
+  premiumEndDate?: Date;
+  cancelAtPeriodEnd?: boolean;
+  nextResetXp: Timestamp;
 }
 
 interface UserContextProps {

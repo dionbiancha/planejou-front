@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { DocumentData } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
+import { useDataUser } from "../../context/UserContext/useUser";
 
 interface RankingProps {
   name: string;
@@ -31,12 +32,13 @@ export function League() {
   const loading = useLoading();
   const { t } = useTranslation();
   const [topUsers, setTopUsers] = useState<RankingProps[]>();
-  const [userData, setUserData] = useState<DocumentData>();
+  const [data, setData] = useState<DocumentData>();
+  const { userData } = useDataUser();
 
   async function handleTopUsersByXP() {
     loading.show();
     try {
-      const res = await getTopUsersByXP();
+      const res = await getTopUsersByXP(userData.league);
 
       setTopUsers(res);
     } catch (error) {
@@ -53,7 +55,7 @@ export function League() {
     loading.show();
     try {
       const res = await getUserData();
-      setUserData(res);
+      setData(res);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message);
@@ -281,7 +283,7 @@ export function League() {
         >
           <Typography variant="h6" mb={1}>
             <b>
-              {t("Divisão")} {t(`${DIVISIONS[userData?.league ?? 1]}`)}
+              {t("Divisão")} {t(`${DIVISIONS[data?.league ?? 1]}`)}
             </b>
           </Typography>
           <Typography variant="body2" mb={2}>

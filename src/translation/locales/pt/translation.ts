@@ -263,6 +263,13 @@ const ptTranslation = {
   Seg: "Seg",
   Qua: "Qua",
   Sex: "Sex",
+  Idioma: "Idioma",
+  "Sua assinatura sera renovada em": "Sua assinatura sera renovada em",
+  "Cancelar assinatura": "Cancelar assinatura",
+  "Tem certeza que deseja cancelar sua assinatura?":
+    "Tem certeza que deseja cancelar sua assinatura?",
+  "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.":
+    "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.",
 };
 
 export default ptTranslation;

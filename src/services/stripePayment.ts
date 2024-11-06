@@ -8,7 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { db } from "../config/firebase";
+import { app, db } from "../config/firebase";
 import { validateAuth } from "./authService";
 
 export const getCheckoutUrl = async (priceId: string): Promise<string> => {
@@ -24,8 +24,8 @@ export const getCheckoutUrl = async (priceId: string): Promise<string> => {
 
   const docRef = await addDoc(checkoutSessionRef, {
     price: priceId,
-    success_url: window.location.origin,
-    cancel_url: window.location.origin,
+    success_url: `${window.location.origin}/objectives`,
+    cancel_url: `${window.location.origin}/objectives`,
   });
 
   return new Promise<string>((resolve, reject) => {
@@ -46,7 +46,7 @@ export const getCheckoutUrl = async (priceId: string): Promise<string> => {
   });
 };
 
-export const getPortalUrl = async (app: FirebaseApp): Promise<string> => {
+export const getPortalUrl = async (): Promise<string> => {
   const auth = getAuth(app);
   const user = auth.currentUser;
 
@@ -88,22 +88,26 @@ export const getPremiumStatus = async () => {
     where("status", "in", ["trialing", "active"])
   );
 
-  return new Promise<{ isPremium: boolean; endDate?: Date }>(
-    (resolve, reject) => {
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          if (snapshot.docs.length === 0) {
-            resolve({ isPremium: false });
-          } else {
-            const subscription = snapshot.docs[0].data();
-            const endDate = subscription.current_period_end.toDate();
-            resolve({ isPremium: true, endDate });
-          }
-          unsubscribe();
-        },
-        reject
-      );
-    }
-  );
+  return new Promise<{
+    isPremium: boolean;
+    endDate?: Date;
+    cancel_at_period_end?: boolean;
+  }>((resolve, reject) => {
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        if (snapshot.docs.length === 0) {
+          resolve({ isPremium: false });
+        } else {
+          const subscription = snapshot.docs[0].data();
+          const endDate = subscription.current_period_end.toDate();
+          const cancel_at_period_end = subscription.cancel_at_period_end;
+
+          resolve({ isPremium: true, endDate, cancel_at_period_end });
+        }
+        unsubscribe();
+      },
+      reject
+    );
+  });
 };

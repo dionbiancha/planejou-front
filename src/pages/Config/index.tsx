@@ -12,10 +12,13 @@ import { useDataUser } from "../../context/UserContext/useUser";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useTranslation } from "react-i18next";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { useEffect } from "react";
-import { updateDarkMode } from "../../services/user";
+import { useState } from "react";
+import { updateDarkMode, updateLanguage } from "../../services/user";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useSnack } from "../../context/SnackContext";
+import i18n from "../../translation/i18n";
+import GenericDialog from "../../components/Dialog/GenericDialog";
+import { getCheckoutUrl, getPortalUrl } from "../../services/stripePayment";
 
 export default function Config() {
   const { t } = useTranslation();
@@ -23,8 +26,42 @@ export default function Config() {
   const snack = useSnack();
   const { goToLogin } = useCustomNavigate();
   const { userData, setUserData } = useDataUser();
+  const { goToLandingPage } = useCustomNavigate();
+  const [openCancelSubscriptionDialog, setOpenCancelSubscriptionDialog] =
+    useState(false);
+
+  async function handleCancelSubscription() {
+    loading.showScreen();
+    try {
+      const res = await getPortalUrl();
+      window.location.href = res;
+    } catch {
+      snack.error(t("Erro ao cancelar a assinatura"));
+      loading.hideScreen();
+    }
+  }
+
+  function freeTrialValidation() {
+    const expiredDate = userData?.testEndDate;
+
+    if (expiredDate && userData?.isPremium === false) {
+      const currentDate = new Date();
+      const expirationDate = expiredDate.toDate(); // Convert Timestamp to Date
+
+      if (currentDate > expirationDate) {
+        // Redirecionar ou tomar alguma ação
+        goToLandingPage(); // ajuste o caminho conforme necessário
+        return true;
+      }
+    }
+    return false;
+  }
 
   async function handleThemeChange(value: string) {
+    if (freeTrialValidation()) {
+      snack.error(t("Seu período de teste expirou!"));
+      return;
+    }
     loading.show();
     try {
       const translatedValue =
@@ -36,6 +73,54 @@ export default function Config() {
       snack.error(t("Erro ao atualizar o tema"));
     }
     loading.hide();
+  }
+
+  async function handleLanguageChange(value: string) {
+    loading.show();
+    try {
+      let language: string = userData.language ?? "pt-BR";
+      if (value === t("Português")) {
+        language = "pt-BR";
+      }
+      if (value === t("Inglês")) {
+        language = "en";
+      }
+      if (value === t("Espanhol")) {
+        language = "es";
+      }
+      setUserData((prev) => ({ ...prev, language: language }));
+      localStorage.setItem("language", language);
+      i18n.changeLanguage(language);
+      await updateLanguage(language);
+    } catch {
+      snack.error(t("Erro ao atualizar o idioma"));
+    }
+    loading.hide();
+  }
+
+  async function handleCheckout() {
+    loading.showScreen();
+    try {
+      const priceId = "price_1QGQFDEAZX87gM7L4D79TpEN";
+      const res = await getCheckoutUrl(priceId);
+      console.log("aqui", res);
+      window.location.href = res;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  function getLanguage() {
+    if (userData.language === t("pt-BR")) {
+      return t("Português");
+    }
+    if (userData.language === t("en")) {
+      return t("Inglês");
+    }
+    if (userData.language === t("es")) {
+      return t("Espanhol");
+    }
+    return t("Português");
   }
 
   function calculateTestProgress(): {
@@ -62,12 +147,48 @@ export default function Config() {
     return { progress, daysRemaining };
   }
 
-  useEffect(() => {
-    console.log(userData.darkMode);
-  }, [userData.darkMode]);
+  function calculatePremiumRemaining(): {
+    progress: number;
+    daysRemaining: number;
+  } {
+    if (!userData.premiumEndDate) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const now = new Date();
+    const totalDuration = 7 * 24 * 60 * 60 * 1000;
+    const endDate = userData.premiumEndDate;
+    const remainingTime = endDate.getTime() - now.getTime();
+
+    const daysRemaining = Math.ceil(remainingTime / (24 * 60 * 60 * 1000));
+
+    if (remainingTime <= 0) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const progress = Math.min((remainingTime / totalDuration) * 100, 100);
+
+    return { progress, daysRemaining };
+  }
+
+  function isExpired() {
+    if (calculateTestProgress().daysRemaining === 0) return true;
+    return false;
+  }
 
   return (
     <Stack flexDirection={"row"}>
+      <GenericDialog
+        open={openCancelSubscriptionDialog}
+        handleClose={() => setOpenCancelSubscriptionDialog(false)}
+        title={t("Tem certeza que deseja cancelar sua assinatura?")}
+        description={t(
+          "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura."
+        )}
+        textButtonCancel={t("Voltar")}
+        textButtonConfirm={t(`Cancelar assinatura`)}
+        onConfirm={handleCancelSubscription}
+      />
       <Card
         sx={{
           boxShadow: "none",
@@ -105,16 +226,70 @@ export default function Config() {
           color="text.secondary"
           sx={{ fontWeight: "bold" }}
         >
+          {t("Idioma")}
+        </Typography>
+        <RoundedSelectField
+          size="medium"
+          items={[t("Português"), t("Inglês"), t("Espanhol")]}
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          value={getLanguage()}
+        />
+        <Typography
+          mt={3}
+          mb={1}
+          variant="subtitle1"
+          color="text.secondary"
+          sx={{ fontWeight: "bold" }}
+        >
           {t("Inscrição")}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t("Seu teste gratuito termina em")}{" "}
-          <b>
-            {calculateTestProgress().daysRemaining}{" "}
-            {calculateTestProgress().daysRemaining === 1 ? t("dia") : t("dias")}
-          </b>
-          . <Link>{t("Atualize agora")}</Link>
-        </Typography>
+        {userData.isPremium ? (
+          <Typography variant="body2" color="text.secondary">
+            {userData.cancelAtPeriodEnd
+              ? t("Sua assinatura vai terminar em")
+              : t("Sua assinatura sera renovada em")}{" "}
+            <b>
+              {calculatePremiumRemaining().daysRemaining}{" "}
+              {calculatePremiumRemaining().daysRemaining === 1
+                ? t("dia")
+                : t("dias")}
+            </b>
+            .{" "}
+            <Link
+              sx={{ cursor: "pointer" }}
+              onClick={() =>
+                userData.cancelAtPeriodEnd
+                  ? handleCancelSubscription()
+                  : setOpenCancelSubscriptionDialog(true)
+              }
+            >
+              {userData.cancelAtPeriodEnd
+                ? t("Reativar assinatura")
+                : t("Cancelar assinatura")}
+            </Link>
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            {isExpired() ? (
+              t("Seu teste gratuito expirou")
+            ) : (
+              <>
+                {t("Seu teste gratuito termina em")}{" "}
+                <b>
+                  {calculateTestProgress().daysRemaining}{" "}
+                  {calculateTestProgress().daysRemaining === 1
+                    ? t("dia")
+                    : t("dias")}
+                </b>
+              </>
+            )}
+            .{" "}
+            <Link onClick={handleCheckout} sx={{ cursor: "pointer" }}>
+              {t("Atualize agora")}
+            </Link>
+          </Typography>
+        )}
+
         <Divider sx={{ my: 3 }} />
         <Stack direction="row" justifyContent="end">
           <Button variant="text" color="inherit" onClick={goToLogin}>

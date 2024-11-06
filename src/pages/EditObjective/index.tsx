@@ -307,14 +307,21 @@ export default function NewObjetive() {
                 />
               </Stack>
             )}
-            <Stack flexDirection={"row"} alignItems={"center"} mb={3}>
+            <Stack
+              sx={{ opacity: 0.2 }}
+              flexDirection={"row"}
+              alignItems={"center"}
+              mb={3}
+            >
               <Typography mr={3} variant="subtitle2">
                 <b>{t("Lembrar de marcar")}</b>
               </Typography>
               <Checkbox
                 size="medium"
                 checked={remindMe}
-                onChange={() => setRemindMe(!remindMe)}
+                onChange={() => {
+                  // setRemindMe(!remindMe)
+                }}
               />
             </Stack>
             {remindMe && (

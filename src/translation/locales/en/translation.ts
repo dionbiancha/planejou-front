@@ -260,6 +260,13 @@ const enTranslation = {
   Seg: "Mon",
   Qua: "Wed",
   Sex: "Fri",
+  Idioma: "Language",
+  "Sua assinatura sera renovada em": "Your subscription will be renewed in",
+  "Cancelar assinatura": "Cancel subscription",
+  "Tem certeza que deseja cancelar sua assinatura?":
+    "Are you sure you want to cancel your subscription?",
+  "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.":
+    "You will lose all the benefits of the premium plan by canceling your subscription.",
 };
 
 export default enTranslation;

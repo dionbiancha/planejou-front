@@ -9,7 +9,6 @@ const LoadingContainer = styled(Box)(() => ({
   justifyContent: "center",
   alignItems: "center",
   height: "100vh",
-  backgroundColor: "#00000084", // Fundo levemente transparente
   position: "fixed",
   top: 0,
   left: 0,
@@ -46,7 +45,7 @@ const Logo = styled("img")({
 const Loading: React.FC = () => {
   const loading = useLoading();
 
-  if (!loading.showScreen) {
+  if (loading.stateScreen) {
     return (
       <LoadingContainer>
         <div style={{ textAlign: "center" }}>
@@ -56,7 +55,7 @@ const Loading: React.FC = () => {
     );
   }
 
-  return null; // Retorna null se não estiver carregando
+  return <></>; // Retorna null se não estiver carregando
 };
 
 export default Loading;

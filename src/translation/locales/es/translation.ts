@@ -141,7 +141,7 @@ const esTranslation = {
   "Seu teste gratuito termina em": "Tu prueba gratuita termina en",
   Inscrição: "Suscripción",
   Habilitado: "Habilitado",
-  Desabilitado: "Deshabilitado",
+  Desabilitado: "Desabilitado",
   "Modo escuro": "Modo oscuro",
   Preferencias: "Preferencias",
   "Erro ao atualizar o tema": "Error al actualizar el tema",
@@ -264,6 +264,13 @@ const esTranslation = {
   Seg: "Lun",
   Qua: "Mié",
   Sex: "Vie",
+  Idioma: "Idioma",
+  "Sua assinatura sera renovada em": "Tu suscripción se renovará en",
+  "Cancelar assinatura": "Cancelar suscripción",
+  "Tem certeza que deseja cancelar sua assinatura?":
+    "¿Estás seguro de que deseas cancelar tu suscripción?",
+  "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.":
+    "Perderás todos los beneficios del plan premium al cancelar tu suscripción.",
 };
 
 export default esTranslation;

@@ -112,15 +112,18 @@ export default function Profile() {
           width: "100%",
         }}
       >
-        <Stack flexDirection={"row"} alignItems={"center"} mb={5}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          alignItems={"center"}
+          mb={5}
+        >
           {userData?.photoURL ? (
             <Box
               sx={{
                 height: "80px",
                 width: "80px",
                 borderRadius: "100%",
-
-                marginRight: 2,
+                marginRight: { xs: 0, md: 2 },
               }}
               component={"img"}
               src={userData?.photoURL}
@@ -136,7 +139,7 @@ export default function Profile() {
                 justifyContent: "center",
                 color: "white",
                 fontSize: "30px",
-                marginRight: 2,
+                marginRight: { xs: 0, md: 2 },
                 backgroundColor: theme.palette.primary.main,
               }}
             >
@@ -145,10 +148,18 @@ export default function Profile() {
           )}
 
           <Stack flexDirection={"column"}>
-            <Typography variant="h5" color="text.secondary">
+            <Typography
+              textAlign={{ xs: "center", md: "left" }}
+              variant="h5"
+              color="text.secondary"
+            >
               <b>{userData?.name}</b>
             </Typography>
-            <Typography variant="subtitle2" color="text.secondary">
+            <Typography
+              textAlign={{ xs: "center", md: "left" }}
+              variant="subtitle2"
+              color="text.secondary"
+            >
               <b>
                 {t("Por aqui desde")}{" "}
                 {userData?.createdAt &&
@@ -158,7 +169,7 @@ export default function Profile() {
           </Stack>
         </Stack>
 
-        <Stack direction={"row"} spacing={3}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
           <Stack
             direction={"row"}
             alignItems={"center"}
@@ -213,7 +224,7 @@ export default function Profile() {
             </Stack>
           </Stack>
         </Stack>
-        <Stack direction={"row"} spacing={3} mt={3}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={3} mt={3}>
           <Stack
             direction={"row"}
             alignItems={"center"}

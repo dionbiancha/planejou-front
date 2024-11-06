@@ -22,9 +22,10 @@ import CustomButton from "../Button/CustomButton";
 import BorderLinearProgress from "../BorderLinearProgress";
 import { useAuthValidation } from "../../hooks/useAuthValidation";
 import { useDataUser } from "../../context/UserContext/useUser";
-import { getUserData } from "../../services/user";
+import { getUserData, resetUserXpIfNeeded } from "../../services/user";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { getCheckoutUrl, getPremiumStatus } from "../../services/stripePayment";
+import { useSnack } from "../../context/SnackContext";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -45,6 +46,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { userData, setUserData } = useDataUser();
   const loading = useLoading();
   const [isPremium, setIsPremium] = useState(true);
+  const snack = useSnack();
 
   useAuthValidation();
 
@@ -67,6 +69,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       return "#C8CACD";
     }
     return "inherit";
+  }
+
+  function isExpired() {
+    if (calculateTestProgress().daysRemaining === 0) return true;
+    return false;
   }
 
   function isValidRoute(path: string) {
@@ -185,6 +192,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const now = new Date();
     const totalDuration = 7 * 24 * 60 * 60 * 1000;
+
     const endDate = userData.testEndDate.toDate();
     const remainingTime = endDate.getTime() - now.getTime();
 
@@ -203,7 +211,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     loading.show();
     try {
       const res = await getUserData();
-
       setUserData((prev) => ({
         ...prev,
         xp: res.xp,
@@ -224,6 +231,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     loading.hide();
   }
 
+  async function handleResetUserXpIfNeeded() {
+    try {
+      await resetUserXpIfNeeded();
+    } catch {
+      snack.error(t("Erro ao resetar XP"));
+    }
+  }
+
   async function handleCheckout() {
     loading.showScreen();
     try {
@@ -238,6 +253,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const checkPremium = async () => {
+      loading.showScreen();
       const userId = localStorage.getItem("userId");
       const newPremiumStatus = userId
         ? await getPremiumStatus()
@@ -245,12 +261,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             isPremium: false,
           };
       setIsPremium(newPremiumStatus.isPremium);
+
+      setUserData((prev) => ({
+        ...prev,
+        isPremium: newPremiumStatus.isPremium,
+        premiumEndDate: newPremiumStatus?.endDate,
+        cancelAtPeriodEnd: newPremiumStatus?.cancel_at_period_end,
+      }));
+      loading.hideScreen();
     };
     checkPremium();
   }, []);
 
   useEffect(() => {
     handleUserData();
+    handleResetUserXpIfNeeded();
   }, []);
 
   const drawer = (
@@ -297,7 +322,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       alignItems: "center",
                       justifyContent: "center",
                       top: 3,
-                      right: 100,
+                      right: 105,
                       position: "absolute",
                       backgroundColor: theme.palette.primary.main,
                       borderRadius: "20px",
@@ -365,6 +390,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     </Box>
   );
 
+  if (loading.stateScreen) {
+    return <></>;
+  }
+
   if (isValidRoute(location.pathname)) {
     return (
       <Container
@@ -390,36 +419,50 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           sx={{
             height: "50px",
             width: "100%",
-            backgroundColor: "#2A303C",
+            backgroundColor: isExpired()
+              ? theme.palette.warning.main
+              : "#2A303C",
             padding: "20px",
           }}
         >
-          <Typography variant="body2" color="#fff">
+          <Typography
+            variant="body2"
+            color={isExpired() ? "#2A303C" : "#fff"}
+            sx={{ mr: "20px", fontSize: { xs: "12px", md: "14px" } }}
+          >
             <b>
-              {calculateTestProgress().daysRemaining}{" "}
-              {calculateTestProgress().daysRemaining === 1
-                ? t("dia")
-                : t("dias")}{" "}
-              {t("de teste gratuito")}
+              {isExpired() ? (
+                t("Seu teste gratuito expirou")
+              ) : (
+                <>
+                  {calculateTestProgress().daysRemaining}{" "}
+                  {calculateTestProgress().daysRemaining === 1
+                    ? t("dia")
+                    : t("dias")}{" "}
+                  {t("de teste gratuito")}
+                </>
+              )}
             </b>
           </Typography>
-          <Box
-            sx={{
-              display: {
-                xs: "none",
-                md: "block",
-              },
-              maxWidth: "300px",
-              width: "100%",
-              marginX: "20px",
-            }}
-          >
-            <BorderLinearProgress
-              rtl
-              variant="determinate"
-              value={calculateTestProgress().progress}
-            />
-          </Box>
+          {!isExpired() && (
+            <Box
+              sx={{
+                display: {
+                  xs: "none",
+                  md: "block",
+                },
+                maxWidth: "300px",
+                width: "100%",
+                marginX: "20px",
+              }}
+            >
+              <BorderLinearProgress
+                rtl
+                variant="determinate"
+                value={calculateTestProgress().progress}
+              />
+            </Box>
+          )}
 
           <CustomButton
             onClick={handleCheckout}

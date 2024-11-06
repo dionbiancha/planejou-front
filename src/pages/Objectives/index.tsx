@@ -67,8 +67,10 @@ interface selectObjectiveProps {
 export function Objectives() {
   const { t, i18n } = useTranslation();
   const loading = useLoading();
+  const { userData } = useDataUser();
   const snack = useSnack();
-  const { goToNewObjetive, goToStart, goToEditObjetive } = useCustomNavigate();
+  const { goToNewObjetive, goToStart, goToEditObjetive, goToLandingPage } =
+    useCustomNavigate();
   const theme = useTheme();
   const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
   const { setGoals } = useGoals();
@@ -175,10 +177,30 @@ export function Objectives() {
     loading.hide();
   }
 
+  function freeTrialValidation() {
+    const expiredDate = userData?.testEndDate;
+
+    if (expiredDate && userData.isPremium === false) {
+      const currentDate = new Date();
+      const expirationDate = expiredDate.toDate(); // Convert Timestamp to Date
+
+      if (currentDate > expirationDate) {
+        // Redirecionar ou tomar alguma ação
+        goToLandingPage(); // ajuste o caminho conforme necessário
+        return true;
+      }
+    }
+    return false;
+  }
+
   async function markObjective(
     data: MarkObjectiveAsCompletedProps,
     objectiveDone?: boolean
   ) {
+    if (freeTrialValidation()) {
+      snack.error(t("Seu período de teste expirou!"));
+      return;
+    }
     try {
       setObjectives((prev) => {
         const newObjectives = prev.map((o) => {
@@ -378,7 +400,10 @@ export function Objectives() {
                                 }}
                               >
                                 <MenuItem
-                                  onClick={() => handleClose(objective.name)}
+                                  sx={{ opacity: 0.3 }}
+                                  onClick={() => {
+                                    handleClose(objective.name);
+                                  }}
                                 >
                                   <ListItemIcon>
                                     <ReplayIcon
@@ -391,6 +416,12 @@ export function Objectives() {
                                 </MenuItem>
                                 <MenuItem
                                   onClick={() => {
+                                    if (freeTrialValidation()) {
+                                      snack.error(
+                                        t("Seu período de teste expirou!")
+                                      );
+                                      return;
+                                    }
                                     setGoals([
                                       {
                                         position: "",
@@ -414,6 +445,12 @@ export function Objectives() {
                                 </MenuItem>
                                 <MenuItem
                                   onClick={() => {
+                                    if (freeTrialValidation()) {
+                                      snack.error(
+                                        t("Seu período de teste expirou!")
+                                      );
+                                      return;
+                                    }
                                     setSelectObjective({
                                       goalId: o.goalId,
                                       objectiveId: objective.id ?? "",

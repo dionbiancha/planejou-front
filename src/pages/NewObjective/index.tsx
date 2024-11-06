@@ -34,7 +34,7 @@ export default function NewObjective() {
   const [repeat, setRepeat] = useState<string>("Diariamente");
   const [selectedDailyDays, setSelectedDailyDays] = useState<string[]>(DAYS);
   const [timesPerWeek, setTimesPerWeek] = useState<string>("3");
-  const [remindMe, setRemindMe] = useState<boolean>(false);
+  const [remindMe] = useState<boolean>(false);
   const [selectedHour, setSelectedHour] = useState<string>("6 am");
   const { goals, setGoals } = useGoals();
   const snack = useSnack();
@@ -257,14 +257,21 @@ export default function NewObjective() {
                 />
               </Stack>
             )}
-            <Stack flexDirection={"row"} alignItems={"center"} mb={3}>
+            <Stack
+              sx={{ opacity: 0.2 }}
+              flexDirection={"row"}
+              alignItems={"center"}
+              mb={3}
+            >
               <Typography mr={3} variant="subtitle2">
                 <b>{t("Lembrar de marcar")}</b>
               </Typography>
               <Checkbox
                 size="medium"
                 checked={remindMe}
-                onChange={() => setRemindMe(!remindMe)}
+                onChange={() => {
+                  // setRemindMe(!remindMe)
+                }}
               />
             </Stack>
             {remindMe && (

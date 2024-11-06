@@ -24,8 +24,9 @@ import { useAuthValidation } from "../../hooks/useAuthValidation";
 import { useDataUser } from "../../context/UserContext/useUser";
 import { getUserData, resetUserXpIfNeeded } from "../../services/user";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import { getCheckoutUrl, getPremiumStatus } from "../../services/stripePayment";
+import { getPremiumStatus } from "../../services/stripePayment";
 import { useSnack } from "../../context/SnackContext";
+import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -47,6 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const loading = useLoading();
   const [isPremium, setIsPremium] = useState(true);
   const snack = useSnack();
+  const { goToSubscribe } = useCustomNavigate();
 
   useAuthValidation();
 
@@ -234,7 +236,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   async function handleResetUserXpIfNeeded() {
     const userId = localStorage.getItem("userId");
-    if (!userId) return;
+    const acessToken = localStorage.getItem("acessToken");
+    if (!userId || !acessToken) return;
     try {
       await resetUserXpIfNeeded();
     } catch {
@@ -242,27 +245,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }
 
-  async function handleCheckout() {
+  async function handleGetPremiumStatus() {
     loading.showScreen();
-    try {
-      const priceId = "price_1QGQFDEAZX87gM7L4D79TpEN";
-      const res = await getCheckoutUrl(priceId);
-      window.location.href = res;
-    } catch (e) {
-      console.log(e);
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      loading.hideScreen();
+      return;
     }
-    loading.hideScreen();
-  }
-
-  useEffect(() => {
-    const checkPremium = async () => {
-      loading.showScreen();
-      const userId = localStorage.getItem("userId");
-      const newPremiumStatus = userId
-        ? await getPremiumStatus()
-        : {
-            isPremium: false,
-          };
+    try {
+      const newPremiumStatus = await getPremiumStatus();
       setIsPremium(newPremiumStatus.isPremium);
 
       setUserData((prev) => ({
@@ -271,15 +262,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         premiumEndDate: newPremiumStatus?.endDate,
         cancelAtPeriodEnd: newPremiumStatus?.cancel_at_period_end,
       }));
-      loading.hideScreen();
-    };
-    checkPremium();
-  }, []);
+    } catch (e) {
+      console.log(e);
+    }
+    loading.hideScreen();
+  }
+
+  const accessToken = localStorage.getItem("accessToken");
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     handleUserData();
+    handleGetPremiumStatus();
     handleResetUserXpIfNeeded();
-  }, []);
+  }, [accessToken, userId]);
 
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
@@ -468,7 +464,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           )}
 
           <CustomButton
-            onClick={handleCheckout}
+            onClick={goToSubscribe}
             variant="contained"
             borderRadius={2}
             size="small"

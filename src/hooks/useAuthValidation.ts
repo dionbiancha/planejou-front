@@ -10,8 +10,13 @@ export const useAuthValidation = () => {
     const userId = localStorage.getItem("userId");
 
     if (!accessToken || !userId) {
-      localStorage.clear();
-      if (location.pathname !== "/register" && location.pathname !== "/") {
+      if (
+        location.pathname !== "/register" &&
+        location.pathname !== "/" &&
+        location.pathname !== "/privacyPolicy" &&
+        location.pathname !== "/termsOfUse" &&
+        location.pathname !== "/update"
+      ) {
         navigate("/login"); // Redirecionar para a página de login
       }
     }

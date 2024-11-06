@@ -34,6 +34,7 @@ export const getCheckoutUrl = async (priceId: string): Promise<string> => {
         url?: string;
       };
       if (error) {
+        console.log(error);
         unsubscribe();
         reject(new Error(`An error occurred: ${error.message}`));
       }

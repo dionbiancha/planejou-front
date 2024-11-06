@@ -39,7 +39,9 @@ const FaqAccordion: React.FC<FaqAccordionProps> = ({ items }) => {
               aria-controls={`panel${index}-content`}
               id={`panel${index}-header`}
             >
-              <Typography variant="h6">{t(item.question)}</Typography>
+              <Typography variant="h6" fontSize={"17px"}>
+                {t(item.question)}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Typography>{t(item.answer)}</Typography>

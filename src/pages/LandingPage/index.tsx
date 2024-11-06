@@ -87,13 +87,14 @@ export default function LandingPage() {
             "Dê o primeiro passo para organizar suas metas de vida com foco e diversão!"
           )}
         </Typography>
-
-        <CustomButton
-          variant="contained"
-          size="large"
-          onClick={goToRegister}
-          label={t("Planejar agora")}
-        />
+        <Link href="/register">
+          <CustomButton
+            variant="contained"
+            size="large"
+            onClick={() => {}}
+            label={t("Planejar agora")}
+          />
+        </Link>
 
         <Link
           mt={2}

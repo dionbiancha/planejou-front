@@ -18,13 +18,13 @@ import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useSnack } from "../../context/SnackContext";
 import i18n from "../../translation/i18n";
 import GenericDialog from "../../components/Dialog/GenericDialog";
-import { getCheckoutUrl, getPortalUrl } from "../../services/stripePayment";
+import { getPortalUrl } from "../../services/stripePayment";
 
 export default function Config() {
   const { t } = useTranslation();
   const loading = useLoading();
   const snack = useSnack();
-  const { goToLogin } = useCustomNavigate();
+  const { goToLogin, goToSubscribe } = useCustomNavigate();
   const { userData, setUserData } = useDataUser();
   const { goToLandingPage } = useCustomNavigate();
   const [openCancelSubscriptionDialog, setOpenCancelSubscriptionDialog] =
@@ -96,18 +96,6 @@ export default function Config() {
       snack.error(t("Erro ao atualizar o idioma"));
     }
     loading.hide();
-  }
-
-  async function handleCheckout() {
-    loading.showScreen();
-    try {
-      const priceId = "price_1QGQFDEAZX87gM7L4D79TpEN";
-      const res = await getCheckoutUrl(priceId);
-      console.log("aqui", res);
-      window.location.href = res;
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   function getLanguage() {
@@ -284,7 +272,7 @@ export default function Config() {
               </>
             )}
             .{" "}
-            <Link onClick={handleCheckout} sx={{ cursor: "pointer" }}>
+            <Link onClick={goToSubscribe} sx={{ cursor: "pointer" }}>
               {t("Atualize agora")}
             </Link>
           </Typography>

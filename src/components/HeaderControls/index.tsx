@@ -1,27 +1,13 @@
 import { useEffect } from "react";
-import {
-  Box,
-  IconButton,
-  Select,
-  MenuItem,
-  useTheme,
-  Button,
-} from "@mui/material";
+import { Box, IconButton, Select, MenuItem, useTheme } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import { useTranslation } from "react-i18next";
 import { useDataUser } from "../../context/UserContext/useUser";
-import { ArrowBack } from "@mui/icons-material";
-import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 
-interface HeaderControlsProps {
-  showGoBack?: boolean;
-}
-
-function HeaderControls({ showGoBack }: HeaderControlsProps) {
+function HeaderControls() {
   const { t, i18n } = useTranslation();
   const { userData, setUserData } = useDataUser();
   const theme = useTheme();
-  const { goBack } = useCustomNavigate();
 
   function onToggleDarkMode() {
     setUserData((prev) => ({
@@ -69,17 +55,6 @@ function HeaderControls({ showGoBack }: HeaderControlsProps) {
         margin: "auto",
       }}
     >
-      {showGoBack && (
-        <Button
-          variant="text"
-          color="inherit"
-          startIcon={<ArrowBack sx={{ height: "20px" }} />}
-          onClick={() => goBack()}
-        >
-          {t("Voltar")}
-        </Button>
-      )}
-
       <Box
         sx={{
           "& .MuiOutlinedInput-root": {

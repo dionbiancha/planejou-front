@@ -1,13 +1,36 @@
-import { Box, Card, Link, Stack, Typography, useTheme } from "@mui/material";
-import HeaderControls from "../../components/HeaderControls";
+import {
+  Box,
+  Button,
+  Card,
+  Link,
+  Radio,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import AddIcon from "@mui/icons-material/Add";
 import FaqAccordion from "../../features/FaqAccordion";
 import RandomImageMover from "../../components/RandomImageMover";
+import { ArrowBack } from "@mui/icons-material";
+import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
+import { useDataUser } from "../../context/UserContext/useUser";
+import { useEffect, useState } from "react";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CustomButton from "../../components/Button/CustomButton";
+import { useLoading } from "../../context/LoadingContext/useLoading";
+import { useSnack } from "../../context/SnackContext";
+import { getCheckoutUrl } from "../../services/stripePayment";
 
 export default function Subscribe() {
+  const loading = useLoading();
+  const { goBack } = useCustomNavigate();
+  const { userData } = useDataUser();
   const theme = useTheme();
+  const snack = useSnack();
   const { t, i18n } = useTranslation();
+  const [selectedSubscribe, setSelectedSubscribe] = useState("year");
+
   const textColor = theme.palette.mode === "light" ? "text.primary" : "#FFF";
 
   function goalImageSrc() {
@@ -30,17 +53,214 @@ export default function Subscribe() {
     return "tutorial/objective-es.gif";
   }
 
+  function calculateTestProgress(): {
+    progress: number;
+    daysRemaining: number;
+  } {
+    if (!userData.testEndDate) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const now = new Date();
+    const totalDuration = 7 * 24 * 60 * 60 * 1000;
+    const endDate = userData.testEndDate.toDate();
+    const remainingTime = endDate.getTime() - now.getTime();
+
+    const daysRemaining = Math.ceil(remainingTime / (24 * 60 * 60 * 1000));
+
+    if (remainingTime <= 0) {
+      return { progress: 0, daysRemaining: 0 };
+    }
+
+    const progress = Math.min((remainingTime / totalDuration) * 100, 100);
+
+    return { progress, daysRemaining };
+  }
+
+  function isExpired() {
+    if (calculateTestProgress().daysRemaining === 0) return true;
+    return false;
+  }
+
+  async function handleCheckout() {
+    loading.showScreen();
+    try {
+      let priceId;
+      if (selectedSubscribe === "month") {
+        priceId = "price_1QI06TEAZX87gM7LeAGHwRko";
+      } else {
+        priceId = "price_1QI06TEAZX87gM7LAulKqM55";
+      }
+
+      const res = await getCheckoutUrl(priceId);
+
+      window.location.href = res;
+    } catch {
+      loading.hideScreen();
+      snack.error(t("Tente novamente mais tarde"));
+    }
+  }
+
+  useEffect(() => {
+    if (userData.isPremium) {
+      goBack();
+    }
+  }, [userData.isPremium]);
+
+  if (userData.isPremium === undefined || userData.isPremium) {
+    return <></>;
+  }
+
   return (
     <Box>
-      <HeaderControls showGoBack />
+      <Card
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          padding: "20px",
+          minHeight: "200px",
+          zIndex: 1000,
+          boxShadow: "0px -0.5px 15px rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        <Stack flexDirection={"column"} margin="auto" maxWidth="400px">
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+            onClick={() => setSelectedSubscribe("month")}
+            sx={{
+              cursor: "pointer",
+              paddingRight: "10px",
+              borderRadius: "15px",
+              height: "50px",
+              mb: 1,
+              opacity: selectedSubscribe === "month" ? 1 : 0.5,
+              border: `1px solid ${
+                selectedSubscribe === "month"
+                  ? theme.palette.primary.main
+                  : theme.palette.text.disabled
+              }`,
+            }}
+          >
+            <Stack flexDirection={"row"} alignItems={"center"}>
+              <Radio checked={selectedSubscribe === "month"} value="month" />
+              <Typography variant="body1" color="text.secondary">
+                {t("Plano Mensal")}
+              </Typography>
+            </Stack>
+            <Typography variant="body1" color="text.secondary">
+              {t("R$")} 9,99/{t("mês")}
+            </Typography>
+          </Stack>
+
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+            onClick={() => setSelectedSubscribe("year")}
+            sx={{
+              cursor: "pointer",
+              paddingRight: "10px",
+              borderRadius: "15px",
+              height: "50px",
+              mb: 2,
+              opacity: selectedSubscribe === "year" ? 1 : 0.5,
+              border: `1px solid ${
+                selectedSubscribe === "year"
+                  ? theme.palette.primary.main
+                  : theme.palette.text.disabled
+              }`,
+            }}
+          >
+            <Stack flexDirection={"row"} alignItems={"center"}>
+              <Radio checked={selectedSubscribe === "year"} value="year" />
+              <Typography variant="body1" color="text.secondary">
+                {t("Plano Anual")}
+              </Typography>
+            </Stack>
+            <Typography variant="body1" color="text.secondary">
+              {t("R$")} 23,88/{t("ano")}
+            </Typography>
+          </Stack>
+
+          <CustomButton
+            fullWidth
+            variant="contained"
+            size="large"
+            onClick={handleCheckout}
+            label={t("Atualize agora")}
+            disabled={loading.state}
+          />
+        </Stack>
+      </Card>
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        mt={5}
+      >
+        <Button
+          variant="text"
+          color="inherit"
+          startIcon={<ArrowBack sx={{ height: "20px" }} />}
+          onClick={() => goBack()}
+        >
+          {t("Voltar")}
+        </Button>
+      </Stack>
 
       <Stack
         flexDirection={"column"}
         justifyContent={"center"}
         alignItems={"center"}
-        mt={{ xs: 15, md: 20 }}
         textAlign={"center"}
+        mb="200px"
       >
+        <Card
+          sx={{
+            width: "100%",
+            maxWidth: "330px",
+            borderRadius: "15px",
+            padding: "15px",
+            mb: 10,
+            mt: 5,
+          }}
+        >
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"start"}
+            alignItems={"center"}
+          >
+            <CheckCircleOutlineIcon
+              color="primary"
+              sx={{ marginRight: "10px" }}
+            />
+            <Stack flexDirection={"column"} alignItems={"start"}>
+              <Box component="b" sx={{ fontSize: { xs: "13px", sm: "" } }}>
+                {isExpired() ? (
+                  <b>{t("Seu teste gratuito expirou")}</b>
+                ) : (
+                  <>
+                    {t("Seu teste gratuito termina em")}{" "}
+                    {calculateTestProgress().daysRemaining}{" "}
+                    {calculateTestProgress().daysRemaining === 1
+                      ? t("dia")
+                      : t("dias")}
+                  </>
+                )}
+              </Box>
+              <Box sx={{ fontSize: { xs: "12px", sm: "15px" } }}>
+                {t("Atualize agora")} {t("e")}{" "}
+                <Box component="b" sx={{ color: theme.palette.primary.main }}>
+                  {t("alcance suas metas")}
+                </Box>
+              </Box>
+            </Stack>
+          </Stack>
+        </Card>
         <RandomImageMover />
         <Typography
           variant="h2"

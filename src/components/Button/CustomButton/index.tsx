@@ -3,6 +3,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 interface CustomButtonProps {
+  fullWidth?: boolean;
   onClick: () => void;
   label: string;
   size?: "small" | "medium" | "large";
@@ -20,6 +21,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   disabled,
   borderRadius = 20,
   loading = false,
+  fullWidth,
 }) => {
   const { t } = useTranslation();
 
@@ -28,6 +30,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       disabled={disabled || loading}
       onClick={onClick}
       sx={{
+        width: fullWidth ? "100%" : "auto",
         borderRadius: borderRadius,
         fontWeight: "bold",
         boxShadow: "none",

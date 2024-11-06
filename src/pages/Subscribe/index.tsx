@@ -1,16 +1,24 @@
-import { Box, Card, Link, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Link,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import HeaderControls from "../../components/HeaderControls";
 import { useTranslation } from "react-i18next";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 import AddIcon from "@mui/icons-material/Add";
 import FaqAccordion from "../../features/FaqAccordion";
-import Footer from "../../components/Footer";
 import RandomImageMover from "../../components/RandomImageMover";
+import { ArrowBack } from "@mui/icons-material";
 
 export default function Subscribe() {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
-  const { goToRegister, goToLogin } = useCustomNavigate();
+  const { goBack } = useCustomNavigate();
   const textColor = theme.palette.mode === "light" ? "text.primary" : "#FFF";
 
   function goalImageSrc() {
@@ -35,7 +43,7 @@ export default function Subscribe() {
 
   return (
     <Box>
-      <HeaderControls />
+      <HeaderControls showGoBack />
 
       <Stack
         flexDirection={"column"}

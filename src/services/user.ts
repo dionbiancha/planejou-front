@@ -17,6 +17,7 @@ import {
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { validateAuth } from "./authService";
 
@@ -98,7 +99,7 @@ export async function getUserData() {
   }
 }
 
-export async function getUserRanking() {
+export async function getUserRanking(league: number) {
   try {
     const auth = validateAuth();
     const userDocRef = doc(db, "users", auth.userId);
@@ -109,25 +110,30 @@ export async function getUserRanking() {
     }
 
     const userData = userDoc.data();
+
+    // Define a query para buscar apenas usuários da mesma liga
     const usersCollection = collection(db, "users");
-    const usersSnapshot = await getDocs(usersCollection);
+    const leagueQuery = query(
+      usersCollection,
+      where("league", "==", league),
+      orderBy("xp", "desc")
+    );
+    const usersSnapshot = await getDocs(leagueQuery);
 
-    // Cria um array de usuários com XP
-    const users = usersSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      xp: doc.data().xp || 0, // Define XP padrão como 0 caso não exista
-    }));
+    // Cria um array de usuários com XP e ID
+    const users = usersSnapshot.docs.map((doc, index) => {
+      return {
+        id: doc.id,
+        xp: doc.data().xp || 0, // Define XP padrão como 0 caso não exista
+        position: index + 1,
+      };
+    });
 
-    // Ordena por XP em ordem decrescente
-    users.sort((a, b) => b.xp - a.xp);
-
-    // Encontra a posição do usuário autenticado
-    const userPosition = users.findIndex((user) => user.id === auth.userId) + 1;
+    const myUser = users.find((user) => user.id === auth.userId);
 
     return {
       ...userData,
-      position: userPosition,
-      totalUsers: users.length,
+      position: myUser?.position,
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -142,23 +148,27 @@ export async function getTopUsersByXP(league: number) {
   try {
     const auth = validateAuth();
     const usersCollectionRef = collection(db, "users");
-    const q = query(usersCollectionRef, orderBy("xp", "desc"), limit(30));
+    const q = query(
+      usersCollectionRef,
+
+      orderBy("xp", "desc"),
+      limit(30),
+      where("league", "==", league)
+    );
     const querySnapshot = await getDocs(q);
 
-    const topUsers = querySnapshot.docs
-      .map((doc) => {
-        const data = doc.data();
-        const firstName = data.name.split(" ")[0];
+    const topUsers = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      const firstName = data.name.split(" ")[0];
 
-        return {
-          name: firstName,
-          xp: data.xp,
-          myAccount: data.id === auth.userId,
-          photoURL: data.photoURL,
-          league: data.league,
-        };
-      })
-      .filter((user) => user.league === league);
+      return {
+        name: firstName,
+        xp: data.xp,
+        myAccount: data.id === auth.userId,
+        photoURL: data.photoURL,
+        league: data.league,
+      };
+    });
 
     return topUsers;
   } catch (error) {

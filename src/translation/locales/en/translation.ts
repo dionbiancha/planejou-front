@@ -123,7 +123,7 @@ const enTranslation = {
   "Casco Lento": "Slow Shell",
   "Casco Duro": "Hard Shell",
   "Turbo Tartaruga": "Turbo Turtle",
-  "Total de Checks": "Total Checks",
+  "Total de Check-ins": "Total Check-ins",
   "Total de Objetivos": "Total Goals",
   "Total de XP": "Total XP",
   "Total de Metas": "Total Goals",

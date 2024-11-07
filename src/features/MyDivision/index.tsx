@@ -20,7 +20,7 @@ export default function MyDivision() {
   async function handleGetDivision() {
     loading.show();
     try {
-      const ranking = await getUserRanking();
+      const ranking = await getUserRanking(userData.league);
       setMyPosition(ranking);
     } catch (error) {
       if (error instanceof Error) {

@@ -8,7 +8,7 @@ import {
   endOfWeek,
   startOfToday,
   startOfMonth,
-  addMonths,
+  subMonths,
 } from "date-fns";
 import { useTranslation } from "react-i18next";
 
@@ -24,27 +24,27 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
   const { t } = useTranslation();
   const oneYearAgo = subDays(today, 365);
 
-  // Gerar todos os dias dos últimos 12 meses, organizados por semana
+  // Gerar todos os dias dos últimos 12 meses, organizados por semana, do dia atual até 1 ano atrás
   const weeks = [];
-  let currentDate = oneYearAgo;
+  let currentDate = today;
 
-  while (currentDate <= today) {
+  while (currentDate >= oneYearAgo) {
     const start = startOfWeek(currentDate);
     const end = endOfWeek(currentDate);
     const daysOfWeek = eachDayOfInterval({ start, end });
     weeks.push(daysOfWeek);
-    currentDate = subDays(end, -1);
+    currentDate = subDays(start, 1); // Retroceder para a semana anterior
   }
 
   // Dias da semana
   const daysOfWeek = ["", "Seg", "", "Qua", "", "Sex", ""];
 
-  // Gerar nomes dos meses no topo da grid
+  // Gerar nomes dos meses no topo da grid (do mês atual até 1 ano atrás)
   const months = [];
-  let monthStart = startOfMonth(oneYearAgo);
-  while (monthStart <= today) {
+  let monthStart = startOfMonth(today);
+  while (monthStart >= oneYearAgo) {
     months.push(monthStart);
-    monthStart = addMonths(monthStart, 1);
+    monthStart = subMonths(monthStart, 1); // Retroceder mês a mês
   }
 
   // Definir a cor das células

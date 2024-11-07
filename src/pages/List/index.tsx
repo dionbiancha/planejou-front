@@ -28,21 +28,6 @@ export function List() {
   const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
   const [showDetails, setShowDetails] = useState<string[]>([]);
 
-  const CAPTION = [
-    {
-      name: "Completo",
-      color: theme.palette.primary.main,
-    },
-    {
-      name: "Incompleto",
-      color: theme.palette.background.default,
-    },
-    {
-      name: "Hoje",
-      color: theme.palette.warning.main,
-    },
-  ];
-
   function handleShowDetails(id: string | undefined) {
     if (!id) return;
     if (showDetails.includes(id)) {
@@ -167,32 +152,6 @@ export function List() {
                         ?.objectives.map((e) => e.completedDays)
                         .reduce((acc, curr) => acc?.concat(curr ?? ""), [])}
                     />
-                    <Stack ml={3.5} flexDirection={"row"} alignItems={"center"}>
-                      {CAPTION.map((caption) => (
-                        <Stack
-                          direction={"row"}
-                          alignItems={"center"}
-                          margin={1}
-                          key={caption.name}
-                        >
-                          <Box
-                            sx={{
-                              width: 10,
-                              height: 10,
-                              margin: 1,
-                              borderRadius: "2px",
-                              backgroundColor: caption.color,
-                            }}
-                          />
-                          <Typography
-                            sx={{ fontSize: "12px" }}
-                            variant="subtitle2"
-                          >
-                            {t(caption.name)}
-                          </Typography>
-                        </Stack>
-                      ))}
-                    </Stack>
 
                     <Typography variant="body2" color="text.secondary" m={1}>
                       <b>{t("Estatísticas")}</b>
@@ -259,7 +218,7 @@ export function List() {
                             </b>
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            <b>{t("Check")}</b>
+                            <b>{t("Check-ins")}</b>
                           </Typography>
                         </Stack>
                       </Stack>

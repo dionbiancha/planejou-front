@@ -124,7 +124,7 @@ const ptTranslation = {
   "Casco Lento": "Casco Lento",
   "Casco Duro": "Casco Duro",
   "Turbo Tartaruga": "Turbo Tartaruga",
-  "Total de Checks": "Total de Checks",
+  "Total de Check-ins": "Total de Check-ins",
   "Total de Objetivos": "Total de Objetivos",
   "Total de XP": "Total de XP",
   "Total de Metas": "Total de Metas",

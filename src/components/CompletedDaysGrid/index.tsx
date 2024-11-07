@@ -1,15 +1,9 @@
-import React from "react";
-import { Grid, Box, Typography, Tooltip, useTheme } from "@mui/material";
-import {
-  format,
-  subDays,
-  eachDayOfInterval,
-  startOfWeek,
-  endOfWeek,
-  startOfToday,
-  startOfMonth,
-  subMonths,
-} from "date-fns";
+import { Box, Stack, Typography, useTheme } from "@mui/material";
+import CalendarHeatmap, { TooltipDataAttrs } from "react-calendar-heatmap";
+import "react-calendar-heatmap/dist/styles.css";
+import { format, subDays, startOfToday, startOfYesterday } from "date-fns";
+import { Tooltip as ReactTooltip } from "react-tooltip"; // Atualização da importação
+import "react-tooltip/dist/react-tooltip.css"; // Importar estilos do react-tooltip
 import { useTranslation } from "react-i18next";
 
 interface CompletedDaysGridProps {
@@ -21,55 +15,69 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
 }) => {
   const theme = useTheme();
   const today = startOfToday();
-  const { t } = useTranslation();
+  const yesterday = startOfYesterday();
   const oneYearAgo = subDays(today, 365);
+  const { t } = useTranslation();
 
-  // Gerar todos os dias dos últimos 12 meses, organizados por semana, do dia atual até 1 ano atrás
-  const weeks = [];
-  let currentDate = today;
+  // Definir explicitamente o tipo de dayCounts
+  const dayCounts: { [key: string]: number } = completedDays.reduce(
+    (acc, date) => {
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    },
+    {} as { [key: string]: number }
+  ); // A linha acima resolve o erro de tipo
 
-  while (currentDate >= oneYearAgo) {
-    const start = startOfWeek(currentDate);
-    const end = endOfWeek(currentDate);
-    const daysOfWeek = eachDayOfInterval({ start, end });
-    weeks.push(daysOfWeek);
-    currentDate = subDays(start, 1); // Retroceder para a semana anterior
-  }
+  // Mapear os dias completos para o formato exigido pelo react-calendar-heatmap
+  const heatmapData = Array.from({ length: 366 }, (_, i) => {
+    const date = subDays(today, i);
+    const formattedDate = format(date, "yyyy-MM-dd");
 
-  // Dias da semana
-  const daysOfWeek = ["", "Seg", "", "Qua", "", "Sex", ""];
-
-  // Gerar nomes dos meses no topo da grid (do mês atual até 1 ano atrás)
-  const months = [];
-  let monthStart = startOfMonth(today);
-  while (monthStart >= oneYearAgo) {
-    months.push(monthStart);
-    monthStart = subMonths(monthStart, 1); // Retroceder mês a mês
-  }
-
-  // Definir a cor das células
-  const getCellColor = (day: Date) => {
-    const formattedDay = format(day, "yyyy-MM-dd");
-    if (day.getTime() === today.getTime()) {
-      return theme.palette.warning.main;
-    }
-    return completedDays.includes(formattedDay)
-      ? theme.palette.primary.main
-      : theme.palette.background.default;
-  };
+    return {
+      date: formattedDate,
+      count: dayCounts[formattedDate] ?? 0, // Retorna o número de ocorrências ou 0
+    };
+  });
 
   function isDarkMode() {
     return theme.palette.mode === "dark";
   }
 
+  const CAPTION = [
+    {
+      name: "Completo",
+      color: theme.palette.primary.main,
+    },
+    {
+      name: "Incompleto",
+      color: theme.palette.background.default,
+    },
+    {
+      name: "Hoje",
+      color: theme.palette.warning.main,
+    },
+  ];
+
   return (
-    <Grid
-      direction="column"
-      spacing={0.5}
+    <Box
       sx={{
+        "& .react-calendar-heatmap": {
+          display: "block",
+          width: "100%",
+          minWidth: "600px",
+          overflowX: "auto",
+          color: theme.palette.text.secondary,
+        },
+        "& .react-calendar-heatmap text": {
+          fontSize: "13px",
+        },
+        "& .react-calendar-heatmap .color-filled": {
+          fill: theme.palette.primary.main,
+        },
+        "& .react-calendar-heatmap .color-empty": {
+          fill: theme.palette.background.default,
+        },
         width: "100%",
-        maxWidth: "600px",
-        paddingBottom: "20px",
         overflowY: "auto",
         "&::-webkit-scrollbar": {
           height: "6px",
@@ -86,63 +94,63 @@ const CompletedDaysGrid: React.FC<CompletedDaysGridProps> = ({
         "&::-webkit-scrollbar-thumb:hover": {
           background: `${isDarkMode() ? "#f5f5f55a" : "#24293345"}`,
         },
+        [theme.breakpoints.down("sm")]: {
+          maxWidth: "100%",
+        },
       }}
     >
-      {/* Linha de meses no topo */}
-      <Grid
-        container
-        width={"700px"}
-        item
-        spacing={0.5}
-        justifyContent="space-between"
-      >
-        <Box width={5} />
-        {months.map((month) => (
-          <Box key={format(month, "yyyy-MM")} width={30} textAlign="center">
-            <Typography variant="caption">{format(month, "MMM")}</Typography>
-          </Box>
+      <CalendarHeatmap
+        startDate={oneYearAgo}
+        endDate={yesterday}
+        values={heatmapData}
+        classForValue={(value) => {
+          if (!value || value.count === 0) return "color-empty";
+          return "color-filled";
+        }}
+        showWeekdayLabels
+        gutterSize={3.5}
+        tooltipDataAttrs={(value) => {
+          return {
+            "data-tooltip-id": "heatmap-tooltip",
+            "data-tooltip-content": `${value?.date} ${
+              value?.count ? `Check-ins: ${value?.count}` : ""
+            }`,
+          } as TooltipDataAttrs;
+        }}
+      />
+      <ReactTooltip
+        id="heatmap-tooltip"
+        style={{
+          backgroundColor: theme.palette.background.default,
+          color: isDarkMode()
+            ? theme.palette.text.primary
+            : theme.palette.text.secondary,
+        }}
+      />
+      <Stack flexDirection={"row"} alignItems={"center"}>
+        {CAPTION.map((caption) => (
+          <Stack
+            direction={"row"}
+            alignItems={"center"}
+            margin={1}
+            key={caption.name}
+          >
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                margin: 1,
+                borderRadius: "2px",
+                backgroundColor: caption.color,
+              }}
+            />
+            <Typography sx={{ fontSize: "12px" }} variant="subtitle2">
+              {t(caption.name)}
+            </Typography>
+          </Stack>
         ))}
-      </Grid>
-
-      <Grid container direction="row" wrap="nowrap">
-        {/* Coluna com dias da semana */}
-        <Grid
-          item
-          container
-          direction="column"
-          justifyContent="space-between"
-          spacing={0.5}
-          paddingRight={2}
-          paddingLeft={2}
-        >
-          {daysOfWeek.map((day) => (
-            <Box key={day} height={15} display="flex" alignItems="center">
-              <Typography variant="caption">{t(day)}</Typography>
-            </Box>
-          ))}
-        </Grid>
-
-        {/* Grade de dias */}
-        {weeks.map((week, weekIndex) => (
-          <Grid container item direction="column" spacing={0.5} key={weekIndex}>
-            {week.map((day) => (
-              <Tooltip
-                key={format(day, "yyyy-MM-dd")}
-                title={format(day, "dd/MM/yyyy")}
-              >
-                <Box
-                  margin={"3px"}
-                  width={10}
-                  height={10}
-                  bgcolor={getCellColor(day)}
-                  borderRadius={"2px"}
-                />
-              </Tooltip>
-            ))}
-          </Grid>
-        ))}
-      </Grid>
-    </Grid>
+      </Stack>
+    </Box>
   );
 };
 

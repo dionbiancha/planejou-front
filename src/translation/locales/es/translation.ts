@@ -124,7 +124,7 @@ const esTranslation = {
   "Casco Lento": "Caparazón Lento",
   "Casco Duro": "Caparazón Duro",
   "Turbo Tartaruga": "Turbo Tortuga",
-  "Total de Checks": "Total de Marcas",
+  "Total de Check-ins": "Total de Check-ins",
   "Total de Objetivos": "Total de Objetivos",
   "Total de XP": "Total de XP",
   "Total de Metas": "Total de Metas",

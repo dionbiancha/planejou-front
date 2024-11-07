@@ -274,7 +274,7 @@ export default function Profile() {
                 <b> {getCompletedAllObjectives()}</b>
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                <b>{t("Total de Checks")}</b>
+                <b>{t("Total de Check-ins")}</b>
               </Typography>
             </Stack>
           </Stack>

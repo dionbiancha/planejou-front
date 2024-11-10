@@ -2,7 +2,6 @@ import {
   addDoc,
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
   updateDoc,
@@ -27,30 +26,24 @@ export async function addGoalList(goals: Goal[]) {
       goals: goalsWithIds,
       userId: auth.userId,
     });
-    const userDocRef = doc(db, "users", auth.userId);
-    await updateDoc(userDocRef, {
-      hasList: true,
-    });
   } catch (e) {
     console.error(e);
   }
 }
 
-export async function getHasList() {
+export async function updateGoalList(goals: Goal[]) {
   try {
     const auth = validateAuth();
-    const userDocRef = doc(db, "users", auth.userId);
-    const userDoc = await getDoc(userDocRef);
-
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      return userData.hasList; // Retorna hasList se existir, ou null
-    } else {
-      console.log("Usuário não encontrado.");
-      return false;
-    }
+    const goalsWithIds = goals.map((goal) => ({
+      ...goal,
+      estimatedCompletion: calculateEstimatedCompletion(goal.months),
+    }));
+    const goalDoc = doc(collection(db, "goals"), auth.userId);
+    await updateDoc(goalDoc, {
+      goals: goalsWithIds,
+    });
   } catch (e) {
-    console.error("Erro ao recuperar hasList:", e);
+    console.error(e);
   }
 }
 
@@ -67,9 +60,6 @@ export async function listGoalsByUserId() {
     if (!querySnapshot.empty) {
       const userGoals = querySnapshot.docs[0].data();
       return userGoals.goals;
-    } else {
-      console.log("Nenhum documento encontrado para este userId.");
-      return null;
     }
   } catch (e) {
     console.error("Erro ao buscar metas:", e);

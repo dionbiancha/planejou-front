@@ -47,7 +47,6 @@ export async function googleSignIn() {
       id: res.user.uid,
       xp: 0,
       testEndDate,
-      hasList: false,
       urlImage: res.user.photoURL || "",
       league: 0,
       totalXp: 0,
@@ -102,14 +101,6 @@ export async function getUserData() {
 export async function getUserRanking(league: number) {
   try {
     const auth = validateAuth();
-    const userDocRef = doc(db, "users", auth.userId);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      throw new Error("User not found");
-    }
-
-    const userData = userDoc.data();
 
     // Define a query para buscar apenas usuários da mesma liga
     const usersCollection = collection(db, "users");
@@ -132,7 +123,6 @@ export async function getUserRanking(league: number) {
     const myUser = users.find((user) => user.id === auth.userId);
 
     return {
-      ...userData,
       position: myUser?.position,
     };
   } catch (error) {
@@ -150,7 +140,6 @@ export async function getTopUsersByXP(league: number) {
     const usersCollectionRef = collection(db, "users");
     const q = query(
       usersCollectionRef,
-
       orderBy("xp", "desc"),
       limit(30),
       where("league", "==", league)
@@ -204,7 +193,6 @@ export async function createAccount(
       id: res.user.uid,
       xp: 0,
       testEndDate,
-      hasList: false,
       urlImage: res.user.photoURL || "",
       league: 0,
       totalXp: 0,

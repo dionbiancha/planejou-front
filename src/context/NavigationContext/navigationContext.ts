@@ -27,6 +27,10 @@ export function useCustomNavigate() {
     validateNavigate("/start");
   }
 
+  function goToEditList() {
+    validateNavigate("/editList");
+  }
+
   function goToList() {
     validateNavigate("/list");
   }
@@ -62,8 +66,8 @@ export function useCustomNavigate() {
     validateNavigate("/subscribe");
   }
 
-  function goToEditObjetive(id: string) {
-    validateNavigate(`/edit/${id}`);
+  function goToEditObjetive() {
+    validateNavigate(`/edit`);
   }
 
   return {
@@ -81,5 +85,6 @@ export function useCustomNavigate() {
     goToTermOfUse,
     goToPrivacyPolicy,
     goToSubscribe,
+    goToEditList,
   };
 }

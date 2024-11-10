@@ -22,6 +22,7 @@ import TermsOfUse from "./TermsOfUse";
 import PrivacyPolicy from "./PrivacyPolicy";
 import Loading from "../components/Loading";
 import Subscribe from "./Subscribe";
+import EditList from "./EditList";
 
 export default function Pages() {
   const { userData } = useDataUser();
@@ -43,7 +44,7 @@ export default function Pages() {
           <Route path="/list" element={<List />} />
           <Route path="/new" element={<NewObjective />} />
           <Route path="/league" element={<League />} />
-          <Route path="/edit/:id" element={<EditObjective />} />
+          <Route path="/edit" element={<EditObjective />} />
           <Route path="/missions" element={<Missions />} />
           <Route path="/social" element={<Social />} />
           <Route path="/profile" element={<Profile />} />
@@ -52,6 +53,7 @@ export default function Pages() {
           <Route path="/termsOfUse" element={<TermsOfUse />} />
           <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
           <Route path="/subscribe" element={<Subscribe />} />
+          <Route path="/editList" element={<EditList />} />
         </Routes>
       </Layout>
     </ThemeProvider>

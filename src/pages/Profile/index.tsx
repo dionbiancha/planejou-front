@@ -1,71 +1,21 @@
 import { Box, Card, Stack, Typography, useTheme } from "@mui/material";
 import MyDivision from "../../features/MyDivision";
 import { useDataUser } from "../../context/UserContext/useUser";
-import { useEffect, useState } from "react";
-import { useLoading } from "../../context/LoadingContext/useLoading";
-import { getUserData } from "../../services/user";
 import { useTranslation } from "react-i18next";
 import { Timestamp } from "firebase/firestore";
 import { useGoals } from "../../context";
-import { listGoalsByUserId } from "../../services/goal";
-import {
-  listObjectivesByUserId,
-  ObjectiveListProps,
-} from "../../services/objective";
+import { useObjectives } from "../../context/ObjectiveContext/useObjective";
 
 export default function Profile() {
-  const { userData, setUserData } = useDataUser();
-  const { setGoals } = useGoals();
+  const { userData } = useDataUser();
+  const { goals } = useGoals();
   const theme = useTheme();
-  const loading = useLoading();
   const { t } = useTranslation();
-  const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
-  const [numberGoals, setNumberGoals] = useState<number>(0);
+  const { objectives } = useObjectives();
 
   function formatTimestampToMonthYear(timestamp: Timestamp) {
     const date = timestamp.toDate();
     return date.toLocaleDateString("pt-BR", { year: "numeric", month: "long" });
-  }
-
-  async function handleGetUserData() {
-    loading.show();
-    try {
-      const res = await getUserData();
-      setUserData((prev) => ({ ...prev, ...res }));
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error("An unknown error occurred");
-      }
-    }
-    loading.hide();
-  }
-
-  async function handleGetGoalList() {
-    loading.show();
-    try {
-      const res = await listGoalsByUserId();
-
-      setGoals((prev) => ({ ...prev, ...res }));
-      setNumberGoals(res.length);
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error("An unknown error occurred");
-      }
-    }
-    loading.hide();
-  }
-
-  async function listObjectives() {
-    try {
-      const res = await listObjectivesByUserId();
-      setObjectives(res);
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   function getCompletedAllObjectives() {
@@ -95,12 +45,6 @@ export default function Profile() {
     if (isNaN(totalObjective)) return 0;
     return totalObjective;
   }
-
-  useEffect(() => {
-    handleGetUserData();
-    handleGetGoalList();
-    listObjectives();
-  }, []);
 
   return (
     <Stack flexDirection={"row"}>
@@ -189,7 +133,7 @@ export default function Profile() {
             />
             <Stack direction={"column"}>
               <Typography variant="h6">
-                <b>{numberGoals}</b>
+                <b>{goals.length}</b>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 <b>{t("Total de Metas")}</b>

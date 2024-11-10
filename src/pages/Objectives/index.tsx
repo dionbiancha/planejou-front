@@ -18,26 +18,26 @@ import { ptBR } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 import { Add, MoreVertOutlined } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { useGoals } from "../../context";
+
 import {
   deleteObjective,
   listObjectivesByUserId,
   markObjectiveAsCompleted,
   MarkObjectiveAsCompletedProps,
-  ObjectiveListProps,
 } from "../../services/objective";
 import { useEffect, useState } from "react";
 import { useDataUser } from "../../context/UserContext/useUser";
-import { getHasList } from "../../services/goal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ReplayIcon from "@mui/icons-material/Replay";
 import DeleteDialog from "../../components/Dialog/DeleteDialog";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useSnack } from "../../context/SnackContext";
-import { getUserData } from "../../services/user";
 import MyDivision from "../../features/MyDivision";
 import ConfettiExplosion from "react-confetti-explosion";
+import { useObjectives } from "../../context/ObjectiveContext/useObjective";
+import { getUserRanking } from "../../services/user";
+import CustomButton from "../../components/Button/CustomButton";
 
 function generateNextSevenDays() {
   const days = [];
@@ -65,15 +65,14 @@ interface selectObjectiveProps {
 }
 
 export function Objectives() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const loading = useLoading();
-  const { userData } = useDataUser();
+  const { userData, setMyPosition } = useDataUser();
   const snack = useSnack();
-  const { goToNewObjetive, goToStart, goToEditObjetive, goToSubscribe } =
+  const { goToNewObjetive, goToEditObjetive, goToSubscribe } =
     useCustomNavigate();
   const theme = useTheme();
-  const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
-  const { setGoals } = useGoals();
+  const { objectives, setObjectives, setEditObjective } = useObjectives();
   const [showDetails, setShowDetails] = useState<string[]>([]);
   const { setUserData } = useDataUser();
   const [isExploding, setIsExploding] = useState(false);
@@ -117,14 +116,14 @@ export function Objectives() {
     });
   };
 
-  function totalObjectives() {
-    return (
-      objectives?.reduce(
-        (acc, goal) => acc + (goal.objectives?.length || 0),
-        0
-      ) || 0
-    );
-  }
+  // function totalObjectives() {
+  //   return (
+  //     objectives?.reduce(
+  //       (acc, goal) => acc + (goal.objectives?.length || 0),
+  //       0
+  //     ) || 0
+  //   );
+  // }
 
   function getIncompleteObjectivesToday() {
     const today = newDate;
@@ -145,36 +144,6 @@ export function Objectives() {
     } else {
       setShowDetails([...showDetails, id]);
     }
-  }
-
-  async function listObjectives() {
-    try {
-      const res = await listObjectivesByUserId();
-      setObjectives(res);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function handleGetUserData() {
-    loading.show();
-    try {
-      const res = await getUserData();
-
-      setUserData((prev) => ({ ...prev, ...res }));
-      localStorage.setItem("language", res.language);
-      localStorage.setItem("darkMode", res.darkMode);
-      if (res.language) {
-        i18n.changeLanguage(res.language);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error("An unknown error occurred");
-      }
-    }
-    loading.hide();
   }
 
   function freeTrialValidation() {
@@ -204,7 +173,7 @@ export function Objectives() {
     try {
       setObjectives((prev) => {
         const newObjectives = prev.map((o) => {
-          if (o.goalId === data.goalId) {
+          if (o.goalId === data.objectives.goalId) {
             return {
               ...o,
               objectives: o.objectives?.map((objective) => {
@@ -241,21 +210,25 @@ export function Objectives() {
       }
 
       await markObjectiveAsCompleted(data);
+      await handleGetDivision(userData.league);
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function handleHasList() {
+  async function handleGetDivision(league: number) {
+    loading.show();
     try {
-      const res = await getHasList();
-      setUserData((prev) => ({ ...prev, hasList: res }));
-      if (!res) {
-        goToStart();
+      const ranking = await getUserRanking(league);
+      setMyPosition(ranking.position);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("An unknown error occurred");
       }
-    } catch (e) {
-      console.log(e);
     }
+    loading.hide();
   }
 
   async function handleDeleteObjective() {
@@ -266,7 +239,7 @@ export function Objectives() {
         goalId: selectObjective.goalId,
         objectiveId: selectObjective.objectiveId,
       });
-      listObjectives();
+      handlelistObjectives();
       snack.success(t("Objetivo excluído com sucesso!"));
     } catch (e) {
       console.log(e);
@@ -275,11 +248,14 @@ export function Objectives() {
     loading.hide();
   }
 
-  useEffect(() => {
-    handleHasList();
-    listObjectives();
-    handleGetUserData();
-  }, []);
+  async function handlelistObjectives() {
+    try {
+      const res = await listObjectivesByUserId();
+      setObjectives(res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   useEffect(() => {
     getIncompleteObjectivesToday();
@@ -296,26 +272,11 @@ export function Objectives() {
         )}
         textButtonCancel={t("Cancelar")}
         textButtonConfirm={t(`Excluir`)}
-        objetive={selectObjective.name}
         onConfirm={handleDeleteObjective}
       />
-      <Stack flexDirection={"row"}>
+      <Stack flexDirection={{ xs: "column-reverse", lg: "row" }}>
         <Box sx={{ width: "100%" }}>
           <Stack flexDirection="column">
-            <Stack direction="row" alignItems="center" justifyContent="start">
-              <Box sx={{ color: theme.palette.text.secondary }} component={"b"}>
-                {totalObjectives()} {t("OBJETIVOS")}
-              </Box>
-              <IconButton color="inherit" onClick={() => goToNewObjetive()}>
-                <Add
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    height: "25px",
-                    width: "25px",
-                  }}
-                />
-              </IconButton>
-            </Stack>
             <Collapse
               sx={{ width: "100%" }}
               in={objectives.length > 0}
@@ -422,15 +383,11 @@ export function Objectives() {
                                       );
                                       return;
                                     }
-                                    setGoals([
-                                      {
-                                        position: "",
-                                        name: "",
-                                        months: 1,
-                                        objectives: [objective],
-                                      },
-                                    ]);
-                                    goToEditObjetive(o.goalId ?? "");
+                                    setEditObjective({
+                                      goalId: o.goalId,
+                                      objective: objective,
+                                    });
+                                    goToEditObjetive();
                                     handleClose(objective.name);
                                   }}
                                 >
@@ -498,7 +455,7 @@ export function Objectives() {
                                 }
                                 markObjective(
                                   {
-                                    goalId: o.goalId,
+                                    objectives: o,
                                     objectiveId: objective.id,
                                     xp:
                                       (objectiveDone
@@ -637,11 +594,34 @@ export function Objectives() {
         </Box>
         <Box
           sx={{
-            display: { xs: "none", lg: "block" },
-            width: "500px",
-            mt: 5,
+            width: { xs: "100%", lg: "600px" },
+            mb: { xs: "20px", lg: 0 },
           }}
         >
+          <Box
+            sx={{
+              marginLeft: { xs: "", lg: "20px" },
+              width: "100%",
+              mb: "20px",
+            }}
+          >
+            <CustomButton
+              icon={
+                <Add
+                  sx={{
+                    height: "25px",
+                    width: "25px",
+                  }}
+                />
+              }
+              variant="contained"
+              fullWidth
+              onClick={() => goToNewObjetive()}
+              disabled={loading.state}
+              size="medium"
+              label="Adicionar objetivo"
+            />
+          </Box>
           <MyDivision />
         </Box>
       </Stack>

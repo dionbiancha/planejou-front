@@ -7,25 +7,21 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useLoading } from "../../context/LoadingContext/useLoading";
-import { useEffect, useState } from "react";
-import { Goal } from "../../context/GoalContext/GoalContext";
-import { listGoalsByUserId } from "../../services/goal";
+import { useState } from "react";
 import BorderLinearProgress from "../../components/BorderLinearProgress";
 import { useTranslation } from "react-i18next";
-import {
-  listObjectivesByUserId,
-  ObjectiveListProps,
-} from "../../services/objective";
 import CompletedDaysGrid from "../../components/CompletedDaysGrid";
 import MyDivision from "../../features/MyDivision";
+import { useGoals } from "../../context";
+import { useObjectives } from "../../context/ObjectiveContext/useObjective";
+import CustomButton from "../../components/Button/CustomButton";
+import EditIcon from "@mui/icons-material/Edit";
 
 export function List() {
-  const loading = useLoading();
   const theme = useTheme();
   const { t } = useTranslation();
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [objectives, setObjectives] = useState<ObjectiveListProps[]>([]);
+  const { goals } = useGoals();
+  const { objectives } = useObjectives();
   const [showDetails, setShowDetails] = useState<string[]>([]);
 
   function handleShowDetails(id: string | undefined) {
@@ -37,32 +33,12 @@ export function List() {
     }
   }
 
-  async function listGoals() {
-    loading.show();
-    try {
-      const res = await listGoalsByUserId();
-      setGoals(res);
-    } catch (e) {
-      console.error("Erro ao listar as metas:", e);
-    }
-    loading.hide();
-  }
-
   function doLater(position: number) {
     return position + 1 > 5;
   }
 
   function showDivider(position: number) {
     return position + 1 === 5;
-  }
-
-  async function listObjectives() {
-    try {
-      const res = await listObjectivesByUserId();
-      setObjectives(res);
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   function getCompletedObjectives(goalId: string) {
@@ -79,14 +55,9 @@ export function List() {
     return value;
   }
 
-  useEffect(() => {
-    listGoals();
-    listObjectives();
-  }, []);
-
   return (
     <>
-      <Stack flexDirection={"row"}>
+      <Stack flexDirection={{ xs: "column-reverse", lg: "row" }}>
         <Collapse
           sx={{ width: "100%" }}
           in={goals.length > 0}
@@ -95,9 +66,8 @@ export function List() {
         >
           <Stack width={"100%"} spacing={3}>
             {goals.map((goal, index) => (
-              <>
+              <Box key={index}>
                 <Card
-                  key={index}
                   sx={{
                     boxShadow: "none",
                     padding: "10px",
@@ -109,9 +79,6 @@ export function List() {
                   }}
                 >
                   <Stack direction="row" alignItems="center">
-                    {/* <IconButton onClick={() => {}}>
-                      <MoreVertOutlined />
-                    </IconButton> */}
                     <Stack
                       direction="row"
                       alignItems="center"
@@ -230,17 +197,35 @@ export function List() {
                     {t("DEPOIS")}
                   </Divider>
                 )}
-              </>
+              </Box>
             ))}
           </Stack>
         </Collapse>
 
         <Box
           sx={{
-            display: { xs: "none", lg: "block" },
-            width: "600px",
+            width: { xs: "100%", lg: "600px" },
+            mb: { xs: "20px", lg: 0 },
           }}
         >
+          <Box
+            sx={{
+              marginLeft: { xs: "", lg: "20px" },
+              width: "100%",
+              mb: "20px",
+            }}
+          >
+            <CustomButton
+              icon={<EditIcon />}
+              variant="contained"
+              fullWidth
+              onClick={() => {}}
+              disabled={false}
+              size="medium"
+              label="Editar lista"
+            />
+          </Box>
+
           <MyDivision />
         </Box>
       </Stack>

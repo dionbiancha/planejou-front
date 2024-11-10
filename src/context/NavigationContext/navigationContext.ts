@@ -62,8 +62,8 @@ export function useCustomNavigate() {
     validateNavigate("/subscribe");
   }
 
-  function goToEditObjetive(id: string) {
-    validateNavigate(`/edit/${id}`);
+  function goToEditObjetive() {
+    validateNavigate(`/edit`);
   }
 
   return {

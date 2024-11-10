@@ -9,6 +9,7 @@ import { UserProvider } from "./context/UserContext";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import Pages from "./pages";
+import { ObjectiveProvider } from "./context/ObjectiveContext";
 
 function App() {
   return (
@@ -17,7 +18,9 @@ function App() {
         <LoadingProvider>
           <SnackProvider>
             <GoalProvider>
-              <Pages />
+              <ObjectiveProvider>
+                <Pages />
+              </ObjectiveProvider>
             </GoalProvider>
           </SnackProvider>
         </LoadingProvider>

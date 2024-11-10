@@ -14,22 +14,27 @@ import { useTranslation } from "react-i18next";
 import { useGoals } from "../../context";
 import { ArrowBack } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { Goal, Objective } from "../../context/GoalContext/GoalContext";
+import { Goal } from "../../context/GoalContext/GoalContext";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import { updateObjective } from "../../services/objective";
-import { useParams } from "react-router-dom";
-import { listGoalsByUserId } from "../../services/goal";
+import {
+  listObjectivesByUserId,
+  updateObjective,
+} from "../../services/objective";
 import EditIcon from "@mui/icons-material/Edit";
+import { Objective } from "../../context/ObjectiveContext";
+import { useObjectives } from "../../context/ObjectiveContext/useObjective";
 
 export default function NewObjetive() {
   const { t } = useTranslation();
   const theme = useTheme();
   const { goals, setGoals } = useGoals();
+  const { editObjective } = useObjectives();
   const { goToObjectives } = useCustomNavigate();
   const [goal, setGoal] = useState<Goal>();
+  const { setObjectives } = useObjectives();
   const [objective, setObjective] = useState("");
   const [objectiveError, setObjectiveError] = useState("");
   const [repeat, setRepeat] = useState<string>("Diariamente");
@@ -40,7 +45,6 @@ export default function NewObjetive() {
 
   const snack = useSnack();
   const loading = useLoading();
-  const { id } = useParams<{ id: string }>();
 
   const toggleDaySelection = (day: string) => {
     setSelectedDailyDays((prevSelectedDays) =>
@@ -102,10 +106,19 @@ export default function NewObjetive() {
     }
   }
 
+  async function handlelistObjectives() {
+    try {
+      const res = await listObjectivesByUserId();
+      setObjectives(res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async function handleEditObjective() {
     try {
       if (!goal?.id || !goal) return;
-      if (!goals[0]?.objectives) return;
+      if (!editObjective) return;
       loading.show();
       const newObjective: Objective = {
         name: objective,
@@ -115,12 +128,13 @@ export default function NewObjetive() {
         remindMe: remindMe ? selectedHour : null,
       };
       const data = {
-        goalId: id ?? "",
-        objectiveId: goals[0]?.objectives[0]?.id ?? "",
+        goalId: editObjective.goalId ?? "",
+        objectiveId: editObjective.objective?.id ?? "",
         updatedData: newObjective,
       };
       await updateObjective(data);
       snack.success("Objetivo modificado com sucesso!");
+      handlelistObjectives();
       goToObjectives();
     } catch (e) {
       console.error(e);
@@ -131,8 +145,9 @@ export default function NewObjetive() {
   async function listGoals() {
     loading.show();
     try {
-      const res = await listGoalsByUserId();
-      const goalValues = res.find((g: Goal) => g.id === id);
+      const goalValues = goals.find(
+        (g: Goal) => g.id === editObjective?.goalId
+      );
 
       if (goalValues) {
         const updatedGoal: Goal[] = [
@@ -141,7 +156,6 @@ export default function NewObjetive() {
             position: goalValues.position,
             name: goalValues.name,
             months: goalValues.months,
-            objectives: goals[0]?.objectives || [],
           },
         ];
 
@@ -149,8 +163,8 @@ export default function NewObjetive() {
         setObjective(goalValues.name);
         setGoal(goalValues);
 
-        if (updatedGoal[0]?.objectives) {
-          const o: Objective = updatedGoal[0]?.objectives[0];
+        if (editObjective?.objective) {
+          const o: Objective = editObjective?.objective;
 
           setObjective(o.name);
           setRepeat(o.repeat);
@@ -163,13 +177,12 @@ export default function NewObjetive() {
     }
     loading.hide();
   }
-  function getContextValues() {
-    listGoals();
-    console.log(goals);
-  }
 
   useEffect(() => {
-    getContextValues();
+    if (!editObjective) {
+      goToObjectives();
+    }
+    listGoals();
   }, []);
 
   return (

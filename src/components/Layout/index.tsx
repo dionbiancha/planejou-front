@@ -22,11 +22,19 @@ import CustomButton from "../Button/CustomButton";
 import BorderLinearProgress from "../BorderLinearProgress";
 import { useAuthValidation } from "../../hooks/useAuthValidation";
 import { useDataUser } from "../../context/UserContext/useUser";
-import { getUserData, resetUserXpIfNeeded } from "../../services/user";
+import {
+  getUserData,
+  getUserRanking,
+  resetUserXpIfNeeded,
+} from "../../services/user";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { getPremiumStatus } from "../../services/stripePayment";
 import { useSnack } from "../../context/SnackContext";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
+import { listGoalsByUserId } from "../../services/goal";
+import { useGoals } from "../../context";
+import { listObjectivesByUserId } from "../../services/objective";
+import { useObjectives } from "../../context/ObjectiveContext/useObjective";
 
 const expandedDrawerWidth = 180;
 const collapsedDrawerWidth = 80;
@@ -43,12 +51,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isLogged] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const { userData, setUserData } = useDataUser();
+  const { t, i18n } = useTranslation();
+  const { userData, setUserData, setMyPosition } = useDataUser();
   const loading = useLoading();
   const [isPremium, setIsPremium] = useState(true);
   const snack = useSnack();
-  const { goToSubscribe } = useCustomNavigate();
+  const { goToSubscribe, goToStart } = useCustomNavigate();
+  const { setGoals } = useGoals();
+  const { setObjectives } = useObjectives();
 
   useAuthValidation();
 
@@ -224,14 +234,48 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         urlImage: res.urlImage,
         league: res.league,
         totalXp: res.totalXp,
-        hasList: res.hasList,
+        createdAt: res.createdAt,
       }));
+      if (res.language) {
+        i18n.changeLanguage(res.language);
+      }
       localStorage.setItem("language", res.language);
       localStorage.setItem("darkMode", res.darkMode);
+      handleGetDivision(res.league);
     } catch (e) {
       console.log(e);
     }
     loading.hide();
+  }
+
+  async function handleGoalList() {
+    loading.show();
+    try {
+      const res = await listGoalsByUserId();
+      if (res) {
+        setGoals(res);
+        handleUserData();
+        handleGetPremiumStatus();
+        handleResetUserXpIfNeeded();
+        handlelistObjectives();
+
+        return;
+      }
+
+      goToStart();
+    } catch (e) {
+      console.log(e);
+    }
+    loading.hide();
+  }
+
+  async function handlelistObjectives() {
+    try {
+      const res = await listObjectivesByUserId();
+      setObjectives(res);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async function handleResetUserXpIfNeeded() {
@@ -268,13 +312,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     loading.hideScreen();
   }
 
+  async function handleGetDivision(league: number) {
+    loading.show();
+    try {
+      const ranking = await getUserRanking(league);
+      setMyPosition(ranking.position);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("An unknown error occurred");
+      }
+    }
+    loading.hide();
+  }
+
   const accessToken = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    handleUserData();
-    handleGetPremiumStatus();
-    handleResetUserXpIfNeeded();
+    handleGoalList();
   }, [accessToken, userId]);
 
   const drawer = (
@@ -511,6 +568,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             {drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
+
+          {/* <IconButton
+            onClick={handleDrawerCollapseToggle}
+            sx={{
+              display: { xs: "none", sm: "flex" },
+            }}
+          >
+            {drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton> */}
         </Box>
         <Box
           component="nav"

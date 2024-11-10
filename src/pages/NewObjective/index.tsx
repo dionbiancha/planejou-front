@@ -14,14 +14,15 @@ import { useTranslation } from "react-i18next";
 import { useGoals } from "../../context";
 import { ArrowBack } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { Goal, Objective } from "../../context/GoalContext/GoalContext";
+import { Goal } from "../../context/GoalContext/GoalContext";
 import RoundedSelectGoalField from "../../features/RoundedSelectGoalField";
 import RoundedTextField from "../../components/Form/RoundedTextField";
 import RoundedSelectField from "../../components/Form/RoundedSelectField";
 import { useSnack } from "../../context/SnackContext";
-import { listGoalsByUserId } from "../../services/goal";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import { addObjective } from "../../services/objective";
+import { addObjective, listObjectivesByUserId } from "../../services/objective";
+import { Objective } from "../../context/ObjectiveContext";
+import { useObjectives } from "../../context/ObjectiveContext/useObjective";
 
 export default function NewObjective() {
   const { t } = useTranslation();
@@ -36,9 +37,10 @@ export default function NewObjective() {
   const [timesPerWeek, setTimesPerWeek] = useState<string>("3");
   const [remindMe] = useState<boolean>(false);
   const [selectedHour, setSelectedHour] = useState<string>("6 am");
-  const { goals, setGoals } = useGoals();
+  const { goals } = useGoals();
   const snack = useSnack();
   const loading = useLoading();
+  const { setObjectives } = useObjectives();
 
   const toggleDaySelection = (day: string) => {
     setSelectedDailyDays((prevSelectedDays) =>
@@ -49,6 +51,7 @@ export default function NewObjective() {
   };
 
   function disabledButton() {
+    if (loading.state) return true;
     if (repeat === "Diariamente") {
       return (
         Boolean(objectiveError) ||
@@ -93,7 +96,20 @@ export default function NewObjective() {
     }
   }
 
+  async function handlelistObjectives() {
+    loading.show();
+    try {
+      const res = await listObjectivesByUserId();
+      setObjectives(res);
+    } catch (e) {
+      loading.hide();
+      console.log(e);
+    }
+    loading.hide();
+  }
+
   async function handleAddObjective() {
+    loading.show();
     try {
       if (!goal?.id || !goal) return;
       const newObjective: Objective = {
@@ -108,20 +124,12 @@ export default function NewObjective() {
         objectives: newObjective,
       };
       await addObjective(data);
+      await handlelistObjectives();
       snack.success("Objetivo criado com sucesso!");
       goToObjectives();
     } catch (e) {
       console.error(e);
-    }
-  }
-
-  async function listGoals() {
-    loading.show();
-    try {
-      const res = await listGoalsByUserId();
-      setGoals(res);
-    } catch (e) {
-      console.error("Erro ao listar as metas:", e);
+      loading.hide();
     }
     loading.hide();
   }
@@ -132,10 +140,6 @@ export default function NewObjective() {
     }, 8000);
 
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    listGoals();
   }, []);
 
   return (

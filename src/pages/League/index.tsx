@@ -1,8 +1,7 @@
 import { Box, Card, Stack, Typography, useTheme } from "@mui/material";
-import { getTopUsersByXP, getUserData } from "../../services/user";
+import { getTopUsersByXP } from "../../services/user";
 import { useEffect, useState } from "react";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import { DocumentData } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
 import { useDataUser } from "../../context/UserContext/useUser";
 
@@ -32,7 +31,6 @@ export function League() {
   const loading = useLoading();
   const { t } = useTranslation();
   const [topUsers, setTopUsers] = useState<RankingProps[]>();
-  const [data, setData] = useState<DocumentData>();
   const { userData } = useDataUser();
 
   async function handleTopUsersByXP() {
@@ -41,21 +39,6 @@ export function League() {
       const res = await getTopUsersByXP(userData.league);
 
       setTopUsers(res);
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error("An unknown error occurred");
-      }
-    }
-    loading.hide();
-  }
-
-  async function handleGetUserData() {
-    loading.show();
-    try {
-      const res = await getUserData();
-      setData(res);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message);
@@ -106,8 +89,8 @@ export function League() {
 
   useEffect(() => {
     handleTopUsersByXP();
-    handleGetUserData();
   }, []);
+
   return (
     <Stack flexDirection={"row"}>
       <Card
@@ -283,7 +266,7 @@ export function League() {
         >
           <Typography variant="h6" mb={1}>
             <b>
-              {t("Divisão")} {t(`${DIVISIONS[data?.league ?? 1]}`)}
+              {t("Divisão")} {t(`${DIVISIONS[userData?.league ?? 1]}`)}
             </b>
           </Typography>
           <Typography variant="body2" mb={2}>

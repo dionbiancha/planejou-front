@@ -43,7 +43,7 @@ export default function Pages() {
           <Route path="/list" element={<List />} />
           <Route path="/new" element={<NewObjective />} />
           <Route path="/league" element={<League />} />
-          <Route path="/edit/:id" element={<EditObjective />} />
+          <Route path="/edit" element={<EditObjective />} />
           <Route path="/missions" element={<Missions />} />
           <Route path="/social" element={<Social />} />
           <Route path="/profile" element={<Profile />} />

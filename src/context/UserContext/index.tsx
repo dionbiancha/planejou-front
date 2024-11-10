@@ -8,7 +8,6 @@ interface UserProps {
   xp: number;
   name: string;
   testEndDate: Timestamp;
-  hasList: boolean;
   totalXp: number;
   league: number;
   createdAt: Timestamp;
@@ -22,6 +21,8 @@ interface UserProps {
 }
 
 interface UserContextProps {
+  myPosition: number | undefined;
+  setMyPosition: React.Dispatch<React.SetStateAction<number | undefined>>;
   userData: UserProps;
   setUserData: React.Dispatch<React.SetStateAction<UserProps>>;
   clearUserData: () => void;
@@ -42,6 +43,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     darkMode: darkMode ?? "Desabilitado",
   } as UserProps);
 
+  const [myPosition, setMyPosition] = useState<number | undefined>(undefined);
+
   function clearUserData() {
     setUserData({} as UserProps);
   }
@@ -49,6 +52,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
+        setMyPosition,
+        myPosition,
         clearUserData,
         setUserData,
         userData,

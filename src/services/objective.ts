@@ -10,10 +10,11 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Goal, Objective } from "../context/GoalContext/GoalContext";
+import { Goal } from "../context/GoalContext/GoalContext";
 import { validateAuth } from "./authService";
 import { db } from "../config/firebase";
 import { v4 as uuidv4 } from "uuid";
+import { Objective } from "../context/ObjectiveContext";
 
 export interface ObjectiveListProps {
   goalId: string;
@@ -21,7 +22,7 @@ export interface ObjectiveListProps {
 }
 
 export interface MarkObjectiveAsCompletedProps {
-  goalId: string;
+  objectives: ObjectiveListProps;
   objectiveId: string | undefined;
   xp: number;
 }
@@ -129,17 +130,16 @@ export async function listObjectivesByUserId(): Promise<ObjectiveListProps[]> {
 }
 
 export async function markObjectiveAsCompleted({
-  goalId,
+  objectives,
   objectiveId,
   xp,
 }: MarkObjectiveAsCompletedProps) {
   try {
     const auth = validateAuth();
-    const docRef = doc(db, "objectives", goalId);
-    const docSnap = await getDoc(docRef);
+    const docRef = doc(db, "objectives", objectives.goalId);
 
-    if (docSnap.exists()) {
-      const existingObjectives = docSnap.data()?.objectives || [];
+    if (objectives) {
+      const existingObjectives = objectives?.objectives || [];
       const today = new Date()
         .toLocaleDateString("pt-BR", {
           year: "numeric",

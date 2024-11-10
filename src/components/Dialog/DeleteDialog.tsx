@@ -3,9 +3,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import { SxProps } from "@mui/system";
+import { Box, SxProps } from "@mui/system";
 
 interface DeleteDialogProps {
   open: boolean;
@@ -15,7 +14,6 @@ interface DeleteDialogProps {
   textButtonConfirm: string;
   textButtonCancel: string;
   onConfirm: () => void;
-  objetive: string;
 }
 
 const DeleteDialog: React.FC<DeleteDialogProps> = ({
@@ -26,10 +24,11 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
   onConfirm,
   textButtonCancel,
   textButtonConfirm,
-  objetive,
 }) => {
   const buttonStyles: SxProps = {
     display: "flex",
+    flexDirection: { xs: "column", sm: "row" },
+
     justifyContent: "center",
     width: "100%",
   };
@@ -43,6 +42,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
       sx={{ textAlign: "center" }}
       PaperProps={{
         sx: {
+          width: "100%",
           padding: "20px",
           borderRadius: "15px", // Aumente o valor conforme necessário
         },
@@ -56,21 +56,31 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
           {description}
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={buttonStyles}>
+      <Box sx={buttonStyles}>
         <Button
           onClick={onConfirm}
-          autoFocus
-          sx={{ backgroundColor: "error.main", color: "white" }}
+          sx={{
+            backgroundColor: "error.main",
+            color: "white",
+            width: { xs: "100%", sm: "150px" },
+            marginRight: { xs: "0px", sm: "10px" },
+          }}
         >
-          {textButtonConfirm}&nbsp;<b>{objetive}</b>
+          <b>{textButtonConfirm}</b>
         </Button>
         <Button
           onClick={handleClose}
-          sx={{ backgroundColor: "text.secondary", color: "white" }}
+          sx={{
+            backgroundColor: "text.secondary",
+            color: "white",
+            width: { xs: "100%", sm: "150px" },
+            marginTop: { xs: "10px", sm: "0px" },
+            marginLeft: { xs: "0px", sm: "10px" },
+          }}
         >
-          <b>{textButtonCancel}</b>
+          {textButtonCancel}
         </Button>
-      </DialogActions>
+      </Box>
     </Dialog>
   );
 };

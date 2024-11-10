@@ -16,6 +16,7 @@ import { useGoals } from "../../context";
 import { useObjectives } from "../../context/ObjectiveContext/useObjective";
 import CustomButton from "../../components/Button/CustomButton";
 import EditIcon from "@mui/icons-material/Edit";
+import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 
 export function List() {
   const theme = useTheme();
@@ -23,6 +24,7 @@ export function List() {
   const { goals } = useGoals();
   const { objectives } = useObjectives();
   const [showDetails, setShowDetails] = useState<string[]>([]);
+  const { goToEditList } = useCustomNavigate();
 
   function handleShowDetails(id: string | undefined) {
     if (!id) return;
@@ -219,7 +221,7 @@ export function List() {
               icon={<EditIcon />}
               variant="contained"
               fullWidth
-              onClick={() => {}}
+              onClick={() => goToEditList()}
               disabled={false}
               size="medium"
               label="Editar lista"

@@ -594,10 +594,17 @@ export function Objectives() {
         </Box>
         <Box
           sx={{
-            width: "600px",
+            width: { xs: "100%", lg: "600px" },
+            mb: { xs: "20px", lg: 0 },
           }}
         >
-          <Box sx={{ marginLeft: "20px", width: "100%", mb: "20px" }}>
+          <Box
+            sx={{
+              marginLeft: { xs: "", lg: "20px" },
+              width: "100%",
+              mb: "20px",
+            }}
+          >
             <CustomButton
               icon={
                 <Add

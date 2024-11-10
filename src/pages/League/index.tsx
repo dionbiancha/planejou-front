@@ -1,4 +1,11 @@
-import { Box, Card, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Card,
+  Skeleton,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { getTopUsersByXP } from "../../services/user";
 import { useEffect, useState } from "react";
 import { useLoading } from "../../context/LoadingContext/useLoading";
@@ -109,137 +116,146 @@ export function League() {
           },
         }}
       >
-        {topUsers?.map((user, index) => (
-          <>
-            <Stack
-              key={index}
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              sx={{
-                color: theme.palette.text.secondary,
-                padding: "10px",
-                mb: 1,
-                backgroundColor: user.myAccount
-                  ? theme.palette.background.default
-                  : "",
-                borderRadius: "8px",
-                cursor: "pointer",
-                "&:hover": {
-                  backgroundColor: theme.palette.background.default,
-                },
-              }}
-            >
-              <Stack flexDirection={"row"} alignItems={"center"}>
+        {loading.state
+          ? [1, 2, 3, 4, 5, 6].map(() => (
+              <Skeleton
+                variant="rectangular"
+                width={"100%"}
+                height={"70px"}
+                sx={{ marginBottom: 3, borderRadius: "10px" }}
+              />
+            ))
+          : topUsers?.map((user, index) => (
+              <>
                 <Stack
-                  alignItems="center"
-                  justifyContent="center"
-                  mr={2}
-                  width="30px"
+                  key={index}
+                  flexDirection={"row"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    padding: "10px",
+                    mb: 1,
+                    backgroundColor: user.myAccount
+                      ? theme.palette.background.default
+                      : "",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: theme.palette.background.default,
+                    },
+                  }}
                 >
-                  {getMedal(index + 1)}
-                </Stack>
-                {user.photoURL ? (
-                  <Box
-                    sx={{
-                      height: "50px",
-                      width: "50px",
-                      borderRadius: "100%",
+                  <Stack flexDirection={"row"} alignItems={"center"}>
+                    <Stack
+                      alignItems="center"
+                      justifyContent="center"
+                      mr={2}
+                      width="30px"
+                    >
+                      {getMedal(index + 1)}
+                    </Stack>
+                    {user.photoURL ? (
+                      <Box
+                        sx={{
+                          height: "50px",
+                          width: "50px",
+                          borderRadius: "100%",
 
-                      marginRight: 2,
-                    }}
-                    component={"img"}
-                    src={user.photoURL}
-                  />
-                ) : (
+                          marginRight: 2,
+                        }}
+                        component={"img"}
+                        src={user.photoURL}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          height: "50px",
+                          width: "50px",
+                          borderRadius: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 2,
+                          color: "#FFF",
+                          backgroundColor: getRandomColor(),
+                        }}
+                      >
+                        <b>{user.name.charAt(0)}</b>
+                      </Box>
+                    )}
+                    <Box>
+                      <b>{user.name}</b>
+                    </Box>
+                  </Stack>
+                  <Box>
+                    <b>{user.xp} XP</b>
+                  </Box>
+                </Stack>
+                {index === 6 && (
                   <Box
                     sx={{
-                      height: "50px",
-                      width: "50px",
-                      borderRadius: "100%",
                       display: "flex",
                       alignItems: "center",
+                      width: "100%",
                       justifyContent: "center",
-                      marginRight: 2,
-                      color: "#FFF",
-                      backgroundColor: getRandomColor(),
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      color: theme.palette.primary.main,
+                      padding: "5px",
+                      borderRadius: "5px",
+                      marginY: "10px",
+                      fontSize: "15px",
                     }}
                   >
-                    <b>{user.name.charAt(0)}</b>
+                    <Box
+                      component={"img"}
+                      src="icons/up-arrow.png"
+                      width="15px"
+                      mr={1}
+                    />
+                    <span>{t("ZONA DE PROMOÇÃO")}</span>
+                    <Box
+                      ml={1}
+                      component={"img"}
+                      src="icons/up-arrow.png"
+                      width="15px"
+                    />
                   </Box>
                 )}
-                <Box>
-                  <b>{user.name}</b>
-                </Box>
-              </Stack>
-              <Box>
-                <b>{user.xp} XP</b>
-              </Box>
-            </Stack>
-            {index === 6 && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  color: theme.palette.primary.main,
-                  padding: "5px",
-                  borderRadius: "5px",
-                  marginY: "10px",
-                  fontSize: "15px",
-                }}
-              >
-                <Box
-                  component={"img"}
-                  src="icons/up-arrow.png"
-                  width="15px"
-                  mr={1}
-                />
-                <span>{t("ZONA DE PROMOÇÃO")}</span>
-                <Box
-                  ml={1}
-                  component={"img"}
-                  src="icons/up-arrow.png"
-                  width="15px"
-                />
-              </Box>
-            )}
-            {index === 22 && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  color: theme.palette.error.main,
-                  padding: "5px",
-                  borderRadius: "5px",
-                  marginY: "10px",
-                  fontSize: "15px",
-                }}
-              >
-                <Box
-                  component={"img"}
-                  src="icons/down-arrow.png"
-                  width="15px"
-                  mr={1}
-                />
-                <span>{t("ZONA DE REBAIXAMENTO")}</span>
-                <Box
-                  ml={1}
-                  component={"img"}
-                  src="icons/down-arrow.png"
-                  width="15px"
-                />
-              </Box>
-            )}
-          </>
-        ))}
+                {index === 22 && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      color: theme.palette.error.main,
+                      padding: "5px",
+                      borderRadius: "5px",
+                      marginY: "10px",
+                      fontSize: "15px",
+                    }}
+                  >
+                    <Box
+                      component={"img"}
+                      src="icons/down-arrow.png"
+                      width="15px"
+                      mr={1}
+                    />
+                    <span>{t("ZONA DE REBAIXAMENTO")}</span>
+                    <Box
+                      ml={1}
+                      component={"img"}
+                      src="icons/down-arrow.png"
+                      width="15px"
+                    />
+                  </Box>
+                )}
+              </>
+            ))}
       </Card>
 
       <Box

@@ -1,4 +1,12 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import { v4 as uuidv4 } from "uuid";
 import { Goal } from "../context/GoalContext/GoalContext";
@@ -17,6 +25,22 @@ export async function addGoalList(goals: Goal[]) {
     await addDoc(collection(db, "goals"), {
       goals: goalsWithIds,
       userId: auth.userId,
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function updateGoalList(goals: Goal[]) {
+  try {
+    const auth = validateAuth();
+    const goalsWithIds = goals.map((goal) => ({
+      ...goal,
+      estimatedCompletion: calculateEstimatedCompletion(goal.months),
+    }));
+    const goalDoc = doc(collection(db, "goals"), auth.userId);
+    await updateDoc(goalDoc, {
+      goals: goalsWithIds,
     });
   } catch (e) {
     console.error(e);

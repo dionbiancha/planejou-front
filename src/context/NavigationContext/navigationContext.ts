@@ -27,6 +27,10 @@ export function useCustomNavigate() {
     validateNavigate("/start");
   }
 
+  function goToEditList() {
+    validateNavigate("/editList");
+  }
+
   function goToList() {
     validateNavigate("/list");
   }
@@ -81,5 +85,6 @@ export function useCustomNavigate() {
     goToTermOfUse,
     goToPrivacyPolicy,
     goToSubscribe,
+    goToEditList,
   };
 }

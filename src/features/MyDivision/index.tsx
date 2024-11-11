@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useDataUser } from "../../context/UserContext/useUser";
 import CustomButton from "../../components/Button/CustomButton";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
-import { useEffect } from "react";
 
 export default function MyDivision() {
   const theme = useTheme();
@@ -49,10 +48,6 @@ export default function MyDivision() {
       }`;
     }
   }
-
-  useEffect(() => {
-    console.log(myPosition);
-  }, [myPosition]);
 
   return (
     <Collapse

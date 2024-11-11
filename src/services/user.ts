@@ -313,6 +313,7 @@ export async function resetUserXpIfNeeded() {
         xp: 0,
         league: newLeague(userPosition, leagueUser),
       });
+      return true;
     }
   } catch (error) {
     if (error instanceof Error) {

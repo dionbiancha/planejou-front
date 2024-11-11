@@ -279,10 +279,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   async function handleResetUserXpIfNeeded() {
     const userId = localStorage.getItem("userId");
-    const acessToken = localStorage.getItem("acessToken");
-    if (!userId || !acessToken) return;
+    const accessToken = localStorage.getItem("accessToken");
+    if (!userId || !accessToken) return;
     try {
-      await resetUserXpIfNeeded();
+      const res = await resetUserXpIfNeeded();
+      if (res) {
+        console.log("XP resetado");
+        handleUserData();
+      }
     } catch {
       snack.error(t("Erro ao resetar XP"));
     }

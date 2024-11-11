@@ -19,7 +19,6 @@ export const useAuthValidation = () => {
 
     if (!accessToken || !userId) {
       if (!allowedPaths.includes(location.pathname)) {
-        console.log("Usuário não autenticadoaaaaaaaaaaaaa", location.pathname);
         navigate("/login"); // Redirecionar para a página de login
       }
     }

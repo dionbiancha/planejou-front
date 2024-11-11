@@ -9,16 +9,19 @@ export const useAuthValidation = () => {
     const accessToken = localStorage.getItem("accessToken");
     const userId = localStorage.getItem("userId");
 
+    const allowedPaths = [
+      "/register",
+      "/",
+      "/privacyPolicy",
+      "/termsOfUse",
+      "/update",
+    ];
+
     if (!accessToken || !userId) {
-      if (
-        location.pathname !== "/register" &&
-        location.pathname !== "/" &&
-        location.pathname !== "/privacyPolicy" &&
-        location.pathname !== "/termsOfUse" &&
-        location.pathname !== "/update"
-      ) {
+      if (!allowedPaths.includes(location.pathname)) {
+        console.log("Usuário não autenticadoaaaaaaaaaaaaa", location.pathname);
         navigate("/login"); // Redirecionar para a página de login
       }
     }
-  }, [location.pathname]);
+  }, [location.pathname, navigate]);
 };

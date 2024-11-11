@@ -99,7 +99,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       path === "/termsOfUse" ||
       path === "/privacyPolicy" ||
       path === "/subscribe" ||
-      path.includes("/edit")
+      path === "/edit"
     );
   }
 
@@ -249,7 +249,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   async function handleGoalList() {
-    loading.show();
+    loading.showScreen();
     try {
       const res = await listGoalsByUserId();
       if (res) {
@@ -258,15 +258,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         handleGetPremiumStatus();
         handleResetUserXpIfNeeded();
         handlelistObjectives();
-
         return;
       }
-
       goToStart();
     } catch (e) {
       console.log(e);
+      loading.hideScreen();
     }
-    loading.hide();
+    loading.hideScreen();
   }
 
   async function handlelistObjectives() {
@@ -331,6 +330,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
+    if (!accessToken || !userId) return;
     handleGoalList();
   }, [accessToken, userId]);
 

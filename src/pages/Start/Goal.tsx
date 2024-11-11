@@ -60,6 +60,10 @@ export default function Goal({ handleStep }: StartProps) {
         setErrorGoal(t("Você atingiu o limite de 25 metas."));
         return;
       }
+      if (goals.some((g) => g.name === goal)) {
+        setErrorGoal(t("Essa meta já foi adicionada."));
+        return;
+      }
       setGoals([
         ...goals,
         { position: `${goals.length}`, name: goal, months: 24 },
@@ -72,6 +76,10 @@ export default function Goal({ handleStep }: StartProps) {
     if (goal.trim()) {
       if (goals.length >= 25) {
         setErrorGoal(t("Você atingiu o limite de 25 metas."));
+        return;
+      }
+      if (goals.some((g) => g.name === goal)) {
+        setErrorGoal(t("Essa meta já foi adicionada."));
         return;
       }
       setGoals([
@@ -137,14 +145,14 @@ export default function Goal({ handleStep }: StartProps) {
           padding: "20px",
           borderRadius: "15px",
           boxShadow: "none",
-          minHeight: "600px",
+          height: "650px",
         }}
       >
         <Stack
           spacing={3}
           flexDirection={"column"}
           justifyContent={"space-between"}
-          sx={{ minHeight: "600px" }}
+          height={"100%"}
         >
           <Box>
             <RoundedTextField
@@ -159,7 +167,11 @@ export default function Goal({ handleStep }: StartProps) {
               error={Boolean(errorGoal)}
               helperText={errorGoal ? t(errorGoal) : ""}
               value={goal}
-              onChange={(event) => setGoal(event.target.value)}
+              onClick={() => setErrorGoal("")}
+              onChange={(event) => {
+                setErrorGoal("");
+                setGoal(event.target.value);
+              }}
               onKeyDown={handleAddGoal}
               placeholder={t("Escreva aqui ou escolha abaixo")}
               sx={{
@@ -168,44 +180,58 @@ export default function Goal({ handleStep }: StartProps) {
                 },
               }}
             />
-            <Stack flexDirection={"row"} flexWrap={"wrap"} mt="20px">
-              {exempleGoals.map((exempleGoal, index) => (
-                <Box
-                  key={index}
-                  onClick={() => {
-                    setGoals([
-                      ...goals,
-                      {
-                        position: `${goals.length}`,
-                        name: t(exempleGoal),
-                        months: 24,
-                      },
-                    ]);
-                  }}
-                  sx={{
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    padding: "5px 10px",
-                    borderRadius: "20px",
-                    margin: "5px",
-                    backgroundColor: `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
-                    "&:hover": {
+            <Stack
+              sx={{ display: { xs: "none", md: "flex" } }}
+              flexDirection={"row"}
+              flexWrap={"wrap"}
+              mt="20px"
+            >
+              {exempleGoals
+                .filter(
+                  (exempleGoal) => !goals.some((g) => g.name === exempleGoal)
+                )
+                .map((exempleGoal, index) => (
+                  <Box
+                    key={index}
+                    onClick={() => {
+                      if (goals.some((g) => g.name === exempleGoal)) {
+                        setErrorGoal(t("Essa meta já foi adicionada."));
+                        return;
+                      }
+                      setGoals([
+                        ...goals,
+                        {
+                          position: `${goals.length}`,
+                          name: t(exempleGoal),
+                          months: 24,
+                        },
+                      ]);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                      borderRadius: "20px",
+                      margin: "5px",
                       backgroundColor: `${
-                        isDarkMode() ? "#24293345" : "#f5f5f5"
+                        isDarkMode() ? "#242933" : "#f9f9f9"
                       }`,
-                    },
-                  }}
-                >
-                  {t(exempleGoal)}
-                </Box>
-              ))}
+                      "&:hover": {
+                        backgroundColor: `${
+                          isDarkMode() ? "#24293345" : "#f5f5f5"
+                        }`,
+                      },
+                    }}
+                  >
+                    {t(exempleGoal)}
+                  </Box>
+                ))}
             </Stack>
             <Box
               sx={{
-                maxHeight: "200px",
-                mt: "20px",
                 height: "100%",
-                pr: "20px",
+                maxHeight: "400px",
+                mt: "20px",
                 overflowY: "auto",
                 "&::-webkit-scrollbar": {
                   width: "6px",

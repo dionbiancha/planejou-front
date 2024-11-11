@@ -44,23 +44,19 @@ export function useCustomNavigate() {
   }
 
   function goToRegister() {
-    validateNavigate("/register");
+    navigate("/register");
   }
 
   function goToLandingPage() {
-    validateNavigate("/");
-  }
-
-  function goToUpdate() {
-    validateNavigate("/register");
+    navigate("/");
   }
 
   function goToTermOfUse() {
-    validateNavigate("/termOfUse");
+    navigate("/termOfUse");
   }
 
   function goToPrivacyPolicy() {
-    validateNavigate("/privacyPolicy");
+    navigate("/privacyPolicy");
   }
   function goToSubscribe() {
     validateNavigate("/subscribe");
@@ -80,7 +76,6 @@ export function useCustomNavigate() {
     goToEditObjetive,
     goToLeague,
     goToRegister,
-    goToUpdate,
     goToLandingPage,
     goToTermOfUse,
     goToPrivacyPolicy,

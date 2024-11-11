@@ -103,7 +103,7 @@ const esTranslation = {
     "Continúa así para subir de división",
   "Você esta na zona de rebaixamento!": "¡Estás en la zona de descenso!",
   Divisão: "División",
-  "VER DIVISÃO": "VER DIVISIÓN",
+  "Ver divisão": "Ver división",
   "Sua posição:": "Tu posición:",
   DEPOIS: "DESPUÉS",
   Objetivos: "Objetivos",
@@ -271,6 +271,8 @@ const esTranslation = {
     "¿Estás seguro de que deseas cancelar tu suscripción?",
   "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.":
     "Perderás todos los beneficios del plan premium al cancelar tu suscripción.",
+  "Adicionar objetivo": "Añadir objetivo",
+  "Editar lista": "Editar lista",
 };
 
 export default esTranslation;

@@ -103,7 +103,7 @@ const ptTranslation = {
     "Continue assim para subir para a divisão",
   "Você esta na zona de rebaixamento!": "Você esta na zona de rebaixamento!",
   Divisão: "Divisão",
-  "VER DIVISÃO": "VER DIVISÃO",
+  "Ver divisão": "Ver divisão",
   "Sua posição:": "Sua posição:",
   DEPOIS: "DEPOIS",
   Objetivos: "Objetivos",
@@ -270,6 +270,8 @@ const ptTranslation = {
     "Tem certeza que deseja cancelar sua assinatura?",
   "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.":
     "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.",
+  "Adicionar objetivo": "Adicionar objetivo",
+  "Editar lista": "Editar lista",
 };
 
 export default ptTranslation;

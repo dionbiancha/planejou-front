@@ -192,7 +192,7 @@ export function League() {
                     <b>{user.xp} XP</b>
                   </Box>
                 </Stack>
-                {index === 6 && (
+                {index === 6 && topUsers.length > 7 && (
                   <Box
                     sx={{
                       display: "flex",

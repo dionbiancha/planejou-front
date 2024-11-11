@@ -194,8 +194,8 @@ export function List() {
                     </Stack>
                   </Collapse>
                 </Card>
-                {showDivider(index) && (
-                  <Divider sx={{ color: theme.palette.divider }}>
+                {showDivider(index) && goals.length >= 6 && (
+                  <Divider sx={{ color: theme.palette.divider, my: "20px" }}>
                     {t("DEPOIS")}
                   </Divider>
                 )}

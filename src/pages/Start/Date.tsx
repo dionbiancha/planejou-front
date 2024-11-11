@@ -12,7 +12,6 @@ import CustomButton from "../../components/Button/CustomButton";
 import { useGoals } from "../../context";
 import { ArrowBack, Add, Remove } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
-import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
 import { addGoalList } from "../../services/goal";
 import { useEffect, useState } from "react";
 import MediaDialog from "../../components/MediaDialog";
@@ -25,7 +24,6 @@ export default function Date({ handleStep }: StartProps) {
   const { goals, setGoals } = useGoals();
   const theme = useTheme();
   const { t, i18n } = useTranslation();
-  const { goToObjectives } = useCustomNavigate();
   const [openDialog, setOpenDialog] = useState(false);
 
   function dateImageSrc() {
@@ -100,7 +98,7 @@ export default function Date({ handleStep }: StartProps) {
     loading.show();
     try {
       await addGoalList(goals);
-      goToObjectives();
+      window.location.href = "/objectives";
     } catch {
       snack.error(t("Ocorreu um erro ao adicionar as metas"));
     }

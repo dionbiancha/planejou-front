@@ -102,7 +102,7 @@ const enTranslation = {
     "Keep it up to advance to the division",
   "Você esta na zona de rebaixamento!": "You're in the relegation zone!",
   Divisão: "Division",
-  "VER DIVISÃO": "SEE DIVISION",
+  "Ver divisão": "See division",
   "Sua posição:": "Your position:",
   DEPOIS: "AFTER",
   Objetivos: "Goals",
@@ -267,6 +267,8 @@ const enTranslation = {
     "Are you sure you want to cancel your subscription?",
   "Você perderá todos os benefícios do plano premium ao cancelar sua assinatura.":
     "You will lose all the benefits of the premium plan by canceling your subscription.",
+  "Adicionar objetivo": "Add goal",
+  "Editar lista": "Edit list",
 };
 
 export default enTranslation;

@@ -434,7 +434,7 @@ export default function LandingPage() {
                     borderRadius: "15px",
                     color: "#FFF",
                     paddingX: "10px",
-                    top: "-10px",
+                    top: { xs: "30px", md: "-10px" },
                     right: "25px",
                     fontSize: "12px",
                   }}
@@ -485,13 +485,15 @@ export default function LandingPage() {
                 </Stack>
                 <Stack
                   width="100%"
-                  flexDirection={"row"}
-                  alignItems={"end"}
+                  flexDirection={{ xs: "column", md: "row" }}
+                  alignItems={{ xs: "center", md: "end" }}
                   justifyContent={"center"}
                   mt={3}
                 >
                   <Typography
-                    sx={{ textDecoration: "line-through" }}
+                    sx={{
+                      textDecoration: "line-through",
+                    }}
                     variant="body2"
                     color={"text.secondary"}
                     mr={2}
@@ -514,7 +516,7 @@ export default function LandingPage() {
                     mb={"10px"}
                     variant="body2"
                     color={"text.secondary"}
-                    ml={2}
+                    ml={{ xs: 0, md: 2 }}
                   >
                     <b>/{t("Mês")}</b>
                   </Typography>

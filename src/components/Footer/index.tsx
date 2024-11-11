@@ -31,7 +31,11 @@ export default function Footer() {
               <b>{t(item.title)}</b>
             </Typography>
             {item.items.map((link) => (
-              <Link sx={{ textDecoration: "none" }} href={link.link}>
+              <Link
+                target={link.target}
+                sx={{ textDecoration: "none" }}
+                href={link.link}
+              >
                 {t(link.title)}
               </Link>
             ))}
@@ -74,24 +78,28 @@ const linksData = [
   {
     title: "Produto",
     items: [
-      { title: "Web App", link: "/login" },
-      { title: "Preços", link: "/prices" },
-      { title: "Atualizações", link: "/update" },
+      { title: "Web App", link: "/login", target: "" },
+
+      { title: "Atualizações", link: "/update", target: "" },
     ],
   },
   {
     title: "Social",
     items: [
-      { title: "Instagram", link: "/precos" },
-      { title: "Twitter", link: "/precos" },
-      { title: "TikTok", link: "/precos" },
+      {
+        title: "Instagram",
+        link: "https://www.instagram.com/planejou.oficial/",
+        target: "_blank",
+      },
+      { title: "Twitter", link: "/precos", target: "_blank" },
+      { title: "TikTok", link: "/precos", target: "_blank" },
     ],
   },
   {
     title: "Jurídico",
     items: [
-      { title: "Termos de uso", link: "/termsOfUse" },
-      { title: "Política de Privacidade", link: "/privacyPolicy" },
+      { title: "Termos de uso", link: "/termsOfUse", target: "" },
+      { title: "Política de Privacidade", link: "/privacyPolicy", target: "" },
     ],
   },
 ];

@@ -21,6 +21,7 @@ import { StartProps, Step } from "../../types";
 import { useGoals } from "../../context";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import MediaDialog from "../../components/MediaDialog";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 
 export default function Goal({ handleStep }: StartProps) {
   const { t, i18n } = useTranslation();
@@ -137,7 +138,32 @@ export default function Goal({ handleStep }: StartProps) {
       alignItems={"center"}
       justifyContent={"center"}
     >
-      <MediaDialog media={mediaArray} open={openDialog} />
+      <MediaDialog
+        media={mediaArray}
+        open={openDialog}
+        close={(e) => setOpenDialog(e)}
+      />
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        sx={{
+          maxWidth: "600px",
+          width: "100%",
+          padding: "10px",
+        }}
+      >
+        <Box />
+        <IconButton
+          size="small"
+          aria-label="open"
+          onClick={() => setOpenDialog(true)}
+        >
+          <EmojiObjectsIcon
+            sx={{ height: "20px", color: theme.palette.warning.main }}
+          />
+        </IconButton>
+      </Stack>
       <Card
         sx={{
           maxWidth: "600px",

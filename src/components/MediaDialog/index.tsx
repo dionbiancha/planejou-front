@@ -3,7 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import CustomButton from "../Button/CustomButton";
 import { useTranslation } from "react-i18next";
 import { Box } from "@mui/material";
@@ -26,14 +26,18 @@ interface MediaProps {
 type MediaDialogProps = {
   media: MediaProps[]; // Array de URLs de imagens ou GIFs
   open: boolean;
+  close?: (state: boolean) => void;
 };
 
-export default function MediaDialog({ media, open }: MediaDialogProps) {
+export default function MediaDialog({ media, open, close }: MediaDialogProps) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const { t } = useTranslation();
 
   const handleClose = () => {
+    if (close) {
+      close(false);
+    }
     setOpenDialog(false);
     setCurrentIndex(0); // Reset para a primeira mídia ao fechar
   };
@@ -64,13 +68,27 @@ export default function MediaDialog({ media, open }: MediaDialogProps) {
       }}
     >
       <DialogContent>
-        <img
-          src={media[currentIndex].media}
-          alt={`Mídia ${currentIndex + 1}`}
-          style={{ maxWidth: "500px", height: "auto", width: "100%" }}
-        />
-        <h2 id="media-dialog-description">{t(media[currentIndex].title)}</h2>
-        <p>{t(media[currentIndex].description)}</p>
+        <Stack
+          flexDirection={"column"}
+          alignItems={"center"}
+          justifyContent={"center"}
+          sx={{ textAlign: "center" }}
+        >
+          <img
+            src={media[currentIndex].media}
+            alt={`Mídia ${currentIndex + 1}`}
+            style={{
+              maxWidth: "500px",
+              height: "auto",
+              width: "100%",
+              borderRadius: "15px", // Ajuste o valor conforme necessário
+            }}
+          />
+          <Typography variant="h5" sx={{ fontWeight: "bold", my: 3 }}>
+            {t(media[currentIndex].title)}
+          </Typography>
+          <Typography>{t(media[currentIndex].description)}</Typography>
+        </Stack>
       </DialogContent>
       {media.length !== 1 && (
         <Stack

@@ -99,7 +99,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       path === "/termsOfUse" ||
       path === "/privacyPolicy" ||
       path === "/subscribe" ||
-      path === "/edit"
+      path === "/edit" ||
+      path === "/editList"
     );
   }
 

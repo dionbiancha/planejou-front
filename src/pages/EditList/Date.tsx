@@ -16,26 +16,47 @@ import { useCustomNavigate } from "../../context/NavigationContext/navigationCon
 import { updateGoalList } from "../../services/goal";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useSnack } from "../../context/SnackContext";
+import MediaDialog from "../../components/MediaDialog";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import { useState } from "react";
 
 export default function Date({ handleStep }: StartProps) {
   const loading = useLoading();
   const snack = useSnack();
   const { goals, setGoals } = useGoals();
   const theme = useTheme();
-  const { t } = useTranslation();
   const { goToObjectives } = useCustomNavigate();
+  const { t, i18n } = useTranslation();
+  const [openDialog, setOpenDialog] = useState(false);
+
+  function dateImageSrc() {
+    if (i18n.language === "pt-BR") {
+      return "tutorial/date.png";
+    }
+    if (i18n.language === "en") {
+      return "tutorial/date-en.png";
+    }
+    return "tutorial/date-es.png";
+  }
+
+  const mediaArray = [
+    {
+      title: "Dê um tempo certo para suas metas!",
+      description:
+        "Escolha prazos que funcionem no seu ritmo e conquiste suas metas sem estresse.",
+      media: dateImageSrc(),
+    },
+  ];
 
   const incrementMonths = (months: number, id: number) => {
+    const monthMap = [
+      1, 2, 3, 4, 5, 6, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120,
+    ];
+    const currentIndex = monthMap.indexOf(months);
     const nextMonths =
-      months === 3
-        ? 6
-        : months === 6
-        ? 12
-        : months === 12
-        ? 24
-        : months === 24
-        ? 48
-        : 3;
+      currentIndex !== -1 && currentIndex < monthMap.length - 1
+        ? monthMap[currentIndex + 1]
+        : 1;
 
     setGoals((prevGoals) =>
       prevGoals.map((goal, index) =>
@@ -46,16 +67,12 @@ export default function Date({ handleStep }: StartProps) {
 
   // Função para decrementar os meses
   const decrementMonths = (months: number, id: number) => {
-    const previousMonths =
-      months === 48
-        ? 24
-        : months === 24
-        ? 12
-        : months === 12
-        ? 6
-        : months === 6
-        ? 3
-        : 3;
+    const monthMap = [
+      1, 2, 3, 4, 5, 6, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120,
+    ];
+    const currentIndex = monthMap.indexOf(months);
+    const previousMonths = currentIndex > 0 ? monthMap[currentIndex - 1] : 120;
+
     setGoals((prevGoals) =>
       prevGoals.map((goal, index) =>
         index === id ? { ...goal, months: previousMonths } : goal
@@ -68,8 +85,8 @@ export default function Date({ handleStep }: StartProps) {
   }
 
   function shortTerm(month: number) {
-    if (month === 3) return "#c2052e11";
-    if (month === 6) return "#f28d0018";
+    if (month <= 3) return "#c2052e11";
+    if (month <= 6) return "#f28d0018";
     return "#05c26a13";
   }
 
@@ -85,7 +102,12 @@ export default function Date({ handleStep }: StartProps) {
   }
 
   return (
-    <Stack direction={"column"} alignItems={"center"} height={"100%"}>
+    <Stack direction={"column"} alignItems={"center"} height={"100%"} mt={5}>
+      <MediaDialog
+        media={mediaArray}
+        open={openDialog}
+        close={(e) => setOpenDialog(e)}
+      />
       <Stack
         flexDirection={"row"}
         justifyContent={"space-between"}
@@ -104,6 +126,15 @@ export default function Date({ handleStep }: StartProps) {
         >
           {t("Voltar")}
         </Button>
+        <IconButton
+          size="small"
+          aria-label="open"
+          onClick={() => setOpenDialog(true)}
+        >
+          <EmojiObjectsIcon
+            sx={{ height: "20px", color: theme.palette.warning.main }}
+          />
+        </IconButton>
       </Stack>
       <Card
         sx={{
@@ -184,7 +215,9 @@ export default function Date({ handleStep }: StartProps) {
                       ? `${goal.months / 12} ${t("ano")}${
                           goal.months / 12 > 1 ? "s" : ""
                         }`
-                      : `${goal.months} ${t("meses")}`}
+                      : `${goal.months} ${
+                          goal.months === 1 ? t("mês") : t("meses")
+                        }`}
                   </Typography>
                   <IconButton
                     size="small"

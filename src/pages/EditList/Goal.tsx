@@ -23,15 +23,18 @@ import { useGoals } from "../../context";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { ArrowBack } from "@mui/icons-material";
 import { useCustomNavigate } from "../../context/NavigationContext/navigationContext";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import MediaDialog from "../../components/MediaDialog";
 
 export default function Goal({ handleStep }: StartProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const [goal, setGoal] = useState("");
   const [errorGoal, setErrorGoal] = useState("");
   const [currentTip, setCurrentTip] = useState(tips[0]);
   const { goals, setGoals } = useGoals();
   const { goBack } = useCustomNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
 
   function isDarkMode() {
     return theme.palette.mode === "dark";
@@ -41,6 +44,10 @@ export default function Goal({ handleStep }: StartProps) {
     if (event.key === "Enter" && goal.trim()) {
       if (goals.length >= 25) {
         setErrorGoal(t("Você atingiu o limite de 25 metas."));
+        return;
+      }
+      if (goals.some((g) => g.name === goal)) {
+        setErrorGoal(t("Essa meta já foi adicionada."));
         return;
       }
       setGoals([
@@ -55,6 +62,10 @@ export default function Goal({ handleStep }: StartProps) {
     if (goal.trim()) {
       if (goals.length >= 25) {
         setErrorGoal(t("Você atingiu o limite de 25 metas."));
+        return;
+      }
+      if (goals.some((g) => g.name === goal)) {
+        setErrorGoal(t("Essa meta já foi adicionada."));
         return;
       }
       setGoals([
@@ -93,6 +104,25 @@ export default function Goal({ handleStep }: StartProps) {
     return t("Próximo");
   }
 
+  function goalImageSrc() {
+    if (i18n.language === "pt-BR") {
+      return "tutorial/goal.gif";
+    }
+    if (i18n.language === "en") {
+      return "tutorial/goal-en.gif";
+    }
+    return "tutorial/goal-es.gif";
+  }
+
+  const mediaArray = [
+    {
+      title: "Monte e organize suas metas!",
+      description:
+        "Adicione suas metas e deixe tudo na ordem que faz sentido pra você. É só arrastar e soltar para organizar!",
+      media: goalImageSrc(),
+    },
+  ];
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTip(tips[Math.floor(Math.random() * tips.length)]);
@@ -108,6 +138,11 @@ export default function Goal({ handleStep }: StartProps) {
       alignItems={"center"}
       justifyContent={"center"}
     >
+      <MediaDialog
+        media={mediaArray}
+        open={openDialog}
+        close={(e) => setOpenDialog(e)}
+      />
       <Stack
         flexDirection={"row"}
         justifyContent={"space-between"}
@@ -126,6 +161,15 @@ export default function Goal({ handleStep }: StartProps) {
         >
           {t("Voltar")}
         </Button>
+        <IconButton
+          size="small"
+          aria-label="open"
+          onClick={() => setOpenDialog(true)}
+        >
+          <EmojiObjectsIcon
+            sx={{ height: "20px", color: theme.palette.warning.main }}
+          />
+        </IconButton>
       </Stack>
       <Card
         sx={{
@@ -166,36 +210,46 @@ export default function Goal({ handleStep }: StartProps) {
               }}
             />
             <Stack flexDirection={"row"} flexWrap={"wrap"} mt="20px">
-              {exempleGoals.map((exempleGoal, index) => (
-                <Box
-                  key={index}
-                  onClick={() => {
-                    setGoals([
-                      ...goals,
-                      {
-                        position: `${goals.length}`,
-                        name: t(exempleGoal),
-                        months: 24,
-                      },
-                    ]);
-                  }}
-                  sx={{
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    padding: "5px 10px",
-                    borderRadius: "20px",
-                    margin: "5px",
-                    backgroundColor: `${isDarkMode() ? "#242933" : "#f9f9f9"}`,
-                    "&:hover": {
+              {exempleGoals
+                .filter(
+                  (exempleGoal) => !goals.some((g) => g.name === exempleGoal)
+                )
+                .map((exempleGoal, index) => (
+                  <Box
+                    key={index}
+                    onClick={() => {
+                      if (goals.some((g) => g.name === exempleGoal)) {
+                        setErrorGoal(t("Essa meta já foi adicionada."));
+                        return;
+                      }
+                      setGoals([
+                        ...goals,
+                        {
+                          position: `${goals.length}`,
+                          name: t(exempleGoal),
+                          months: 24,
+                        },
+                      ]);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                      borderRadius: "20px",
+                      margin: "5px",
                       backgroundColor: `${
-                        isDarkMode() ? "#24293345" : "#f5f5f5"
+                        isDarkMode() ? "#242933" : "#f9f9f9"
                       }`,
-                    },
-                  }}
-                >
-                  {t(exempleGoal)}
-                </Box>
-              ))}
+                      "&:hover": {
+                        backgroundColor: `${
+                          isDarkMode() ? "#24293345" : "#f5f5f5"
+                        }`,
+                      },
+                    }}
+                  >
+                    {t(exempleGoal)}
+                  </Box>
+                ))}
             </Stack>
             <Box
               sx={{

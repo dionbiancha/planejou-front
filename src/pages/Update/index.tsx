@@ -99,7 +99,7 @@ export default function Update() {
                   </Typography>
                 ))}
               </Stack>
-              {index !== UPDATES.length - 1 && <Divider />}
+              {index !== UPDATES.length - 1 && <Divider sx={{ my: 3 }} />}
             </Stack>
           ))}
         </Stack>
@@ -126,6 +126,23 @@ const UPDATES = [
       },
       {
         title: "Sistema de Ranking",
+      },
+    ],
+  },
+  {
+    title: "Correção de bugs e melhorias",
+    date: "13 de novembro de 2024",
+    description:
+      "A pedido do Keropi1 estou subindo algumas correções e melhorias",
+    items: [
+      {
+        title: "Possibilidade de adicionar metas de curto, médio e longo prazo",
+      },
+      {
+        title: "Correção de bugs no sistema de ranking",
+      },
+      {
+        title: "Agora é possivel rever a dica na criação de metas e prazos",
       },
     ],
   },

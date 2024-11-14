@@ -102,6 +102,10 @@ export default function Goal({ handleStep }: StartProps) {
     const [removed] = updatedGoals.splice(result.source.index, 1);
     updatedGoals.splice(result.destination.index, 0, removed);
 
+    // Atualiza a posição de cada item
+    updatedGoals.forEach((goal, index) => {
+      goal.position = index.toString();
+    });
     setGoals(updatedGoals);
   };
 

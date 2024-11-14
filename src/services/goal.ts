@@ -34,13 +34,21 @@ export async function addGoalList(goals: Goal[]) {
 export async function updateGoalList(goals: Goal[]) {
   try {
     const auth = validateAuth();
+    const goalsQuery = query(
+      collection(db, "goals"),
+      where("userId", "==", auth.userId)
+    );
+    const querySnapshot = await getDocs(goalsQuery);
+
     const goalsWithIds = goals.map((goal) => ({
       ...goal,
       estimatedCompletion: calculateEstimatedCompletion(goal.months),
     }));
-    const goalDoc = doc(collection(db, "goals"), auth.userId);
-    await updateDoc(goalDoc, {
-      goals: goalsWithIds,
+
+    querySnapshot.forEach(async (docSnapshot) => {
+      await updateDoc(docSnapshot.ref, {
+        goals: goalsWithIds,
+      });
     });
   } catch (e) {
     console.error(e);

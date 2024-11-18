@@ -283,8 +283,12 @@ export default function NewObjetive() {
                 flexDirection={"row"}
                 justifyContent={"space-between"}
               >
-                {DAYS.map((day) => (
-                  <Stack alignItems={"center"} justifyContent={"center"}>
+                {DAYS.map((day, index) => (
+                  <Stack
+                    key={index}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                  >
                     {loading.state ? (
                       <Skeleton
                         variant="rectangular"

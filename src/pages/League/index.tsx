@@ -43,6 +43,7 @@ export function League() {
   async function handleTopUsersByXP() {
     loading.show();
     try {
+      if (!userData.league) return;
       const res = await getTopUsersByXP(userData.league);
 
       setTopUsers(res);
@@ -117,8 +118,9 @@ export function League() {
         }}
       >
         {loading.state
-          ? [1, 2, 3, 4, 5, 6].map(() => (
+          ? [1, 2, 3, 4, 5, 6].map((index) => (
               <Skeleton
+                key={index}
                 variant="rectangular"
                 width={"100%"}
                 height={"70px"}
@@ -126,9 +128,8 @@ export function League() {
               />
             ))
           : topUsers?.map((user, index) => (
-              <>
+              <Box key={index}>
                 <Stack
-                  key={index}
                   flexDirection={"row"}
                   justifyContent={"space-between"}
                   alignItems={"center"}
@@ -254,7 +255,7 @@ export function League() {
                     />
                   </Box>
                 )}
-              </>
+              </Box>
             ))}
       </Card>
 

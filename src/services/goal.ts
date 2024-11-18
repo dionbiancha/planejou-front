@@ -41,6 +41,8 @@ export async function updateGoalList(goals: Goal[]) {
 
     const goalsWithIds = goals.map((goal) => ({
       ...goal,
+      id: goal.id || uuidv4(),
+      createdAt: goal.createdAt || new Date(),
       estimatedCompletion: calculateEstimatedCompletion(goal.months),
     }));
 

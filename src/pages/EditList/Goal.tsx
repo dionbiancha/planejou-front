@@ -203,7 +203,11 @@ export default function Goal({ handleStep }: StartProps) {
               error={Boolean(errorGoal)}
               helperText={errorGoal ? t(errorGoal) : ""}
               value={goal}
-              onChange={(event) => setGoal(event.target.value)}
+              onClick={() => setErrorGoal("")}
+              onChange={(event) => {
+                setErrorGoal("");
+                setGoal(event.target.value);
+              }}
               onKeyDown={handleAddGoal}
               placeholder={t("Escreva aqui ou escolha abaixo")}
               sx={{

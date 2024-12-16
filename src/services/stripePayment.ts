@@ -9,6 +9,7 @@ import {
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { app, db } from "../config/firebase";
 import { validateAuth } from "./authService";
+import { getUserFriend } from "./user";
 
 export const getCheckoutUrl = async (priceId: string): Promise<string> => {
   const authData = validateAuth();
@@ -87,23 +88,30 @@ export const getPremiumStatus = async () => {
     subscriptionsRef,
     where("status", "in", ["trialing", "active"])
   );
+  const friend = await getUserFriend();
 
   return new Promise<{
     isPremium: boolean;
     endDate?: Date;
     cancel_at_period_end?: boolean;
+    friend: boolean;
   }>((resolve, reject) => {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
         if (snapshot.docs.length === 0) {
-          resolve({ isPremium: false });
+          resolve({ isPremium: false, friend });
         } else {
           const subscription = snapshot.docs[0].data();
           const endDate = subscription.current_period_end.toDate();
           const cancel_at_period_end = subscription.cancel_at_period_end;
-
-          resolve({ isPremium: true, endDate, cancel_at_period_end });
+          const friendState = friend;
+          resolve({
+            isPremium: true,
+            endDate,
+            cancel_at_period_end,
+            friend: friendState,
+          });
         }
         unsubscribe();
       },

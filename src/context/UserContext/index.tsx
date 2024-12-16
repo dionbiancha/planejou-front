@@ -18,6 +18,7 @@ interface UserProps {
   premiumEndDate?: Date;
   cancelAtPeriodEnd?: boolean;
   nextResetXp: Timestamp;
+  isFriend?: boolean;
 }
 
 interface UserContextProps {

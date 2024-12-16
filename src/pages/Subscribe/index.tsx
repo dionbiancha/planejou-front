@@ -102,7 +102,7 @@ export default function Subscribe() {
   }
 
   useEffect(() => {
-    if (userData.isPremium) {
+    if (userData.isPremium || userData.isFriend) {
       goBack();
     }
   }, [userData.isPremium]);

@@ -309,6 +309,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         isPremium: newPremiumStatus.isPremium,
         premiumEndDate: newPremiumStatus?.endDate,
         cancelAtPeriodEnd: newPremiumStatus?.cancel_at_period_end,
+        isFriend: newPremiumStatus?.friend,
       }));
     } catch (e) {
       console.log(e);
@@ -341,7 +342,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const drawer = (
     <Box onClick={isMobile ? handleDrawerToggle : undefined}>
-      {!isPremium && <Toolbar />}
+      {!isPremium && !userData.isFriend && <Toolbar />}
 
       <List>
         {menu.map((value) => (
@@ -470,7 +471,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
-      {!isPremium && (
+      {!isPremium && !userData.isFriend && (
         <Stack
           position="fixed"
           zIndex={1201}

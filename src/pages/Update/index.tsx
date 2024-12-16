@@ -146,4 +146,18 @@ const UPDATES = [
       },
     ],
   },
+  {
+    title: "Correção de bugs e melhorias",
+    date: "16 de dezembro de 2024",
+    description: "Correção de bugs e melhorias",
+    items: [
+      {
+        title: "Implementação de Friend List",
+      },
+      {
+        title:
+          "Correção de bugs na criação de metas onde o botão de continuar não aparecia",
+      },
+    ],
+  },
 ];

@@ -331,3 +331,23 @@ function newLeague(position: number, league: number) {
     return league;
   } else return league === 0 ? 0 : league - 1;
 }
+
+export async function getUserFriend() {
+  try {
+    const auth = validateAuth();
+    const userDocRef = doc(db, "friends", auth.userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      return true; // Retorna os dados do usuário
+    } else {
+      return false;
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}

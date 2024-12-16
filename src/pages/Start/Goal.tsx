@@ -259,9 +259,10 @@ export default function Goal({ handleStep }: StartProps) {
             </Stack>
             <Box
               sx={{
-                height: "100%",
-                maxHeight: "400px",
+                maxHeight: "200px",
                 mt: "20px",
+                height: "100%",
+                pr: "20px",
                 overflowY: "auto",
                 "&::-webkit-scrollbar": {
                   width: "6px",

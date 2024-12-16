@@ -153,7 +153,7 @@ export function Objectives() {
       const currentDate = new Date();
       const expirationDate = expiredDate.toDate(); // Convert Timestamp to Date
 
-      if (currentDate > expirationDate) {
+      if (currentDate > expirationDate && !userData.isFriend) {
         // Redirecionar ou tomar alguma ação
         goToSubscribe(); // ajuste o caminho conforme necessário
         return true;

@@ -47,7 +47,7 @@ export default function Config() {
       const currentDate = new Date();
       const expirationDate = expiredDate.toDate(); // Convert Timestamp to Date
 
-      if (currentDate > expirationDate) {
+      if (currentDate > expirationDate && !userData.isFriend) {
         // Redirecionar ou tomar alguma ação
         goToSubscribe(); // ajuste o caminho conforme necessário
         return true;
@@ -57,7 +57,7 @@ export default function Config() {
   }
 
   async function handleThemeChange(value: string) {
-    if (freeTrialValidation()) {
+    if (freeTrialValidation() && !userData.isFriend) {
       snack.error(t("Seu período de teste expirou!"));
       return;
     }
@@ -230,7 +230,12 @@ export default function Config() {
         >
           {t("Inscrição")}
         </Typography>
-        {userData.isPremium ? (
+        {userData.isFriend ? (
+          <Typography variant="body2" color="text.secondary">
+            {t("Aqui você é VIP, aproveite amigo, ")}
+            <b>{t("você é um amigo")} 🤝🏻</b>
+          </Typography>
+        ) : userData.isPremium ? (
           <Typography variant="body2" color="text.secondary">
             {userData.cancelAtPeriodEnd
               ? t("Sua assinatura vai terminar em")

@@ -43,9 +43,7 @@ export function League() {
   async function handleTopUsersByXP() {
     loading.show();
     try {
-      if (!userData.league) return;
       const res = await getTopUsersByXP(userData.league);
-
       setTopUsers(res);
     } catch (error) {
       if (error instanceof Error) {
